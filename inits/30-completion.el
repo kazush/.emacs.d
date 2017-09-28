@@ -21,6 +21,8 @@
   (setq company-echo-delay 0)
   (add-hook 'prog-mode-hook
             '(lambda () (company-mode)))
+  (define-key company-active-map (kbd "C-n") #'company-select-next)
+  (define-key company-active-map (kbd "C-p") #'company-select-previous)
   )
 
 (use-package company-ycmd
