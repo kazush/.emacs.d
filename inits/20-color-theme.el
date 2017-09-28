@@ -46,27 +46,40 @@ FRAME defaults to the selected frame."
 
 (add-hook 'font-lock-mode-hook
           '(lambda ()
-             (set-face-background 'mode-line "gray20")
-             (set-face-background 'default "gray15")
+             ;; (set-face-background 'mode-line "gray20")
+             ;; (set-face-background 'default "gray15")
              (set-face-foreground 'region nil)
-             (set-face-background 'region "royalblue")
-             (set-face-background 'highlight "gray30")
-             (set-face-foreground 'highlight nil)
+             (set-face-background 'region "navy")
+             ;; (set-face-background 'highlight "gray30")
+             ;; (set-face-foreground 'highlight nil)
              (set-face-foreground 'font-lock-type-face "PaleGoldenrod")
              )
           'APPEND)
 
-;; Set face for hl-line-mode
+;; ;; Set face for hl-line-mode
 (set-face-background hl-line-face "gray22")
 (set-face-foreground hl-line-face nil)
 
-;; Use zenburn theme.
-(use-package hc-zenburn-theme
+;; ;; Use zenburn theme.
+;; (use-package hc-zenburn-theme
+;;   :ensure t
+;;   :config
+;;   (load-theme 'hc-zenburn t))
+
+(use-package solarized-theme
   :ensure t
   :config
-  (load-theme 'hc-zenburn t))
+  (load-theme 'solarized-dark t))
 
-;; (install-package 'atom-one-dark-theme)
+;; (setq color-themes '())
+;; (use-package color-theme-solarized
+;;    :ensure t
+;;    :config
+;;    (setq frame-background-mode 'dark)
+;;    (setq solarized-termcolors 16)
+;;    (load-theme 'solarized t))
+
 ;; (use-package atom-one-dark-theme
+;;   :ensure t
 ;;   :config
 ;;   (load-theme 'atom-one-dark t))

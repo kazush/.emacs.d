@@ -5,8 +5,8 @@
 
 ;; set default frame parameters
 ;; (add-to-list 'default-frame-alist '(alpha 90 80))
-(add-to-list 'default-frame-alist '(background-color . "gray8"))
-(add-to-list 'default-frame-alist '(foreground-color . "white"))
+;; (add-to-list 'default-frame-alist '(background-color . "gray8"))
+;; (add-to-list 'default-frame-alist '(foreground-color . "white"))
 (add-to-list 'default-frame-alist '(font . "Monospace-10"))
 
 (menu-bar-mode -1)
