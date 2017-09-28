@@ -90,3 +90,10 @@
      (whitespace-mode "" whitespace)
      (yas-minor-mode "" yasnippet)
      (auto-revert-mode ""))))
+
+;; smart-mode-line
+(use-package smart-mode-line
+  :ensure t
+  :config
+  (setq sml/no-confirm-load-theme t)
+  (sml/setup))
