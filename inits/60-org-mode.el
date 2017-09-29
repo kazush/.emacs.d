@@ -11,20 +11,17 @@
   (global-set-key "\C-com" '(lambda () (interactive) (org-capture nil "m")))
   (global-set-key "\C-cot" '(lambda () (interactive) (org-capture nil "t")))
   :config
-  (setq org-directory "~/org")
-  (setq org-default-notes-file (concat org-directory "/notes.org"))
+  (global-set-key "\C-coj" '(lambda () (interactive) (org-capture nil "j")))
   (setq org-hide-leading-stars t)
-  (setq org-startup-truncated nil)
-  (setq org-startup-folded nil)
   (setq org-capture-templates
         '(("j" "Journal"
-           entry (file+datetree (concat org-directory "/journal.org"))
+           entry (file+datetree "~/org/journal.org")
            "* %?\n\n  %i\n\n  From: %a")
           ("m" "Memo"
-           entry (file nil)
+           entry (file "~/org/notes.org")
            "* %? %T\n\n  %i\n\n  From: %a")
           ("t" "Todo"
-           entry (file (concat org-directory "/todo.org"))
+           entry (file "~/org/todo.org")
            "* TODO %?\n  %i\n  %a")
           ))
   (setq org-todo-keywords
@@ -39,18 +36,23 @@
   (setq org-stuck-projects
         '("+PROJECT/-DONE-SOMEDAY" ("TODO" "WAIT")))
   (setq org-src-fontify-natively t)
-  ;; enable babel
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((ditaa . t)
-     (dot . t)))
-  )
+  (setq org-confirm-babel-evaluate nil)
+  ;; enable babel for languages
+  (require 'ob-shell)
+  (require 'ob-java)
+  (require 'ob-python)
+  (require 'ob-C)
+  (require 'ob-emacs-lisp)
+  (require 'ob-org)
+  (require 'ob-awk)
+  (require 'ob-sed)
+  (require 'ob-js)
+  (require 'ob-css)
+)
 
 ;; helm support
 (use-package helm-org-rifle :ensure t)
 
 ;; ob-async
 (use-package ob-async
-  :ensure t
-  :config
-  (add-to-list 'org-ctrl-c-ctrl-c-hook 'ob-async-org-babel-execute-src-block))
+  :ensure t)

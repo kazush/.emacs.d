@@ -27,14 +27,11 @@
   :mode (("\\.uml$" . plantuml-mode))
   :config
   (with-eval-after-load 'org
-    (add-to-list 'org-src-lang-modes '("plantuml" . plantuml)))
+    (setq org-plantuml-jar-path "~/Downloads/plantuml.jar")
+    (add-to-list 'org-src-lang-modes '("plantuml" . plantuml))
+    (require 'ob-plantuml))
   (setq plantuml-jar-path "~/Downloads/plantuml.jar"))
 
-(setq org-plantuml-jar-path "~/Downloads/plantuml.jar")
-(with-eval-after-load 'org
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((plantuml . t))))
 
 ;; graphviz-dot
 (use-package graphviz-dot-mode

@@ -5,10 +5,9 @@
   :config
   (add-to-list 'company-backends 'company-restclient)
   (add-to-list 'auto-mode-alist '("\\.http$" . restclient-mode)))
+
 ;; restclient support for org babel
 (use-package ob-restclient
   :ensure t
   :config
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((restclient . t))))
+  (require 'ob-restclient))
