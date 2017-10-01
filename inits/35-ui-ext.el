@@ -69,8 +69,27 @@
 ;; ace-window
 (use-package ace-window
   :ensure t
-  :bind (("C-c b" . ace-window))
+  :bind (("C-c 1" . aw-switch-to-window-1)
+         ("C-c 2" . aw-switch-to-window-2)
+         ("C-c 3" . aw-switch-to-window-3)
+         ("C-c 4" . aw-switch-to-window-4)
+         ("C-c 5" . aw-switch-to-window-5)
+         ("C-c 6" . aw-switch-to-window-6)
+         ("C-c 7" . aw-switch-to-window-7)
+         ("C-c 8" . aw-switch-to-window-8)
+         ("C-c 9" . aw-switch-to-window-9)
+         ("C-c b" . ace-window)
+         ("C-c x" . aw-flip-window))
   :config
+  ;; generate aw-switch-to-window-N
+  (require 'cl)
+  (dotimes (num 9 t)
+    (fset (intern (format "aw-switch-to-window-%d" (1+ num)))
+          (lexical-let ((n num))
+            (lambda () (interactive)
+              (ignore-errors
+                (aw-switch-to-window (nth n (aw-window-list))))))))
+
   (setq aw-background nil)
   (setq aw-scope 'frame)
   (ace-window-display-mode))
