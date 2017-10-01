@@ -11,16 +11,16 @@
   (define-key perspeen-command-map (kbd "C-d") 'perspeen-tab-del))
 
 ;; popwin
-(use-package popwin
-  :ensure t
-  :config
-  (global-set-key (kbd "C-c P") popwin:keymap)
-  (setq popwin:popup-window-height 30)
-  (push '(compilation-mode :noselect t :stick t :tail t :position bottom)
-        popwin:special-display-config)
-  (push '("^\\*shell\\*" :regexp t :stick t :position bottom)
-        popwin:special-display-config)
-  (popwin-mode 1))
+;; (use-package popwin
+;;   :ensure t
+;;   :config
+;;   (global-set-key (kbd "C-c P") popwin:keymap)
+;;   (setq popwin:popup-window-height 30)
+;;   (push '(compilation-mode :noselect t :stick t :tail t :position bottom)
+;;         popwin:special-display-config)
+;;   ;; (push '("^\\*shell\\*" :regexp t :stick t :position bottom)
+;;   ;;       popwin:special-display-config)
+;;   (popwin-mode 1))
 
 ;; sr-speedbar
 (use-package sr-speedbar

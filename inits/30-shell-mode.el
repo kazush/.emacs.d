@@ -37,18 +37,18 @@
                           (xterm-color-filter string))))))))
 
 ;; shell-pop
-(use-package shell-pop
-  :disabled
-  :ensure t
-  :bind (("C-c e" . shell-pop))
-  :config
-  (setq shell-pop-universal-key "\C-ce")
-  (setq shell-pop-window-size 40)
-  (setq shell-pop-window-position "bottom")
-  (setq shell-pop-full-span t))
+;; (use-package shell-pop
+;;   :disabled
+;;   :ensure t
+;;   :bind (("C-c e" . shell-pop))
+;;   :config
+;;   (setq shell-pop-universal-key "\C-ce")
+;;   (setq shell-pop-window-size 40)
+;;   (setq shell-pop-window-position "bottom")
+;;   (setq shell-pop-full-span t))
 
 ;; To get the shell buffer in the same buffer.
-(push (cons "\\*shell\\*" display-buffer--same-window-action) display-buffer-alist)
+;; (push (cons "\\*shell\\*" display-buffer--same-window-action) display-buffer-alist)
 
 ;; Key bindings
 (global-set-key "\C-cs" 'shell)
