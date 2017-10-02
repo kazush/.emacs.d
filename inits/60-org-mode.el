@@ -11,7 +11,7 @@
   (global-set-key "\C-com" '(lambda () (interactive) (org-capture nil "m")))
   (global-set-key "\C-cot" '(lambda () (interactive) (org-capture nil "t")))
   :config
-  (global-set-key "\C-coj" '(lambda () (interactive) (org-capture nil "j")))
+  (define-key org-mode-map (kbd "M-RET") 'org-meta-return)
   (setq org-hide-leading-stars t)
   (setq org-capture-templates
         '(("j" "Journal"
