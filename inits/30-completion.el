@@ -19,6 +19,7 @@
   (setq company-tooltip-limit 20)
   (setq company-idle-delay 0.2)
   (setq company-echo-delay 0)
+  (setq company-dabbrev-downcase nil)
   (add-hook 'prog-mode-hook
             '(lambda () (company-mode)))
   (define-key company-active-map (kbd "C-n") #'company-select-next)
