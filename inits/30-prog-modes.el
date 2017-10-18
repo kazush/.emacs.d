@@ -48,23 +48,28 @@
 (use-package go-mode
   :ensure t
   :mode (("\\.go$" . go-mode))
-  :init
+  :config
   (add-hook 'go-mode-hook
             '(lambda ()
+               (setq-local compile-command
+                           "go build -v && go test -v && go vet")
+               (setq-local gofmt-command "goimports")
+               (setq-local fill-column 100)
+               (setq-local c-basic-offset 4)
+               (setq-local tab-width 4)
+               (setq-local indent-tabs-mode 1)
                (ycmd-mode)
                (company-mode)
                (flycheck-mode)
                (go-guru-hl-identifier-mode)
-               (go-eldoc-setup)
                (add-hook 'before-save-hook 'gofmt-before-save)
                (local-set-key (kbd "M-.") 'godef-jump)
-               (local-set-key (kbd "M-*") 'pop-tag-mark)
-               (set (make-local-variable 'compile-command)
-                    "go build -v && go test -v && go vet")
-               (setq gofmt-command "goimports")
-               (setq fill-column 120)
-               (setq tab-width 4)
-               (setq indent-tabs-mode 1))))
+               (local-set-key (kbd "M-*") 'pop-tag-mark))))
+
+(use-package go-eldoc
+  :ensure t
+  :config
+  (add-hook 'go-mode-hook 'go-eldoc-setup))
 
 (use-package go-guru :ensure t)
 (use-package golint :ensure t)
