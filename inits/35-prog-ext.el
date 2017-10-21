@@ -1,3 +1,25 @@
+;; compilation
+(setq compilation-scroll-output 'first-error)
+
+;; linum-mode
+;(setq linum-format "%4d\u2502")
+;(add-hook 'prog-mode-hook
+;          '(lambda () (linum-mode 1)))
+
+(use-package flycheck
+  :ensure t
+  :config
+  (add-hook 'prog-mode-hook 'flycheck-mode))
+(use-package flycheck-ycmd
+  :ensure t
+  :config
+  (add-hook 'after-init-mode #'flycheck-ycmd-setup))
+
+;; Do not use TAB for indentation in prog mode
+(add-hook 'prog-mode-hook
+          '(lambda ()
+             (setq-default indent-tabs-mode nil)))
+
 ;; smartparens
 (use-package smartparens
   :ensure t
@@ -74,7 +96,3 @@
   :ensure t
   :config
   (add-hook 'prog-mode-hook 'dumb-jump-mode))
-
-;; clang-foramt
-(use-package clang-format
-  :ensure t)

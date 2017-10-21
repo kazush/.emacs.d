@@ -1,24 +1,4 @@
-;; compilation
-(setq compilation-scroll-output 'first-error)
-
-;; linum-mode
-;(setq linum-format "%4d\u2502")
-;(add-hook 'prog-mode-hook
-;          '(lambda () (linum-mode 1)))
-
-(use-package flycheck
-  :ensure t
-  :config
-  (add-hook 'prog-mode-hook 'flycheck-mode))
-(use-package flycheck-ycmd
-  :ensure t
-  :config
-  (add-hook 'after-init-mode #'flycheck-ycmd-setup))
-
-;; Do not use TAB for indentation in prog mode
-(add-hook 'prog-mode-hook
-          '(lambda ()
-             (setq-default indent-tabs-mode nil)))
+;; C/C++
 
 ;; c/c++-mode
 (use-package google-c-style
@@ -35,6 +15,16 @@
   :config
   (eval-after-load "company"
     '(add-to-list 'company-backends 'company-c-headers)))
+(use-package clang-format
+  :ensure t
+  :config
+  (add-hook 'c-mode-common-hook
+            '(lambda ()
+               (local-set-key (kbd "C-c i b") 'clang-format-buffer)
+               (local-set-key (kbd "C-c i r") 'clang-format-region)))
+  (setq clang-format-style-option "google"))
+
+;; Javascript
 
 ;; javascript-mode
 (add-hook 'js-mode-hook '(lambda ()
@@ -43,6 +33,8 @@
 
 ;; angular-mode
 (use-package angular-mode :ensure t)
+
+;; Go
 
 ;; go-mode
 (use-package go-mode
@@ -79,6 +71,16 @@
   (eval-after-load 'go-mode
     '(substitute-key-definition 'go-import-add 'helm-go-package go-mode-map)))
 
+;; Python
+
+;; yapf
+(use-package yapfify
+  :ensure t
+  :config
+  ;; (add-hook 'python-mode-hook 'yapf-mode)
+  (add-hook 'python-mode-hook
+            '(lambda () (local-set-key (kbd "C-c i b") 'yapfify-buffer))))
+
 ;; anaconda-mode for python
 (use-package anaconda-mode
   :ensure t
@@ -91,3 +93,11 @@
   (eval-after-load "company"
     '(add-to-list 'company-backends 'company-anaconda)))
 
+;; Java
+
+(add-hook 'java-mode-hook
+          '(lambda ()
+             (local-set-key (kbd "C-c i b") 'google-java-format-buffer)
+             (local-set-key (kbd "C-c i r") 'google-java-format-region)))
+
+;;; 30-prog-modes.el ends here
