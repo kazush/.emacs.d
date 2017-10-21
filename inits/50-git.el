@@ -13,12 +13,12 @@
 (use-package helm-git-grep
   :ensure t
   :commands (helm-git-grep helm-git-grep-from-helm)
-  :bind (("C-c g" . helm-git-grep))
+  :bind (("C-c h g" . helm-git-grep))
   :init
-  (define-key isearch-mode-map (kbd "C-c g")
+  (define-key isearch-mode-map (kbd "C-c h g")
     'helm-git-grep-from-isearch)
   (eval-after-load 'helm
-    '(define-key helm-map (kbd "C-c g") 'helm-git-grep-from-helm)))
+    '(define-key helm-map (kbd "C-c h g") 'helm-git-grep-from-helm)))
 
 (use-package git-gutter
   :ensure t

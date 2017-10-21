@@ -8,4 +8,4 @@
   :config (helm-projectile-on))
 (use-package projectile-speedbar
   :ensure t
-  :bind ("C-c i p" . projectile-speedbar-open-current-buffer-in-tree))
+  :bind ("C-c I p" . projectile-speedbar-open-current-buffer-in-tree))

@@ -8,7 +8,7 @@
   :bind (("C-c h o" . helm-occur)
          ("C-c h r" . helm-recentf)
          ("C-c h %" . helm-regexp)
-         ("C-c h g" . helm-do-grep-ag)
+         ("C-c g" . helm-do-grep-ag)
          ("M-x" . helm-M-x))
   :config
   (setq helm-completion-mode-string "")

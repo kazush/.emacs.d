@@ -25,14 +25,14 @@
 ;; sr-speedbar
 (use-package sr-speedbar
   :ensure t
-  :bind (("C-c i s" . sr-speedbar-toggle))
+  :bind (("C-c I s" . sr-speedbar-toggle))
   :config
   (setq sr-speedbar-right-side nil))
 
 ;; neotree
 (use-package neotree
   :ensure t
-  :bind (("C-c i n" . neotree-toggle)))
+  :bind (("C-c I n" . neotree-toggle)))
 
 ;; migemo
 ;; (install-package 'migemo)
