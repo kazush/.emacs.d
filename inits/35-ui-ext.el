@@ -79,6 +79,7 @@
          ("C-c 8" . aw-switch-to-window-8)
          ("C-c 9" . aw-switch-to-window-9)
          ("C-c b" . ace-window)
+         ("C-x x" . aw-flip-window)
          ("C-c x" . aw-flip-window))
   :config
   ;; generate aw-switch-to-window-N
