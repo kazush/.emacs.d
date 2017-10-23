@@ -9,6 +9,7 @@
          ("C-c h r" . helm-recentf)
          ("C-c h %" . helm-regexp)
          ("C-c g" . helm-do-grep-ag)
+         ("M-y" . helm-show-kill-ring)
          ("M-x" . helm-M-x))
   :config
   (setq helm-completion-mode-string "")
