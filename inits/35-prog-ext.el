@@ -10,10 +10,10 @@
   :ensure t
   :config
   (add-hook 'prog-mode-hook 'flycheck-mode))
-(use-package flycheck-popup-tip
-  :ensure t
-  :config
-  (flycheck-popup-tip-mode))
+;; (use-package flycheck-popup-tip
+;;   :ensure t
+;;   :config
+;;   (flycheck-popup-tip-mode))
 
 (use-package flycheck-ycmd
   :ensure t
