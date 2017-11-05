@@ -20,8 +20,8 @@
   (setq company-idle-delay 0.2)
   (setq company-echo-delay 0)
   (setq company-dabbrev-downcase nil)
-  (add-hook 'prog-mode-hook
-            '(lambda () (company-mode)))
+  (add-hook 'prog-mode-hook #'company-mode)
+  (add-hook 'eshell-mode-hook #'company-mode)
   (define-key company-active-map (kbd "C-n") #'company-select-next)
   (define-key company-active-map (kbd "C-p") #'company-select-previous)
   )
