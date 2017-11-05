@@ -1,3 +1,7 @@
+;;; 35-ui-ext.el --- UI extension configuration
+;;; Commentary:
+;;; Code:
+
 ;; perspeen
 (use-package perspeen
   :ensure t
@@ -117,3 +121,12 @@
   :config
   (setq sml/no-confirm-load-theme t)
   (sml/setup))
+
+;; fancy-narrow
+(use-package fancy-narrow
+  :ensure t
+  :config
+  (add-hook 'prog-mode-hook 'fancy-narrow-mode))
+
+(provide '35-ui-ext)
+;;; 35-ui-ext.el ends here
