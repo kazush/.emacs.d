@@ -21,6 +21,12 @@
   (setq comint-output-filter-functions
         (remove 'ansi-color-process-output
                 comint-output-filter-functions))
+  (add-hook 'eshell-mode-hook
+            (lambda ()
+              (setenv "TERM" "xterm-256color")
+              (setq xterm-color-preserve-properties t)))
+  (add-to-list 'eshell-preoutput-filter-functions 'xterm-color-filter)
+  (setq eshell-output-filter-functions (remove 'eshell-handle-ansi-color eshell-output-filter-functions))
   (setq compilation-environment '("TERM=xterm-256color"))
   (add-hook 'compilation-start-hook
           (lambda (proc)
