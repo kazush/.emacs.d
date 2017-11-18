@@ -12,17 +12,24 @@
 (add-hook 'eshell-mode-hook
           '(lambda ()
              ;; aliases
-             (eshell/alias "ls" "ls -lA")
-             (eshell/alias "l" "ls -lA")
+             (eshell/alias "ls" "ls -A $*")
+             (eshell/alias "l" "ls -lA $*")
              (eshell/alias "ff" "find-file $1")
              (eshell/alias "e" "find-file $1")
+             (eshell/alias "ms" "magit-status")
+             (eshell/alias "gc" "git checkout $*")
+             (eshell/alias "gb" "git branch $*")
+             (eshell/alias "gs" "git status $*")
+             (eshell/alias "gd" "git diff $*")
              ;; visual commands
              (add-to-list 'eshell-visual-commands "ssh")
              (add-to-list 'eshell-visual-commands "tail")
              (add-to-list 'eshell-visual-commands "top")
              (with-eval-after-load 'company
                (company-mode 1)
-               (setq-local company-backends '(company-capf company-files)))))
+               (setq-local company-tooltip-limit 5)
+               (setq-local company-idle-delay 1.0)
+               (setq-local company-backends '(company-capf)))))
 
 (defun myeshell ()
   (interactive)
