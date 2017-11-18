@@ -58,10 +58,10 @@
                (local-set-key (kbd "M-.") 'godef-jump)
                (local-set-key (kbd "M-*") 'pop-tag-mark))))
 
-(use-package go-eldoc
-  :ensure t
-  :config
-  (add-hook 'go-mode-hook 'go-eldoc-setup))
+;; (use-package go-eldoc
+;;   :ensure t
+;;   :config
+;;   (add-hook 'go-mode-hook 'go-eldoc-setup))
 
 (use-package go-guru :ensure t)
 (use-package golint :ensure t)
