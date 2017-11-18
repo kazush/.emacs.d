@@ -9,7 +9,8 @@
 (use-package flycheck
   :ensure t
   :config
-  (add-hook 'prog-mode-hook 'flycheck-mode))
+  (add-hook 'prog-mode-hook 'flycheck-mode)
+  (setq flycheck-indication-mode nil))
 ;; (use-package flycheck-popup-tip
 ;;   :ensure t
 ;;   :config
