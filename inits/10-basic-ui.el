@@ -49,7 +49,7 @@
 (setq use-dialog-box nil)
 
 ;; mode-line format
-(setq-default mode-line-format '("%e" mode-line-front-space mode-line-modified mode-line-remote " " mode-line-buffer-identification " " mode-line-position (vc-mode vc-mode) mode-line-modes mode-line-misc-info mode-line-end-spaces))
+(setq-default mode-line-format '("%e" mode-line-front-space mode-line-modified mode-line-remote " " mode-line-buffer-identification " " mode-line-position (vc-mode vc-mode) " " mode-line-modes mode-line-misc-info mode-line-end-spaces))
 
 ;; Move to another window with S-<arrow>
 (when (fboundp 'windmove-default-keybindings)
