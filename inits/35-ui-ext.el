@@ -6,7 +6,7 @@
 (use-package perspeen
   :ensure t
   :init
-  (setq perspeen-use-tab t)
+  (setq perspeen-use-tab nil)
   :config
   (perspeen-mode)
   (define-key perspeen-command-map (kbd "o") 'perspeen-goto-last-ws)
