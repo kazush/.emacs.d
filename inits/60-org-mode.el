@@ -62,3 +62,8 @@
   :ensure t
   :config
   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+
+;; org-cliplink
+(use-package org-cliplink
+  :ensure t
+  :bind (("C-c o L" . org-cliplink)))
