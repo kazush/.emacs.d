@@ -40,5 +40,10 @@
 (use-package eshell-z
   :ensure t)
 
+(use-package eshell-git-prompt
+  :ensure t
+  :config
+  (eshell-git-prompt-use-theme 'powerline))
+
 (provide '30-eshell)
 ;;; 30-eshell.el ends here
