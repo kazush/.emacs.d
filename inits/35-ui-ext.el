@@ -137,5 +137,9 @@
   :config
   (add-hook 'prog-mode-hook 'fancy-narrow-mode))
 
+;; emojify
+(use-package emojify
+  :ensure t)
+
 (provide '35-ui-ext)
 ;;; 35-ui-ext.el ends here
