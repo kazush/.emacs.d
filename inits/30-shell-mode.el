@@ -5,7 +5,7 @@
           '(lambda ()
              (shell-dirtrack-mode 0)
              (dirtrack-mode 1)
-             (setq dirtrack-list '("(..:..)\\((.+)\\)*\\([^\033()$]+\\)" 2))
+             (setq dirtrack-list '("(..:..)\\((.+)\\)*\\([^\033()$#]+\\)" 2))
              (company-mode 0))
           'APPEND)
 
