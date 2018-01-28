@@ -15,6 +15,7 @@
              (eshell/alias "ls" "ls -A $*")
              (eshell/alias "l" "ls -lA $*")
              (eshell/alias "ff" "find-file $1")
+             (eshell/alias "ffsu" "find-file /sudo::$PWD/$1")
              (eshell/alias "e" "find-file $1")
              (eshell/alias "ms" "magit-status")
              (eshell/alias "gc" "git checkout $*")
@@ -31,11 +32,19 @@
                (setq-local company-idle-delay 1.0)
                (setq-local company-backends '(company-capf)))))
 
+(defun eshell-cwd ()
+  (interactive)
+  (let ((cwd default-directory))
+    (eshell)
+    ;; (switch-to-buffer "*eshell*")
+    (cd cwd)))
+
 (defun myeshell ()
   (interactive)
   (eshell "new"))
 
-(global-set-key (kbd "C-c e") #'myeshell)
+(global-set-key (kbd "C-c e") #'eshell-cwd)
+(global-set-key (kbd "C-c E") #'myeshell)
 
 (use-package eshell-z
   :ensure t)
