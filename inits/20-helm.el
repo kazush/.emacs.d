@@ -20,6 +20,11 @@
   (unless (boundp 'completion-in-region-function)
     (define-key lisp-interaction-mode-map [remap completion-at-point] 'helm-lisp-completion-at-point)
     (define-key emacs-lisp-mode-map       [remap completion-at-point] 'helm-lisp-completion-at-point))
+
+  (add-to-list 'display-buffer-alist
+         `(,(rx bos "*helm" (* not-newline) "*" eos)
+           (display-buffer-in-atom-window)
+           (inhibit-same-window . t)))
   )
 
 (use-package helm-descbinds
