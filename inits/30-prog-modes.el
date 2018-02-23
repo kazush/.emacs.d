@@ -3,8 +3,7 @@
 ;; Split window and display compilation buffer below the original window.
 (add-to-list 'display-buffer-alist
              `(,(rx bos "*compilation" (* not-newline) "*" eos)
-               (display-buffer-in-atom-window)
-               (inhibit-same-window . t)))
+               (display-buffer--maybe-pop-up-frame-or-window)))
 
 ;; c/c++-mode
 (use-package google-c-style
