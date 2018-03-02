@@ -98,6 +98,17 @@
   (eval-after-load "company"
     '(add-to-list 'company-backends 'company-anaconda)))
 
+;; https://github.com/jorgenschaefer/elpy/issues/887
+(defun python-shell-completion-native-try ()
+  "Return non-nil if can trigger native completion."
+  (with-eval-after-load 'python
+    '(let ((python-shell-completion-native-enable t)
+           (python-shell-completion-native-output-timeout
+            python-shell-completion-native-try-output-timeout))
+       (python-shell-completion-native-get-completions
+        (get-buffer-process (current-buffer))
+        nil "_"))))
+
 ;; Java
 
 (add-hook 'java-mode-hook
