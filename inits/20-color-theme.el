@@ -54,6 +54,7 @@ FRAME defaults to the selected frame."
              (set-face-background 'font-lock-comment-face nil)
              (set-face-foreground 'font-lock-comment-delimiter-face "LightSlateGray")
              (set-face-background 'font-lock-comment-delimiter-face nil)
+             (set-face-background 'rainbow-delimiters-unmatched-face "red")
              ;; (set-face-background 'highlight "gray30")
              ;; (set-face-foreground 'highlight nil)
              ;; (set-face-foreground 'font-lock-type-face "PaleGoldenrod")
