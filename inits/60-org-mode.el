@@ -48,7 +48,14 @@
   (require 'ob-sed)
   (require 'ob-js)
   (require 'ob-css)
+  (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
 )
+
+(use-package ob-ipython
+  :ensure t)
+
+(use-package ob-go
+  :ensure t)
 
 ;; helm support
 (use-package helm-org-rifle :ensure t)
