@@ -48,9 +48,6 @@
 ;(add-hook 'find-file-hook (lambda () (linum-mode 1)))
 (setq use-dialog-box nil)
 
-;; mode-line format
-(setq-default mode-line-format '("%e" mode-line-front-space mode-line-modified mode-line-remote " " mode-line-buffer-identification " " mode-line-position (vc-mode vc-mode) " " mode-line-modes mode-line-misc-info mode-line-end-spaces))
-
 ;; Move to another window with S-<arrow>
 (when (fboundp 'windmove-default-keybindings)
   (windmove-default-keybindings))
@@ -67,5 +64,6 @@
 (when window-system
   ;; enable wheelmouse support by default
   (mwheel-install)
-  ;; use extended compound-text coding for X clipboard
-  (set-selection-coding-system 'compound-text-with-extensions))
+
+  ;; make pasting utf8 text work
+  (set-selection-coding-system nil))

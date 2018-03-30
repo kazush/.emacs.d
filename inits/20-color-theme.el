@@ -50,13 +50,17 @@ FRAME defaults to the selected frame."
              (set-face-background 'default "gray15")
              (set-face-foreground 'region nil)
              (set-face-background 'region "gray30")
-             (set-face-foreground 'font-lock-comment-face "LightSlateGray")
-             (set-face-background 'font-lock-comment-face nil)
+             (set-face-attribute 'font-lock-comment-face nil
+                                 :foreground "LightSlateGray"
+                                 :background (face-attribute 'default :background)
+                                 :slant 'italic)
              (set-face-foreground 'font-lock-comment-delimiter-face "LightSlateGray")
              (set-face-background 'font-lock-comment-delimiter-face nil)
              (set-face-background 'rainbow-delimiters-unmatched-face "red")
-             ;; (set-face-background 'highlight "gray30")
-             ;; (set-face-foreground 'highlight nil)
+             (set-face-attribute 'highlight nil
+                                 :foreground "orange"
+                                 :background (face-attribute 'default :background)
+                                 :weight 'bold)
              ;; (set-face-foreground 'font-lock-type-face "PaleGoldenrod")
              ;; (set-face-foreground 'font-lock-type-face "yellow")
              )
@@ -85,7 +89,26 @@ FRAME defaults to the selected frame."
 ;;    (setq solarized-termcolors 256)
 ;;    (load-theme 'solarized t))
 
-(use-package atom-one-dark-theme
+;; all-the-icons
+(use-package all-the-icons
   :ensure t
   :config
-  (load-theme 'atom-one-dark t))
+  (setq inhibit-compacting-font-caches t))
+
+(use-package zerodark-theme
+  :ensure t)
+;; (load-theme 'zerodark-theme t)
+;; (zerodark-setup-modeline-format)
+
+;; (use-package atom-one-dark-theme
+;;   :ensure t
+;;   :config
+;;   (load-theme 'atom-one-dark t))
+
+(use-package spaceline
+  :ensure t
+  :config
+  (require 'spaceline-config)
+  (spaceline-spacemacs-theme)
+  (spaceline-helm-mode)
+  (spaceline-info-mode))

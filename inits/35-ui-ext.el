@@ -14,38 +14,12 @@
   (define-key perspeen-command-map (kbd "C-n") 'perspeen-tab-next)
   (define-key perspeen-command-map (kbd "C-d") 'perspeen-tab-del))
 
-;; popwin
-;; (use-package popwin
-;;   :ensure t
-;;   :config
-;;   (global-set-key (kbd "C-c P") popwin:keymap)
-;;   (setq popwin:popup-window-height 30)
-;;   (push '(compilation-mode :noselect t :stick t :tail t :position bottom)
-;;         popwin:special-display-config)
-;;   ;; (push '("^\\*shell\\*" :regexp t :stick t :position bottom)
-;;   ;;       popwin:special-display-config)
-;;   (popwin-mode 1))
-
-;; sr-speedbar
-(use-package sr-speedbar
-  :ensure t
-  :bind (("C-c I s" . sr-speedbar-toggle))
-  :config
-  (setq sr-speedbar-right-side nil)
-  (defadvice delete-other-windows (after my-sr-speedbar-delete-other-window-advice activate)
-    "Check whether we are in speedbar, if it is, jump to next window."
-    (let ()
-      (when (and (sr-speedbar-window-exist-p sr-speedbar-window)
-                 (eq sr-speedbar-window (selected-window)))
-        (other-window 1)
-        )))
-  (ad-enable-advice 'delete-other-windows 'after 'my-sr-speedbar-delete-other-window-advice)
-  (ad-activate 'delete-other-windows))
-
 ;; neotree
 (use-package neotree
   :ensure t
-  :bind (("C-c I n" . neotree-toggle)))
+  :bind (("C-c I n" . neotree-toggle))
+  :config
+  (setq neo-theme (if (display-graphic-p) 'icons 'arrow)))
 
 ;; migemo
 ;; (install-package 'migemo)
@@ -107,29 +81,6 @@
   (setq aw-background nil)
   (setq aw-scope 'frame)
   (ace-window-display-mode))
-
-;; dim - change mode line names
-(use-package dim
-  :ensure t
-  :config
-  (dim-major-names
-   '((emacs-lisp-mode "El")
-     (lisp-interaction-mode "Li")
-     (python-mode "Py")))
-  (dim-minor-names
-   '((eldoc-mode "" eldoc)
-     (ws-butler-mode "" ws-butler)
-     (smartparens-mode "" smartparens)
-     (whitespace-mode "" whitespace)
-     (yas-minor-mode "" yasnippet)
-     (auto-revert-mode ""))))
-
-;; smart-mode-line
-(use-package smart-mode-line
-  :ensure t
-  :config
-  (setq sml/no-confirm-load-theme t)
-  (sml/setup))
 
 ;; fancy-narrow
 (use-package fancy-narrow
