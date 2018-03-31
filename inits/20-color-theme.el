@@ -67,27 +67,8 @@ FRAME defaults to the selected frame."
           'APPEND)
 
 ;; ;; Set face for hl-line-mode
-(set-face-background hl-line-face "gray22")
-(set-face-foreground hl-line-face nil)
-
-;; ;; Use zenburn theme.
-;; (use-package hc-zenburn-theme
-;;   :ensure t
-;;   :config
-;;   (load-theme 'hc-zenburn t))
-
-;; (use-package solarized-theme
-;;   :ensure t
-;;   :config
-;;   (load-theme 'solarized-dark t))
-
-;; (setq color-themes '())
-;; (use-package color-theme-solarized
-;;    :ensure t
-;;    :config
-;;    (setq frame-background-mode 'dark)
-;;    (setq solarized-termcolors 256)
-;;    (load-theme 'solarized t))
+;; (set-face-background hl-line-face "gray22")
+;; (set-face-foreground hl-line-face nil)
 
 ;; all-the-icons
 (use-package all-the-icons
@@ -96,14 +77,11 @@ FRAME defaults to the selected frame."
   (setq inhibit-compacting-font-caches t))
 
 (use-package zerodark-theme
-  :ensure t)
-;; (load-theme 'zerodark-theme t)
-;; (zerodark-setup-modeline-format)
-
-;; (use-package atom-one-dark-theme
-;;   :ensure t
-;;   :config
-;;   (load-theme 'atom-one-dark t))
+  :ensure t
+  :config
+  (load-theme 'zerodark t)
+  ;; (zerodark-setup-modeline-format)
+  )
 
 (use-package spaceline
   :ensure t
