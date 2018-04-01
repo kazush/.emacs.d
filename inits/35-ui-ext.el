@@ -92,5 +92,20 @@
 (use-package emojify
   :ensure t)
 
+;; transpose-frame
+(use-package transpose-frame
+  :ensure t
+  :config
+  (defhydra hydra-transpose-frame ()
+    "transpose frame"
+    ("x" transpose-frame)
+    ("v" flip-frame)
+    ("h" flop-frame)
+    ("r" rotate-frame)
+    ("j" rotate-frame-clockwise)
+    ("k" rotate-frame-anticlockwise)
+    ("q" nil)))
+
+
 (provide '35-ui-ext)
 ;;; 35-ui-ext.el ends here
