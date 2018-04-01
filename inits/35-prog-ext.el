@@ -65,7 +65,8 @@
 (use-package rainbow-delimiters
   :ensure t
   :config
-  (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
+  (add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
+  (set-face-background 'rainbow-delimiters-unmatched-face "red"))
 
 ;; show whitespaces
 (use-package whitespace

@@ -56,7 +56,6 @@ FRAME defaults to the selected frame."
                                  :slant 'italic)
              (set-face-foreground 'font-lock-comment-delimiter-face "LightSlateGray")
              (set-face-background 'font-lock-comment-delimiter-face nil)
-             (set-face-background 'rainbow-delimiters-unmatched-face "red")
              (set-face-attribute 'highlight nil
                                  :foreground "orange"
                                  :background (face-attribute 'default :background)
