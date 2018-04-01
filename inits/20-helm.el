@@ -38,3 +38,7 @@
 (use-package helm-swoop
   :ensure t
   :bind (("C-c O" . helm-swoop)))
+
+(use-package swiper-helm
+  :ensure t
+  :bind (("C-s" . swiper-helm)))
