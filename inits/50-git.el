@@ -32,3 +32,6 @@
 ;; (use-package magithub
 ;;   :after magit
 ;;   :config (magithub-feature-autoinject t))
+
+(use-package git-timemachine
+  :ensure t)
