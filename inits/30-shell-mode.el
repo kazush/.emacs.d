@@ -53,11 +53,10 @@
 ;;   (setq shell-pop-window-position "bottom")
 ;;   (setq shell-pop-full-span t))
 
-;; To get the shell buffer in the same buffer.
-;; (push (cons "\\*shell\\*" display-buffer--same-window-action) display-buffer-alist)
+;; To open a new window below the current buffer.
 (add-to-list 'display-buffer-alist
-             `(,(rx bos "*shell" (* not-newline) "*" eos)
-               (display-buffer--maybe-pop-up-frame-or-window)
+             `(,(rx bos "*" (or "term" "shell" "eshell") (* not-newline) "*" eos)
+               (display-buffer-in-atom-window)
                (inhibit-same-window . t)))
 
 ;; Key bindings
