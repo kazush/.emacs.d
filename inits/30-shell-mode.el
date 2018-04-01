@@ -55,6 +55,10 @@
 
 ;; To get the shell buffer in the same buffer.
 ;; (push (cons "\\*shell\\*" display-buffer--same-window-action) display-buffer-alist)
+(add-to-list 'display-buffer-alist
+             `(,(rx bos "*shell" (* not-newline) "*" eos)
+               (display-buffer--maybe-pop-up-frame-or-window)
+               (inhibit-same-window . t)))
 
 ;; Key bindings
 (global-set-key "\C-cs" 'shell)
