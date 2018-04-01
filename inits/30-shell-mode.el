@@ -1,13 +1,42 @@
 ;; shell (comint)
-(setq explicit-bash-args '("--noediting" "-i" "-l"))
+;; (setq explicit-bash-args '("--noediting" "-i" "-l"))
+
+;; dirtrack using procfs
+(defun shell-procfs-dirtrack (str)
+  (prog1 str
+    (when (string-match comint-prompt-regexp str)
+      (let ((directory (file-symlink-p
+                        (format "/proc/%s/cwd"
+                                (process-id
+                                 (get-buffer-process
+                                  (current-buffer)))))))
+        (when (file-directory-p directory)
+          (cd directory))))))
+
+(define-minor-mode shell-procfs-dirtrack-mode
+  "Track shell directory by inspecting procfs."
+  nil nil nil
+  (cond (shell-procfs-dirtrack-mode
+         (when (bound-and-true-p shell-dirtrack-mode)
+           (shell-dirtrack-mode 0))
+         (when (bound-and-true-p dirtrack-mode)
+           (dirtrack-mode 0))
+         (add-hook 'comint-preoutput-filter-functions
+                   'shell-procfs-dirtrack nil t))
+        (t
+         (remove-hook 'comint-preoutput-filter-functions
+                      'shell-procfs-dirtrack t))))
+
+(add-hook 'shell-mode-hook '(lambda () (shell-procfs-dirtrack-mode 1)))
+
 ;; custom dir track list
-(add-hook 'shell-mode-hook
-          '(lambda ()
-             (shell-dirtrack-mode 0)
-             (dirtrack-mode 1)
-             (setq dirtrack-list '("(..:..)\\((.+)\\)*\\([^\033()$#]+\\)" 2))
-             (company-mode 0))
-          'APPEND)
+;; (add-hook 'shell-mode-hook
+;;           '(lambda ()
+;;              (shell-dirtrack-mode 0)
+;;              (dirtrack-mode 1)
+;;              (setq dirtrack-list '("(..:..)\\((.+)\\)*\\([^\033()$#]+\\)" 2))
+;;              (company-mode 0))
+;;           'APPEND)
 
 ;; custom password prompt regexp
 (setq comint-password-prompt-regexp
@@ -42,25 +71,49 @@
                  (funcall 'compilation-filter proc
                           (xterm-color-filter string))))))))
 
-;; shell-pop
-;; (use-package shell-pop
-;;   :disabled
-;;   :ensure t
-;;   :bind (("C-c e" . shell-pop))
-;;   :config
-;;   (setq shell-pop-universal-key "\C-ce")
-;;   (setq shell-pop-window-size 40)
-;;   (setq shell-pop-window-position "bottom")
-;;   (setq shell-pop-full-span t))
+(use-package multi-term
+  :ensure t
+  :bind (("C-c s" . get-term))
+  :config
+  (setq multi-term-dedicated-close-back-to-open-buffer-p nil)
+  (setq multi-term-dedicated-select-after-open-p t)
+  (setq multi-term-program "/bin/bash")
+  (setq term-bind-key-alist
+        '(("C-c C-k" . term-char-mode)
+          ("C-c C-l" . term-line-mode)))
 
-;; To open a new window below the current buffer.
-(add-to-list 'display-buffer-alist
-             `(,(rx bos "*" (or "term" "shell" "eshell") (* not-newline) "*" eos)
-               (lambda (buf alist)
-                 (let ((win (get-buffer-window buf)))
-                   (if win win
-                     (display-buffer-in-atom-window buf alist))))))
+  (defun last-term-buffer (l)
+    "Return most recently used term buffer."
+    (when l
+      (if (eq 'term-mode (with-current-buffer (car l) major-mode))
+          (car l) (last-term-buffer (cdr l)))))
 
+  ;; override multi-term to use display-buffer
+  (defun multi-term ()
+    "Create new term buffer.
+Will prompt you shell name when you type `C-u' before this command."
+    (interactive)
+    (let (term-buffer)
+      ;; Set buffer.
+      (setq term-buffer (multi-term-get-buffer current-prefix-arg))
+      (setq multi-term-buffer-list (nconc multi-term-buffer-list (list term-buffer)))
+      (set-buffer term-buffer)
+      ;; Internal handle for `multi-term' buffer.
+      (multi-term-internal)
+      ;; Switch buffer
+      (select-window (display-buffer term-buffer))))
+
+  (defun get-term (arg)
+    "Switch to the term buffer last used, or create a new one if
+    none exists, or if the current buffer is already a term."
+    (interactive "p")
+    (let ((b (last-term-buffer (buffer-list))))
+      (if (or (not b) (= arg 4))
+          (multi-term)
+        (if (eq 'term-mode major-mode)
+            (delete-window)
+          (select-window (display-buffer b))))))
+  )
 
 ;; Key bindings
-(global-set-key "\C-cs" 'shell)
+(global-set-key (kbd "C-c S") 'shell)
