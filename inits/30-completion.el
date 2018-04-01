@@ -3,7 +3,7 @@
   :ensure t
   :config
   (set-variable 'ycmd-server-command
-                (list "python"
+                (list "/usr/bin/python2.7"
                       (substitute-in-file-name "$HOME/ws/ycmd/ycmd/__main__.py")))
   (setq request-message-level -1)
   (setq url-show-status nil)
