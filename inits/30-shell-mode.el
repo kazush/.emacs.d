@@ -56,8 +56,11 @@
 ;; To open a new window below the current buffer.
 (add-to-list 'display-buffer-alist
              `(,(rx bos "*" (or "term" "shell" "eshell") (* not-newline) "*" eos)
-               (display-buffer-in-atom-window)
-               (inhibit-same-window . t)))
+               (lambda (buf alist)
+                 (let ((win (get-buffer-window buf)))
+                   (if win win
+                     (display-buffer-in-atom-window buf alist))))))
+
 
 ;; Key bindings
 (global-set-key "\C-cs" 'shell)
