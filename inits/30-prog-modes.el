@@ -5,6 +5,10 @@
 ;;              `(,(rx bos "*compilation" (* not-newline) "*" eos)
 ;;                (display-buffer--maybe-pop-up-frame-or-window)))
 
+;; elisp
+(add-hook 'emacs-lisp-mode-hook
+          '(lambda () (ycmd-mode 0)))
+
 ;; c/c++-mode
 (use-package google-c-style
   :ensure t
