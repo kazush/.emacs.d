@@ -115,3 +115,8 @@
   :ensure t
   :config
   (add-hook 'prog-mode-hook 'dumb-jump-mode))
+
+(use-package aggressive-indent
+  :ensure t
+  :config
+  (add-hook 'prog-mode-hook 'aggressive-indent-mode))
