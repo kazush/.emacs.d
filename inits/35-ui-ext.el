@@ -115,7 +115,7 @@ Narrow To: _n_: region _p_: page    _d_: defun
 Frame
 Transpose: _x_: transpose  _v_: flip      _h_: flop
    Rotate: _r_: rotate 180 _j_: clockwise _k_: anticlockwise
-""
+"
     ("x" transpose-frame)
     ("v" flip-frame)
     ("h" flop-frame)
