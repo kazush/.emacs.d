@@ -86,7 +86,21 @@
 (use-package fancy-narrow
   :ensure t
   :config
-  (add-hook 'prog-mode-hook 'fancy-narrow-mode))
+  (add-hook 'prog-mode-hook 'fancy-narrow-mode)
+  (defhydra hydra-narrow (:hint nil)
+    "
+Narrow To: _n_: region _p_: page    _d_: defun
+      Org: _b_: block  _e_: element _s_: subtree
+           _w_: widen   _q_: quit
+"
+    ("n" fancy-narrow-to-region)
+    ("w" fancy-widen)
+    ("p" fancy-narrow-to-page)
+    ("d" fancy-narrow-to-defun)
+    ("b" org-fancy-narrow-to-block)
+    ("e" org-fancy-narrow-to-element)
+    ("s" org-fancy-narrow-to-subtree)
+    ("q" nil)))
 
 ;; emojify
 (use-package emojify
@@ -96,8 +110,12 @@
 (use-package transpose-frame
   :ensure t
   :config
-  (defhydra hydra-transpose-frame ()
-    "transpose frame"
+  (defhydra hydra-transpose-frame (:hint nil)
+    "
+Frame
+Transpose: _x_: transpose  _v_: flip      _h_: flop
+   Rotate: _r_: rotate 180 _j_: clockwise _k_: anticlockwise
+""
     ("x" transpose-frame)
     ("v" flip-frame)
     ("h" flop-frame)

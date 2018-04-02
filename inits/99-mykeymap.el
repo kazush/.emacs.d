@@ -12,6 +12,7 @@
 (define-key my-map (kbd "t") 'hydra-transpose-frame/body)
 (define-key my-map (kbd "g") 'hydra-git-gutter/body)
 (define-key my-map (kbd "f") 'hydra-flycheck/body)
+(define-key my-map (kbd "n") 'hydra-narrow/body)
 
 (provide '99-mykeymap)
 ;;; 99-mykeymap.el ends here
