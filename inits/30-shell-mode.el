@@ -78,9 +78,20 @@
   (setq multi-term-dedicated-close-back-to-open-buffer-p nil)
   (setq multi-term-dedicated-select-after-open-p t)
   (setq multi-term-program "/bin/bash")
+  (setq term-unbind-key-list '("C-z" "C-x" "C-c" "C-h"))
   (setq term-bind-key-alist
-        '(("C-c C-k" . term-char-mode)
+        '(("C-c C-c" . term-send-raw)
+          ("C-c C-x" . term-send-raw)
+          ("C-c C-z" . term-send-raw)
+          ("C-c C-h" . term-send-raw)
+          ("C-c C-k" . term-char-mode)
           ("C-c C-l" . term-line-mode)))
+
+  (add-hook 'term-mode-hook
+            (lambda ()
+              (define-key term-mode-map (kbd "C-a") 'term-bol)
+              (define-key term-mode-map (kbd "C-c C-a") 'move-beginning-of-line)
+              (setq-local term-prompt-regexp "^[^#$%>]*[#$%>] *")))
 
   (defun last-term-buffer (l)
     "Return most recently used term buffer."
@@ -100,6 +111,8 @@ Will prompt you shell name when you type `C-u' before this command."
       (set-buffer term-buffer)
       ;; Internal handle for `multi-term' buffer.
       (multi-term-internal)
+      ;; default to term-line-mode
+      (term-line-mode)
       ;; Switch buffer
       (select-window (display-buffer term-buffer))))
 
