@@ -23,10 +23,10 @@
     ("G"  (progn (goto-char (point-max)) (flycheck-previous-error)) "Last")
     ("q"  nil)))
 
-;; (use-package flycheck-popup-tip
-;;   :ensure t
-;;   :config
-;;   (flycheck-popup-tip-mode))
+(use-package flycheck-popup-tip
+  :ensure t
+  :config
+  (flycheck-popup-tip-mode))
 
 (use-package flycheck-ycmd
   :ensure t
