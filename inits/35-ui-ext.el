@@ -56,6 +56,9 @@
 ;; ace-window
 (use-package ace-window
   :ensure t
+  :init
+  (define-prefix-command 'my-aw-map)
+  (global-set-key (kbd "C-c w") 'my-aw-map)
   :bind (("C-c 1" . aw-switch-to-window-1)
          ("C-c 2" . aw-switch-to-window-2)
          ("C-c 3" . aw-switch-to-window-3)
@@ -67,7 +70,15 @@
          ("C-c 9" . aw-switch-to-window-9)
          ("C-c b" . ace-window)
          ("C-x x" . aw-flip-window)
-         ("C-c w" . aw-swap-window))
+         ("C-c w 1" . aw-swap-window-to-1)
+         ("C-c w 2" . aw-swap-window-to-2)
+         ("C-c w 3" . aw-swap-window-to-3)
+         ("C-c w 4" . aw-swap-window-to-4)
+         ("C-c w 5" . aw-swap-window-to-5)
+         ("C-c w 6" . aw-swap-window-to-6)
+         ("C-c w 7" . aw-swap-window-to-7)
+         ("C-c w 8" . aw-swap-window-to-8)
+         ("C-c w 9" . aw-swap-window-to-9))
   :config
   ;; generate aw-switch-to-window-N
   (require 'cl)
@@ -76,7 +87,12 @@
           (lexical-let ((n num))
             (lambda () (interactive)
               (ignore-errors
-                (aw-switch-to-window (nth n (aw-window-list))))))))
+                (aw-switch-to-window (nth n (aw-window-list)))))))
+    (fset (intern (format "aw-swap-window-to-%d" (1+ num)))
+          (lexical-let ((n num))
+            (lambda () (interactive)
+              (ignore-errors
+                (aw-swap-window (nth n (aw-window-list))))))))
 
   (setq aw-background nil)
   (setq aw-scope 'frame)
