@@ -73,7 +73,7 @@
 
 (use-package multi-term
   :ensure t
-  :bind (("C-c s" . get-term))
+  ;; :bind (("C-c s" . get-term))
   :config
   (setq multi-term-dedicated-close-back-to-open-buffer-p nil)
   (setq multi-term-dedicated-select-after-open-p t)
@@ -126,5 +126,23 @@ Will prompt you shell name when you type `C-u' before this command."
           (select-window (display-buffer b))))))
   )
 
+(defun last-shell-buffer (l)
+  "Return most recently used shell buffer."
+  (when l
+    (if (eq 'shell-mode (with-current-buffer (car l) major-mode))
+        (car l) (last-shell-buffer (cdr l)))))
+
+(defun get-shell (arg)
+  "Switch to the shell buffer last used, or create a new one if
+    none exists, or if the current buffer is already a shell."
+  (interactive "p")
+  (let ((b (last-shell-buffer (buffer-list))))
+    (if (or (not b) (= arg 4))
+        (shell)
+      (if (eq 'shell-mode major-mode)
+          (delete-window)
+        (select-window (display-buffer b))))))
+
 ;; Key bindings
+(global-set-key (kbd "C-c s") 'get-shell)
 (global-set-key (kbd "C-c S") 'shell)
