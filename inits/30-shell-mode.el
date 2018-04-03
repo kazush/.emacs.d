@@ -111,8 +111,6 @@ Will prompt you shell name when you type `C-u' before this command."
       (set-buffer term-buffer)
       ;; Internal handle for `multi-term' buffer.
       (multi-term-internal)
-      ;; default to term-line-mode
-      (term-line-mode)
       ;; Switch buffer
       (select-window (display-buffer term-buffer))))
 
