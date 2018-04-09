@@ -20,6 +20,13 @@
   (unless (boundp 'completion-in-region-function)
     (define-key lisp-interaction-mode-map [remap completion-at-point] 'helm-lisp-completion-at-point)
     (define-key emacs-lisp-mode-map       [remap completion-at-point] 'helm-lisp-completion-at-point))
+
+  (defun my/helm-buffers-list (sources)
+    "Dispatch helm with specified sources"
+    (helm :sources sources
+          :buffer "*helm buffers*"
+          :keymap helm-buffer-map
+          :truncate-lines helm-buffers-truncate-lines))
   )
 
 (use-package helm-descbinds
