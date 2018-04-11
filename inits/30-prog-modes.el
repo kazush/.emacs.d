@@ -37,8 +37,8 @@
 
 ;; javascript-mode
 (add-hook 'js-mode-hook '(lambda ()
-                           (setq js-indent-level 2)
-                           (setq tab-width 2)))
+                           (setq-local js-indent-level 2)
+                           (setq-local tab-width 2)))
 
 ;; angular-mode
 (use-package angular-mode :ensure t)
