@@ -15,6 +15,8 @@
   (setq company-show-numbers t)
   (setq company-lighter "")
   (setq company-idle-delay 0.2)
+  (add-hook 'shell-mode-hook (lambda () (setq-local company-idle-delay 0.5)))
+  (add-hook 'eshell-mode-hook (lambda () (setq-local company-idle-delay 0.5)))
   (setq company-echo-delay 0)
   (setq company-dabbrev-downcase nil)
   (add-hook 'prog-mode-hook #'company-mode)

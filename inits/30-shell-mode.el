@@ -53,7 +53,7 @@
   (add-hook 'eshell-mode-hook
             (lambda ()
               (setenv "TERM" "xterm-256color")
-              (setq xterm-color-preserve-properties t)))
+              (setq-local xterm-color-preserve-properties t)))
   (add-to-list 'eshell-preoutput-filter-functions 'xterm-color-filter)
   (setq eshell-output-filter-functions (remove 'eshell-handle-ansi-color eshell-output-filter-functions))
   (setq compilation-environment '("TERM=xterm-256color"))
@@ -73,7 +73,6 @@
 
 (use-package multi-term
   :ensure t
-  :bind (("C-c s" . get-term))
   :config
   (setq multi-term-dedicated-close-back-to-open-buffer-p nil)
   (setq multi-term-dedicated-select-after-open-p t)
@@ -112,27 +111,29 @@ Will prompt you shell name when you type `C-u' before this command."
       (select-window (display-buffer term-buffer))))
   )
 
-(defun my/shellish-mode-p (mode)
-  (seq-contains '(shell-mode eshell-mode term-mode) mode))
+(defun my/shellish-buffer-p (buf)
+  "Return if BUF is a shell-ish buffer."
+  (let ((mode (with-current-buffer buf major-mode)))
+    (and (string-match-p
+          (rx bos "*" (or "term" "shell" "eshell") (* not-newline) "*" eos)
+          (buffer-name buf))
+         (seq-contains '(shell-mode eshell-mode term-mode) mode))))
 
 (defvar my/helm-source-shellish-buffers-list
   (helm-make-source "Shell/Eshell/Term Buffers" 'helm-source-buffers
     :buffer-list
     (lambda ()
       (mapcar #'buffer-name
-              (cl-remove-if-not
-               (lambda (buf)
-                 (with-current-buffer buf
-                   (my/shellish-mode-p major-mode)))
-               (buffer-list))))))
+              (cl-remove-if-not 'my/shellish-buffer-p (buffer-list))))))
 
 (defun my/last-shellish-buffer (buflist)
-  "Return most recently used shell-ish buffer."
+  "Return most recently used shell-ish buffer in BUFLIST."
   (when buflist
-    (if (my/shellish-mode-p (with-current-buffer (car buflist) major-mode))
+    (if (my/shellish-buffer-p (car buflist))
         (car buflist) (my/last-shellish-buffer (cdr buflist)))))
 
 (defun my/chdir (dir)
+  "Change directory to DIR."
   (let* ((proc (get-buffer-process (current-buffer)))
          (pmark (process-mark proc)))
     (goto-char pmark)
@@ -144,18 +145,21 @@ Will prompt you shell name when you type `C-u' before this command."
     (set-marker pmark (point))))
 
 (defun my/helm-shellish-buffers-list ()
+  "Launch Helm buffers list with shell-ish buffers."
   (interactive)
   (my/helm-buffers-list my/helm-source-shellish-buffers-list))
 
 (defun my/get-shellish (arg shellfunc)
-  "Switch to the shell-ish buffer last used, or create a new one if
-    none exists, or if the current buffer is already a term."
+  "Switch to the shell-ish buffer last used or create new without prefix (ARG).
+Close the window if the current buffer is already a shell-ish
+buffer.  With prefix show Helm buffers list.  Create a new one if
+double prefixes by calling SHELLFUNC."
   (interactive "p")
   (let ((cwd default-directory)
         (b (my/last-shellish-buffer (buffer-list (selected-frame)))))
     (if (or (not b) (= arg 16))
         (funcall shellfunc)
-      (if (and (= arg 1) (my/shellish-mode-p major-mode))
+      (if (and (= arg 1) (my/shellish-buffer-p (current-buffer)))
           (delete-window)
         (select-window (display-buffer b))
         (if (= arg 4)
@@ -181,3 +185,4 @@ Will prompt you shell name when you type `C-u' before this command."
 
 ;; Key bindings
 (global-set-key (kbd "C-c s") 'my/get-shell)
+(global-set-key (kbd "C-c t") 'my/get-term)
