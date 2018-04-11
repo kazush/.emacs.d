@@ -15,7 +15,7 @@
                      (display-buffer-in-side-window buf alist))))
                (side . bottom) (slot . -1) (preserve-size . (nil . t))
                (window-parameters . ((no-other-window . t) (no-delete-other-windows . t)))
-               (window-height . 15)))
+               (window-height . 18)))
 
 (add-to-list 'display-buffer-alist
              `(,(rx bos "*" (or "Completion" "compilation" "helm") (* not-newline) "*" eos)
@@ -25,7 +25,7 @@
                      (display-buffer-in-side-window buf alist))))
                (side . bottom) (slot . 1) (preserve-size . (nil . t))
                (window-parameters . ((no-other-window . t) (no-delete-other-windows . t)))
-               (window-height . 15)))
+               (window-height . 18)))
 
 (provide '99-mykeymap)
 ;;; 99-windows.el ends here
