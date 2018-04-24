@@ -87,5 +87,5 @@ FRAME defaults to the selected frame."
   :config
   (require 'spaceline-config)
   (spaceline-spacemacs-theme)
-  (spaceline-helm-mode)
+  ;; (spaceline-helm-mode)
   (spaceline-info-mode))
