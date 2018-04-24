@@ -122,4 +122,5 @@
 (use-package aggressive-indent
   :ensure t
   :config
-  (add-hook 'prog-mode-hook 'aggressive-indent-mode))
+  (add-hook 'go-mode-hook 'aggressive-indent-mode)
+  (add-hook 'emacs-lisp-mode-hook 'aggressive-indent-mode))
