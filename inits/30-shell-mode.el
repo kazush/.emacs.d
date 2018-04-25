@@ -169,10 +169,7 @@ double prefixes by calling SHELLFUNC."
   "Create a new shell with base directory name."
   (interactive)
   (if (my/last-shellish-buffer (buffer-list (selected-frame)))
-      (shell (format "*shell<%s>*"
-                     (file-name-nondirectory
-                      (directory-file-name
-                       (expand-file-name default-directory)))))
+      (shell (format "*shell<%s>*" (read-string "Shell buffer name: ")))
     (shell)))
 
 (defun my/get-shell (arg)
