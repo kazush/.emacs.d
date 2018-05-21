@@ -1,4 +1,4 @@
-;;; 99-windows.el --- Configurations for window management
+;;; 98-windows.el --- Configurations for window management
 ;;; Commentary:
 ;;; Code:
 
@@ -27,5 +27,5 @@
                (window-parameters . ((no-other-window . t) (no-delete-other-windows . t)))
                (window-height . 18)))
 
-(provide '99-mykeymap)
-;;; 99-windows.el ends here
+(provide '98-windows)
+;;; 98-windows.el ends here

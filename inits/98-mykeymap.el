@@ -1,4 +1,4 @@
-;;; 99-mykeymap.el --- defines my keymap here
+;;; 98-mykeymap.el --- defines my keymap here
 ;;; Commentary:
 ;;; Code:
 
@@ -15,5 +15,5 @@
 (define-key my-map (kbd "n") 'hydra-narrow/body)
 (define-key my-map (kbd "m") 'hydra-multiple-cursors/body)
 
-(provide '99-mykeymap)
-;;; 99-mykeymap.el ends here
+(provide '98-mykeymap)
+;;; 98-mykeymap.el ends here
