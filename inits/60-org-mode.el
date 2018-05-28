@@ -12,6 +12,8 @@
   (global-set-key "\C-cot" '(lambda () (interactive) (org-capture nil "t")))
   :config
   (define-key org-mode-map (kbd "M-RET") 'org-meta-return)
+  (setq org-src-window-setup 'current-window)
+  (setq org-agenda-window-setup 'current-window)
   (setq org-hide-leading-stars t)
   (setq org-capture-templates
         '(("j" "Journal"
@@ -49,7 +51,7 @@
   (require 'ob-js)
   (require 'ob-css)
   (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
-)
+  )
 
 (use-package ob-ipython
   :ensure t)
