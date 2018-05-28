@@ -85,6 +85,8 @@ FRAME defaults to the selected frame."
 (use-package spaceline
   :ensure t
   :config
+  (if (not window-system)
+      (setq powerline-default-separator 'utf-8))
   (require 'spaceline-config)
   (spaceline-spacemacs-theme)
   ;; (spaceline-helm-mode)
