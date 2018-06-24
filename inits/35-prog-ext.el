@@ -124,3 +124,9 @@
   :config
   (add-hook 'go-mode-hook 'aggressive-indent-mode)
   (add-hook 'emacs-lisp-mode-hook 'aggressive-indent-mode))
+
+(use-package symbol-overlay
+  :ensure t
+  :hook ((prog-mode) . symbol-overlay-mode)
+  :config
+  (setq symbol-overlay-idle-time 1.0))
