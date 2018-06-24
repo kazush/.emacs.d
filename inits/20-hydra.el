@@ -7,6 +7,36 @@
   :config
   (require 'hydra-examples))
 
+(defun forward-to-symbol (arg)
+  "Move forward until encountering the beginning of a symbol.
+With argument, do this that many times."
+  (interactive "^p")
+  (or (re-search-forward "\\W\\_<" nil t arg)
+      (goto-char (if (> arg 0) (point-max) (point-min)))))
+
+(defun backward-to-symbol (arg)
+  "Move backward until encountering the end of a symbol.
+With argument, do this that many times."
+  (interactive "^p")
+  (forward-to-symbol (- arg)))
+
+;; Cursor movement
+(global-set-key
+ (kbd "C-c v")
+ (defhydra hydra-move ()
+   "move"
+   ("l" forward-to-symbol)
+   ("h" backward-to-symbol)
+   ("e" move-end-of-line)
+   ("a" move-beginning-of-line)
+   ("j" next-line)
+   ("k" previous-line)
+   ("n" forward-paragraph)
+   ("p" backward-paragraph)
+   ("SPC" scroll-up-command)
+   ("S-SPC" scroll-down-command)
+   ("q" nil)))
+
 ;; window management
 (defhydra hydra-window (:color red
                                :hint nil)
