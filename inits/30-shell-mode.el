@@ -123,8 +123,11 @@ Will prompt you shell name when you type `C-u' before this command."
   (helm-make-source "Shell/Eshell/Term Buffers" 'helm-source-buffers
     :buffer-list
     (lambda ()
-      (mapcar #'buffer-name
-              (cl-remove-if-not 'my/shellish-buffer-p (buffer-list))))))
+      (let ((buflist (mapcar
+                      #'buffer-name
+                      (cl-remove-if-not 'my/shellish-buffer-p (buffer-list)))))
+        (message "cdr buflist:%s car buflist:%s" (cdr buflist) (car buflist))
+        (append (cdr buflist) (list (car buflist)))))))
 
 (defun my/last-shellish-buffer (buflist)
   "Return most recently used shell-ish buffer in BUFLIST."
