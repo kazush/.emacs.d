@@ -5,6 +5,20 @@
 ;;              `(,(rx bos "*compilation" (* not-newline) "*" eos)
 ;;                (display-buffer--maybe-pop-up-frame-or-window)))
 
+(defvar my/compilation-last-buffer nil)
+(defun my/get-compilation-buffer (arg)
+  (interactive "p")
+  (let* ((b (get-buffer "*compilation*"))
+         (w (get-buffer-window b)))
+    (if (and w (= arg 4))
+        (delete-window w)
+      (if (and b (eq b (current-buffer)))
+          (select-window (display-buffer my/compilation-last-buffer))
+        (cond (b
+               (setq my/compilation-last-buffer (current-buffer))
+               (select-window (display-buffer b))))))))
+(global-set-key (kbd "C-c C-g") #'my/get-compilation-buffer)
+
 ;; elisp
 (add-hook 'emacs-lisp-mode-hook
           '(lambda () (ycmd-mode 0)))
