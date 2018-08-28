@@ -44,26 +44,20 @@ FRAME defaults to the selected frame."
       (setq candidate (car color-list)))
     best-color))
 
-(add-hook 'font-lock-mode-hook
-          '(lambda ()
-             ;; (set-face-background 'mode-line "gray20")
-             (set-face-background 'default "gray15")
-             (set-face-foreground 'region nil)
-             (set-face-background 'region "gray30")
-             (set-face-attribute 'font-lock-comment-face nil
-                                 :foreground "LightSlateGray"
-                                 :background (face-attribute 'default :background)
-                                 :slant 'italic)
-             (set-face-foreground 'font-lock-comment-delimiter-face "LightSlateGray")
-             (set-face-background 'font-lock-comment-delimiter-face nil)
-             (set-face-attribute 'highlight nil
-                                 :foreground "orange"
-                                 :background (face-attribute 'default :background)
-                                 :weight 'bold)
-             ;; (set-face-foreground 'font-lock-type-face "PaleGoldenrod")
-             ;; (set-face-foreground 'font-lock-type-face "yellow")
-             )
-          'APPEND)
+;; (set-face-background 'mode-line "gray20")
+(set-face-background 'default "gray15")
+(set-face-foreground 'region nil)
+(set-face-background 'region "gray30")
+(set-face-attribute 'font-lock-comment-face nil
+                    :foreground "LightSlateGray"
+                    :background (face-attribute 'default :background)
+                    :slant 'italic)
+(set-face-foreground 'font-lock-comment-delimiter-face "LightSlateGray")
+(set-face-background 'font-lock-comment-delimiter-face nil)
+(set-face-attribute 'highlight nil
+                    :foreground "orange"
+                    :background (face-attribute 'default :background)
+                    :weight 'bold)
 
 ;; ;; Set face for hl-line-mode
 ;; (set-face-background hl-line-face "gray22")
