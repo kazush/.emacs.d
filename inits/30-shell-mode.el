@@ -152,6 +152,7 @@ Will prompt you shell name when you type `C-u' before this command."
   (interactive)
   (my/helm-buffers-list my/helm-source-shellish-buffers-list))
 
+(defvar my/shellish-last-buffer nil)
 (defun my/get-shellish (arg shellfunc)
   "Switch to the shell-ish buffer last used or create new without prefix (ARG).
 Close the window if the current buffer is already a shell-ish
@@ -160,13 +161,19 @@ double prefixes by calling SHELLFUNC."
   (interactive "p")
   (let ((cwd default-directory)
         (b (my/last-shellish-buffer (buffer-list (selected-frame)))))
-    (if (or (not b) (= arg 16))
-        (funcall shellfunc)
-      (if (and (= arg 1) (my/shellish-buffer-p (current-buffer)))
-          (delete-window)
-        (select-window (display-buffer b))
-        (if (= arg 4)
-            (my/helm-shellish-buffers-list))))))
+    (cond ((or (not b) (= arg 16))
+           (setq my/shellish-last-buffer (current-buffer))
+           (funcall shellfunc))
+          ((and (= arg 64) b)
+           (delete-window (get-buffer-window b)))
+          ((= arg 4)
+           (my/helm-shellish-buffers-list))
+          ((my/shellish-buffer-p (current-buffer))
+           (if my/shellish-last-buffer
+               (select-window (display-buffer my/shellish-last-buffer))))
+          (b
+           (setq my/shellish-last-buffer (current-buffer))
+           (select-window (display-buffer b))))))
 
 (defun my/newshell ()
   "Create a new shell with base directory name."
