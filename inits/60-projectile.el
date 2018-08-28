@@ -3,6 +3,9 @@
   :config
   (setq projectile-mode-line '(:eval (format " [%s]" (projectile-project-name))))
   (projectile-mode)
+  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+  (add-hook 'comint-mode-hook
+            (lambda () (projectile-mode 0)))
   (setq projectile-completion-system 'helm))
 
 (use-package helm-projectile
