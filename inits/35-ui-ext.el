@@ -51,7 +51,9 @@
 ;; ace-jump-mode
 (use-package ace-jump-mode
   :ensure t
-  :bind (("C-c SPC" . ace-jump-mode)))
+  :bind (("C-c j" . ace-jump-mode))
+  :config
+  (setq ace-jump-mode-scope 'window))
 
 ;; ace-window
 (use-package ace-window

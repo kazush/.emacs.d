@@ -41,7 +41,8 @@
 ;; smartparens
 (use-package smartparens
   :ensure t
-  :bind (("C-c >" . sp-slurp-hybrid-sexp)
+  :bind (("C-M-f" . sp-forward-sexp)
+         ("C-c >" . sp-slurp-hybrid-sexp)
          ("C-c <" . sp-backward-slurp)
          ("C-c }" . sp-rewrap-sexp))
   :init

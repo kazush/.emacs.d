@@ -5,14 +5,15 @@
 ;; Disable startup message.
 (setq inhibit-startup-message t)
 
-;; Set load-path.
+;; Set additional load-path.
 (add-to-list 'load-path "~/lib/elisp")
 
 (require 'package)
 (setq package-archives
       '(("gnu" . "https://elpa.gnu.org/packages/")
-;        ("melpa-stable" . "https://stable.melpa.org/packages/")
+        ;; ("melpa-stable" . "https://stable.melpa.org/packages/")
         ("melpa" . "https://melpa.org/packages/")))
+(setq package-user-dir (concat "~/.emacs.d/" emacs-version "/elpa") )
 
 ;; Initialize package system.
 (package-initialize)
@@ -31,7 +32,6 @@
 (install-package 'use-package)
 (eval-when-compile
   (require 'use-package))
-(require 'bind-key)
 
 ;; init-loader
 (use-package init-loader

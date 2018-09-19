@@ -17,7 +17,7 @@
         (cond (b
                (setq my/compilation-last-buffer (current-buffer))
                (select-window (display-buffer b))))))))
-(global-set-key (kbd "C-c C-g") #'my/get-compilation-buffer)
+(global-set-key (kbd "\C-c C") #'my/get-compilation-buffer)
 
 ;; elisp
 (add-hook 'emacs-lisp-mode-hook
@@ -47,15 +47,24 @@
                (local-set-key (kbd "C-c i r") 'clang-format-region)))
   (setq clang-format-style-option "google"))
 
+;; Web-mode (HTML+CS/JS)
+(use-package web-mode
+  :ensure t
+  :mode ("\\.p?html?\\'" "\\.tpl\\.php\\'" "\\.[agj]sp\\'" "\\.as[cp]x\\'" "\\.erb\\'" "\\.mustache\\'" "\\.djhtml\\'"))
+
 ;; Javascript
 
-;; javascript-mode
-(add-hook 'js-mode-hook '(lambda ()
-                           (setq-local js-indent-level 2)
-                           (setq-local tab-width 2)))
+;; style
+(setq-default js-indent-level 2)
+(setq-default tab-width 2)
 
-;; angular-mode
-(use-package angular-mode :ensure t)
+;; rjsx-mode
+(use-package rjsx-mode
+  :ensure t
+  :mode ("\\.js\\'" "\\.ts\\'" "\\.jsx\\'" "\\.tsx\\'"))
+
+;; ng2-mode for Angular 2
+(use-package ng2-mode :ensure t)
 
 ;; Go
 
@@ -133,5 +142,18 @@
           '(lambda ()
              (local-set-key (kbd "C-c i b") 'google-java-format-buffer)
              (local-set-key (kbd "C-c i r") 'google-java-format-region)))
+
+;; Protobuf
+(use-package protobuf-mode
+  :ensure t
+  :after (smartparens)
+  :hook (protobuf-mode . smartparens-mode))
+
+;; sh-mode
+(add-hook 'sh-mode-hook
+          '(lambda ()
+             (setq-local sh-basic-offset 2)
+             (setq-local tab-width 2)
+             (setq-local indent-tabs-mode 0)))
 
 ;;; 30-prog-modes.el ends here

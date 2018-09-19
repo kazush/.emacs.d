@@ -65,6 +65,7 @@ FRAME defaults to the selected frame."
 
 ;; all-the-icons
 (use-package all-the-icons
+  :if window-system
   :ensure t
   :config
   (setq inhibit-compacting-font-caches t))

@@ -11,6 +11,10 @@
 
 (use-package company
   :ensure t
+  :hook ((prog-mode eshell-mode) . company-mode)
+  :bind (:map company-active-map
+              ("C-n" . company-select-next)
+              ("C-p" . company-select-previous))
   :config
   (setq company-show-numbers t)
   (setq company-lighter "")
@@ -19,10 +23,6 @@
   (add-hook 'eshell-mode-hook (lambda () (setq-local company-idle-delay 0.5)))
   (setq company-echo-delay 0)
   (setq company-dabbrev-downcase nil)
-  (add-hook 'prog-mode-hook #'company-mode)
-  (add-hook 'eshell-mode-hook #'company-mode)
-  (define-key company-active-map (kbd "C-n") #'company-select-next)
-  (define-key company-active-map (kbd "C-p") #'company-select-previous)
   (require 'color)
   (let ((bg (face-attribute 'default :background)))
     (set-face-attribute 'company-tooltip nil
@@ -67,6 +67,7 @@ In that case, insert the number."
 
 (use-package company-ycmd
   :ensure t
+  :after (company ycmd)
   :config
   (company-ycmd-setup)
   (setq company-ycmd-request-sync-timeout 0))
