@@ -61,7 +61,22 @@
 ;; rjsx-mode
 (use-package rjsx-mode
   :ensure t
-  :mode ("\\.js\\'" "\\.ts\\'" "\\.jsx\\'" "\\.tsx\\'"))
+  :mode ("\\.js\\'" "\\.jsx\\'"))
+
+;; Typescript
+(use-package tide
+  :ensure t
+  :after (flycheck)
+  :mode (("\\.tsx$" . web-mode))
+  :hook ((typescript-mode . tide-setup)
+         (typescript-mode . tide-hl-identifier-mode)
+         (web-mode . (lambda ()
+                       (when (string-equal "tsx" (file-name-extension buffer-file-name))
+                         (tide-setup)
+                         (tide-hl-identifier-mode))))
+         (before-save . tide-format-before-save))
+  :config
+  (flycheck-add-mode 'typescript-tslint 'web-mode))
 
 ;; ng2-mode for Angular 2
 (use-package ng2-mode :ensure t)
