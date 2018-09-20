@@ -43,7 +43,6 @@
   :ensure t
   :bind (("C-M-f" . sp-forward-sexp)
          ("C-c >" . sp-slurp-hybrid-sexp)
-         ("C-c <" . sp-backward-slurp)
          ("C-c }" . sp-rewrap-sexp))
   :init
   (require 'smartparens-config)
@@ -57,6 +56,7 @@
   (sp-pair "(" ")" :when '(my-sp-pair-function) :wrap "C-c (")
   (sp-pair "{" "}" :when '(my-sp-pair-function) :wrap "C-c {")
   (sp-pair "[" "]" :when '(my-sp-pair-function) :wrap "C-c [")
+  (sp-pair "<" ">" :when '(my-sp-pair-function) :wrap "C-c <")
   (sp-pair "\"" "\"" :when '(my-sp-pair-function) :wrap "C-c \"")
   (sp-pair "'" "'" :when '(my-sp-pair-function) :wrap "C-c '")
   (sp-pair "`" "`" :when '(my-sp-pair-function) :wrap "C-c `")
