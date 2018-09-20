@@ -3,20 +3,28 @@
   :ensure t
   :bind (("M-SPC" . er/expand-region)))
 
+;; iedit
+(use-package iedit
+  :ensure t
+  :config
+  (define-key iedit-mode-keymap (kbd "C-o") 'iedit-toggle-unmatched-lines-visible))
+
 ;; multiple-cursors
 (use-package multiple-cursors
   :ensure t
-  :bind (("C-c SPC" . mc/mark-all-like-this-dwim))
-  :config
-  (defhydra hydra-multiple-cursors (:hint nil)
+  :bind (("C-c ;" . hydra-multiple-cursors/body))
+  :init
+  (defhydra hydra-multiple-cursors (:body-pre (mc/mark-all-like-this-dwim nil)
+                                              :hint nil)
     "
      ^Up^            ^Down^        ^Other^
 ----------------------------------------------
 [_p_]   Next    [_n_]   Next    [_l_] Edit lines
 [_P_]   Skip    [_N_]   Skip    [_a_] Mark all
 [_M-p_] Unmark  [_M-n_] Unmark  [_r_] Mark by regexp
-^ ^             ^ ^             [_q_] Quit
+^ ^             [_i_]   iEdit   [_q_] Quit
 "
+    ("i" iedit-mode :exit t)
     ("l" mc/edit-lines :exit t)
     ("a" mc/mark-all-like-this :exit t)
     ("n" mc/mark-next-like-this)
@@ -44,13 +52,6 @@
   (define-key undo-tree-map (kbd "C-x u") 'undo-tree-undo)
   (define-key undo-tree-map (kbd "C-_") 'undo-tree-visualize)
   (setq undo-tree-mode-lighter ""))
-
-;; iedit
-(use-package iedit
-  :ensure t
-  :bind (("C-c ;" . iedit-mode))
-  :config
-  (define-key iedit-mode-keymap (kbd "C-o") 'iedit-toggle-unmatched-lines-visible))
 
 ;; ws-butler
 (use-package ws-butler
