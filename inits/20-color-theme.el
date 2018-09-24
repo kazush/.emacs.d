@@ -44,20 +44,53 @@ FRAME defaults to the selected frame."
       (setq candidate (car color-list)))
     best-color))
 
-;; (set-face-background 'mode-line "gray20")
-(set-face-background 'default "gray15")
-(set-face-foreground 'region nil)
-(set-face-background 'region "gray30")
-(set-face-attribute 'font-lock-comment-face nil
-                    :foreground "LightSlateGray"
-                    :background (face-attribute 'default :background)
-                    :slant 'italic)
-(set-face-foreground 'font-lock-comment-delimiter-face "LightSlateGray")
-(set-face-background 'font-lock-comment-delimiter-face nil)
-(set-face-attribute 'highlight nil
-                    :foreground "orange"
-                    :background (face-attribute 'default :background)
-                    :weight 'bold)
+(defun my/set-default-faces ()
+  "Set default faces."
+  (interactive)
+  (require 'color)
+  (set-face-attribute 'default nil
+                      :foreground "#afafaf"
+                      :background "gray15")
+  (set-face-attribute 'region nil
+                      :foreground 'unspecified
+                      :background "gray30")
+
+  (set-face-attribute 'mode-line-inactive nil
+                      :foreground (face-foreground 'mode-line)
+                      :background (color-darken-name
+                                   (face-background 'mode-line) 10)
+                      :inherit 'mode-line)
+  (set-face-attribute 'font-lock-comment-face nil
+                      :foreground "LightSlateGray"
+                      :slant 'italic
+                      :inherit 'default)
+  (set-face-attribute 'font-lock-comment-delimiter-face nil
+                      :slant 'unspecified
+                      :inherit 'font-lock-comment-face)
+  (set-face-attribute 'highlight nil
+                      :foreground "orange"
+                      :background 'unspecified
+                      :weight 'bold
+                      :inherit 'default)
+  (set-face-foreground 'font-lock-function-name-face
+                       (color-darken-name
+                        (face-foreground 'font-lock-type-face) 20))
+  (set-face-foreground 'font-lock-variable-name-face "khaki")
+  (set-face-foreground 'font-lock-preprocessor-face
+                       (color-darken-name
+                        (face-foreground 'font-lock-keyword-face) 20))
+  )
+
+(my/set-default-faces)
+;; Re-initialize after init files are loaded.
+(add-hook 'emacs-startup-hook 'my/set-default-faces)
+
+(use-package zerodark-theme
+  :ensure t
+  :config
+  (load-theme 'zerodark t)
+  ;; (zerodark-setup-modeline-format)
+  )
 
 ;; ;; Set face for hl-line-mode
 ;; (set-face-background hl-line-face "gray22")
@@ -69,13 +102,6 @@ FRAME defaults to the selected frame."
   :ensure t
   :config
   (setq inhibit-compacting-font-caches t))
-
-(use-package zerodark-theme
-  :ensure t
-  :config
-  (load-theme 'zerodark t)
-  ;; (zerodark-setup-modeline-format)
-  )
 
 (use-package spaceline
   :ensure t
