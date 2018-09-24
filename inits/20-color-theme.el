@@ -49,7 +49,6 @@ FRAME defaults to the selected frame."
   (interactive)
   (require 'color)
   (set-face-attribute 'default nil
-                      :foreground "#afafaf"
                       :background "gray15")
   (set-face-attribute 'region nil
                       :foreground 'unspecified
@@ -74,11 +73,11 @@ FRAME defaults to the selected frame."
                       :inherit 'default)
   (set-face-foreground 'font-lock-function-name-face
                        (color-darken-name
-                        (face-foreground 'font-lock-type-face) 20))
+                        (face-foreground 'font-lock-type-face) 10))
   (set-face-foreground 'font-lock-variable-name-face "khaki")
   (set-face-foreground 'font-lock-preprocessor-face
-                       (color-darken-name
-                        (face-foreground 'font-lock-keyword-face) 20))
+                       (color-lighten-name
+                        (face-foreground 'font-lock-keyword-face) 10))
   )
 
 (my/set-default-faces)
