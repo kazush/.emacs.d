@@ -131,3 +131,9 @@
   :hook ((prog-mode) . symbol-overlay-mode)
   :config
   (setq symbol-overlay-idle-time 1.0))
+
+(use-package highlight-indent-guides
+  :ensure t
+  :hook (prog-mode . highlight-indent-guides-mode)
+  :config
+  (setq highlight-indent-guides-method 'character))
