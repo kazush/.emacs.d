@@ -35,10 +35,9 @@
                           :inherit 'default)
       (set-face-attribute 'company-tooltip-selection nil
                           :foreground 'unspecified
-                          ;; :background (color-lighten-name
-                          ;;              (face-background 'company-tooltip)
-                          ;;              10)
-                          :background "steelblue"
+                          :background (color-lighten-name
+                                       (face-background 'company-tooltip)
+                                       10)
                           :inherit 'company-tooltip)
       (set-face-attribute 'company-tooltip-common nil
                           :background 'unspecified
