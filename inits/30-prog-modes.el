@@ -50,7 +50,54 @@
 ;; Web-mode (HTML+CS/JS)
 (use-package web-mode
   :ensure t
-  :mode ("\\.p?html?\\'" "\\.tpl\\.php\\'" "\\.[agj]sp\\'" "\\.as[cp]x\\'" "\\.erb\\'" "\\.mustache\\'" "\\.djhtml\\'"))
+  :mode ("\\.p?html?\\'" "\\.tpl\\.php\\'" "\\.[agj]sp\\'" "\\.as[cp]x\\'" "\\.erb\\'" "\\.mustache\\'" "\\.djhtml\\'")
+  :hook ((web-mode . (lambda ()
+                       (setq-local indent-tabs-mode nil))))
+  :after (smartparens)
+  :config
+  (define-key web-mode-map (kbd "C-c /") 'web-mode-element-close)
+  (setq web-mode-markup-indent-offset 2)
+  (setq web-mode-css-indent-offset 2)
+  (setq web-mode-code-indent-offset 2)
+  (setq web-mode-sql-indent-offset 2)
+  (setq web-mode-enable-block-face t)
+  (setq web-mode-enable-part-face t)
+  (setq web-mode-enable-auto-pairing nil)
+  (setq web-mode-enable-auto-closing t)
+  (setq web-mode-enable-auto-opening t)
+  (setq web-mode-enable-auto-quoting t)
+  (setq web-mode-enable-auto-indentation t)
+  (setq web-mode-enable-css-colorization t)
+  (setq web-mode-enable-current-element-highlight nil)
+  (setq web-mode-enable-current-column-highlight nil)
+  (setq web-mode-enable-comment-interpolation t)
+
+  (set-face-foreground 'web-mode-current-element-highlight-face "orange")
+  (set-face-foreground 'web-mode-html-entity-face "yellow")
+  (set-face-foreground 'web-mode-html-tag-face "orangered")
+  (set-face-foreground 'web-mode-html-tag-bracket-face
+                       (color-darken-name (face-foreground 'default) 20))
+  (set-face-foreground 'web-mode-html-attr-name-face "orange")
+  (set-face-foreground 'web-mode-html-attr-equal-face "cyan")
+  (set-face-foreground 'web-mode-html-attr-value-face
+                       (face-foreground 'font-lock-constant-face))
+  ;; (set-face-foreground 'web-mode-annotation-tag-face "lightblue")
+  ;; (set-face-foreground 'web-mode-annotation-type-face "pink")
+  ;; (set-face-foreground 'web-mode-annotation-value-face "navy")
+  ;; (set-face-foreground 'web-mode-constant-face "limegreen")
+  ;; (set-face-foreground 'web-mode-filter-face "darkblue")
+  ;; (set-face-foreground 'web-mode-keyword-face "pink")
+  ;; (set-face-foreground 'web-mode-symbol-face
+  ;;                      (face-foreground 'font-lock-constant-face))
+  ;; (set-face-foreground 'web-mode-type-face "navy")
+  ;; (set-face-foreground 'web-mode-variable-name-face "lightblue")
+
+  (defun sp-web-mode-is-code-context (id action context)
+    (and (eq action 'insert)
+         (not (or (get-text-property (point) 'part-side)
+                  (get-text-property (point) 'block-side)))))
+  (sp-local-pair 'web-mode "<" nil :when '(sp-web-mode-is-code-context))
+  )
 
 ;; Javascript
 
