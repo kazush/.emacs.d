@@ -55,7 +55,7 @@
                           :foreground 'unspecified
                           :background (face-background
                                        'company-tooltip-selection)
-                          :inherit 'company-tooltip-align-annotations)
+                          :inherit 'company-tooltip-annotation)
       (set-face-attribute 'company-scrollbar-bg nil
                           :background (color-lighten-name bg 10))
       (set-face-attribute 'company-scrollbar-fg nil
