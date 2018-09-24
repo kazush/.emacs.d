@@ -28,8 +28,8 @@
   (dolist (package package-list)
     (install-package package)))
 
-;; use-package
-(install-package 'use-package)
+;; use-package and its dependencies
+(install-packages '(use-package diminish))
 (eval-when-compile
   (require 'use-package))
 

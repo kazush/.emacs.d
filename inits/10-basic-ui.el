@@ -69,3 +69,8 @@
 
   ;; make pasting utf8 text work
   (set-selection-coding-system nil))
+
+;; diminish
+(use-package diminish
+  :config
+  (diminish 'eldoc-mode))
