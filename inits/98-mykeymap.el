@@ -11,7 +11,6 @@
 (define-key my-map (kbd "r") 'hydra-rectangle/body)
 (define-key my-map (kbd "t") 'hydra-transpose-frame/body)
 (define-key my-map (kbd "g") 'hydra-git-gutter/body)
-(define-key my-map (kbd "f") 'hydra-flycheck/body)
 (define-key my-map (kbd "n") 'hydra-narrow/body)
 (define-key my-map (kbd "m") 'hydra-multiple-cursors/body)
 
