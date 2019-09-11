@@ -165,12 +165,13 @@ double prefixes by calling SHELLFUNC."
            (setq my/shellish-last-buffer (current-buffer))
            (funcall shellfunc))
           ((and (= arg 4) b)
-           (delete-window (get-buffer-window b)))
+           (select-window (display-buffer my/shellish-last-buffer)))
           ((= arg 16)
            (my/helm-shellish-buffers-list))
           ((my/shellish-buffer-p (current-buffer))
-           (if my/shellish-last-buffer
-               (select-window (display-buffer my/shellish-last-buffer))))
+           (when my/shellish-last-buffer
+             (delete-window (get-buffer-window b))
+             (select-window (display-buffer my/shellish-last-buffer))))
           (b
            (setq my/shellish-last-buffer (current-buffer))
            (select-window (display-buffer b))))))
