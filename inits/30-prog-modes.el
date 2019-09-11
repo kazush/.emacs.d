@@ -47,6 +47,9 @@
                (local-set-key (kbd "C-c i r") 'clang-format-region)))
   (setq clang-format-style-option "google"))
 
+;; MQL4
+(add-to-list 'auto-mode-alist '("\\.mq[45h]$" . c++-mode))
+
 ;; Web-mode (HTML+CS/JS)
 (use-package web-mode
   :ensure t
