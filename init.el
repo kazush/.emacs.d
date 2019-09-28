@@ -14,6 +14,7 @@
         ;; ("melpa-stable" . "https://stable.melpa.org/packages/")
         ("melpa" . "https://melpa.org/packages/")))
 (setq package-user-dir (concat "~/.emacs.d/" emacs-version "/elpa") )
+(setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
 
 ;; Initialize package system.
 (package-initialize)
@@ -31,11 +32,12 @@
 ;; use-package and its dependencies
 (install-packages '(use-package diminish))
 (eval-when-compile
-  (require 'use-package))
+  (require 'use-package)
+  (require 'use-package-ensure)
+  (setq use-package-always-ensure t))
 
 ;; init-loader
 (use-package init-loader
-  :ensure t
   :config
   (setq init-loader-show-log-after-init 'error-only)
   (init-loader-load))

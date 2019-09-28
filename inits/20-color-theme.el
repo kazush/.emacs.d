@@ -85,7 +85,6 @@ FRAME defaults to the selected frame."
 (add-hook 'emacs-startup-hook 'my/set-default-faces)
 
 (use-package zerodark-theme
-  :ensure t
   :config
   (load-theme 'zerodark t)
   ;; (zerodark-setup-modeline-format)
@@ -98,12 +97,10 @@ FRAME defaults to the selected frame."
 ;; all-the-icons
 (use-package all-the-icons
   :if window-system
-  :ensure t
   :config
   (setq inhibit-compacting-font-caches t))
 
 (use-package spaceline
-  :ensure t
   :config
   (if (not window-system)
       (setq powerline-default-separator 'utf-8))

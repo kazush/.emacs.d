@@ -25,21 +25,17 @@
 
 ;; c/c++-mode
 (use-package google-c-style
-  :ensure t
   :config
   (add-hook 'c-mode-common-hook 'google-set-c-style)
   (add-hook 'c-mode-common-hook 'google-make-newline-indent))
 (use-package modern-cpp-font-lock
-  :ensure t
   :config
   (modern-c++-font-lock-global-mode t))
 (use-package company-c-headers
-  :ensure t
   :config
   (eval-after-load "company"
     '(add-to-list 'company-backends 'company-c-headers)))
 (use-package clang-format
-  :ensure t
   :config
   (add-hook 'c-mode-common-hook
             '(lambda ()
@@ -52,7 +48,6 @@
 
 ;; Web-mode (HTML+CS/JS)
 (use-package web-mode
-  :ensure t
   :mode ("\\.p?html?\\'" "\\.tpl\\.php\\'" "\\.[agj]sp\\'" "\\.as[cp]x\\'" "\\.erb\\'" "\\.mustache\\'" "\\.djhtml\\'")
   :hook ((web-mode . (lambda ()
                        (setq-local indent-tabs-mode nil))))
@@ -110,12 +105,10 @@
 
 ;; rjsx-mode
 (use-package rjsx-mode
-  :ensure t
   :mode ("\\.js\\'" "\\.jsx\\'"))
 
 ;; Typescript
 (use-package tide
-  :ensure t
   :after (flycheck)
   :mode (("\\.tsx$" . web-mode))
   :hook ((typescript-mode . tide-setup)
@@ -135,7 +128,6 @@
 
 ;; go-mode
 (use-package go-mode
-  :ensure t
   :mode (("\\.go$" . go-mode))
   :config
   (add-hook 'go-mode-hook
@@ -163,7 +155,7 @@
 (use-package go-guru :ensure t)
 (use-package golint :ensure t)
 (use-package helm-go-package
-  :ensure t
+  :if my/enable-helm
   :init
   (eval-after-load 'go-mode
     '(substitute-key-definition 'go-import-add 'helm-go-package go-mode-map)))
@@ -172,7 +164,6 @@
 
 ;; yapf
 (use-package yapfify
-  :ensure t
   :config
   ;; (add-hook 'python-mode-hook 'yapf-mode)
   (add-hook 'python-mode-hook
@@ -180,12 +171,10 @@
 
 ;; anaconda-mode for python
 (use-package anaconda-mode
-  :ensure t
   :config
   (add-hook 'python-mode-hook 'anaconda-mode)
   (add-hook 'python-mode-hook 'anaconda-eldoc-mode))
 (use-package company-anaconda
-  :ensure t
   :config
   (eval-after-load "company"
     '(add-to-list 'company-backends 'company-anaconda)))
@@ -210,7 +199,6 @@
 
 ;; Protobuf
 (use-package protobuf-mode
-  :ensure t
   :after (smartparens)
   :hook (protobuf-mode . smartparens-mode))
 

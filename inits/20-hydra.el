@@ -3,7 +3,6 @@
 ;;; Code:
 
 (use-package hydra
-  :ensure t
   :config
   (require 'hydra-examples))
 

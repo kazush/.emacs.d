@@ -94,7 +94,6 @@ In that case, insert the number."
   )
 
 (use-package company-ycmd
-  :ensure t
   :after (company ycmd)
   :config
   (company-ycmd-setup)

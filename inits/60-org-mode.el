@@ -1,5 +1,4 @@
 (use-package org
-  :ensure t
   :commands (org-agenda org-iswitchb org-capture)
   :bind (("C-c o a" . org-agenda)
          ("C-c o b" . org-iswitchb)
@@ -53,26 +52,21 @@
   (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
   )
 
-(use-package ob-ipython
-  :ensure t)
-
-(use-package ob-go
-  :ensure t)
+(use-package ob-ipython)
+(use-package ob-go)
 
 ;; helm support
-(use-package helm-org-rifle :ensure t)
+(use-package helm-org-rifle
+  :if my/enable-helm)
 
 ;; ob-async
-(use-package ob-async
-  :ensure t)
+(use-package ob-async)
 
 ;; org-bullets
 (use-package org-bullets
-  :ensure t
   :config
   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 
 ;; org-cliplink
 (use-package org-cliplink
-  :ensure t
   :bind (("C-c o L" . org-cliplink)))

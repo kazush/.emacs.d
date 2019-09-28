@@ -7,7 +7,6 @@
 ;          '(lambda () (linum-mode 1)))
 
 (use-package flycheck
-  :ensure t
   :config
   (add-hook 'prog-mode-hook 'flycheck-mode)
   (setq flycheck-indication-mode nil))
@@ -18,7 +17,6 @@
 ;;   (flycheck-popup-tip-mode))
 
 (use-package flycheck-ycmd
-  :ensure t
   :config
   (add-hook 'after-init-mode #'flycheck-ycmd-setup))
 
@@ -29,7 +27,6 @@
 
 ;; smartparens
 (use-package smartparens
-  :ensure t
   :bind (("C-M-f" . sp-forward-sexp)
          ("C-c >" . sp-slurp-hybrid-sexp)
          ("C-c }" . sp-rewrap-sexp))
@@ -69,19 +66,16 @@
 
 ;; embrace
 (use-package embrace
-  :ensure t
   :bind (("C-c :" . embrace-commander)))
 
 ;; rainbow-delimiters
 (use-package rainbow-delimiters
-  :ensure t
   :config
   (add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
   (set-face-background 'rainbow-delimiters-unmatched-face "red"))
 
 ;; show whitespaces
 (use-package whitespace
-  :ensure t
   :init
   (add-hook 'after-change-major-mode-hook
             '(lambda ()
@@ -111,24 +105,20 @@
 
 ;; dumb-jump
 (use-package dumb-jump
-  :ensure t
   :config
   (add-hook 'prog-mode-hook 'dumb-jump-mode))
 
 (use-package aggressive-indent
-  :ensure t
   :config
   (add-hook 'go-mode-hook 'aggressive-indent-mode)
   (add-hook 'emacs-lisp-mode-hook 'aggressive-indent-mode))
 
 (use-package symbol-overlay
-  :ensure t
   :hook ((prog-mode) . symbol-overlay-mode)
   :config
   (setq symbol-overlay-idle-time 1.0))
 
 (use-package highlight-indent-guides
-  :ensure t
   :hook (prog-mode . highlight-indent-guides-mode)
   :diminish highlight-indent-guides-mode
   :config

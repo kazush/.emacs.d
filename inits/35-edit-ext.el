@@ -1,17 +1,14 @@
 ;; expand-region
 (use-package expand-region
-  :ensure t
   :bind (("M-SPC" . er/expand-region)))
 
 ;; iedit
 (use-package iedit
-  :ensure t
   :config
   (define-key iedit-mode-keymap (kbd "C-o") 'iedit-toggle-unmatched-lines-visible))
 
 ;; multiple-cursors
 (use-package multiple-cursors
-  :ensure t
   :bind (("C-c ;" . hydra-multiple-cursors/body))
   :init
   (defhydra hydra-multiple-cursors (:body-pre (mc/mark-all-like-this-dwim nil)
@@ -38,13 +35,15 @@
   )
 
 ;; wgrep
-(use-package wgrep :ensure t)
-(use-package wgrep-helm :ensure t)
-(use-package wgrep-ag :ensure t)
+(use-package wgrep
+  :if my/enable-helm)
+(use-package wgrep-ag
+  :if my/enable-helm)
+(use-package wgrep-helm
+  :if my/enable-helm)
 
 ;; undo tree
 (use-package undo-tree
-  :ensure t
   :config
   (global-undo-tree-mode)
   (setq undo-tree-visualizer-diff 1)
@@ -55,7 +54,6 @@
 
 ;; ws-butler
 (use-package ws-butler
-  :ensure t
   :config
   (add-hook 'prog-mode-hook 'ws-butler-mode)
   (setcar (cdr (assoc 'ws-butler-mode minor-mode-alist)) ""))

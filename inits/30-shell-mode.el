@@ -44,7 +44,6 @@
 
 ;; xterm-color
 (use-package xterm-color
-  :ensure t
   :config
   (add-hook 'comint-preoutput-filter-functions 'xterm-color-filter)
   (setq comint-output-filter-functions
@@ -72,7 +71,6 @@
                             (xterm-color-filter string))))))))
 
 (use-package multi-term
-  :ensure t
   :config
   (setq multi-term-dedicated-close-back-to-open-buffer-p nil)
   (setq multi-term-dedicated-select-after-open-p t)
@@ -119,21 +117,23 @@ Will prompt you shell name when you type `C-u' before this command."
           (buffer-name buf))
          (seq-contains '(shell-mode eshell-mode term-mode) mode))))
 
-(defvar my/helm-source-shellish-buffers-list
-  (helm-make-source "Shell/Eshell/Term Buffers" 'helm-source-buffers
-    :buffer-list
-    (lambda ()
-      (let ((buflist (mapcar
-                      #'buffer-name
-                      (cl-remove-if-not 'my/shellish-buffer-p (buffer-list)))))
-        (message "cdr buflist:%s car buflist:%s" (cdr buflist) (car buflist))
-        (append (cdr buflist) (list (car buflist)))))))
+(when my/enable-helm
+  (defvar my/helm-source-shellish-buffers-list
+    (helm-make-source "Shell/Eshell/Term Buffers" 'helm-source-buffers
+      :buffer-list
+      (lambda ()
+        (let ((buflist (mapcar
+                        #'buffer-name
+                        (cl-remove-if-not 'my/shellish-buffer-p (buffer-list)))))
+          (message "cdr buflist:%s car buflist:%s" (cdr buflist) (car buflist))
+          (append (cdr buflist) (list (car buflist))))))))
 
-(defun my/last-shellish-buffer (buflist)
-  "Return most recently used shell-ish buffer in BUFLIST."
-  (when buflist
-    (if (my/shellish-buffer-p (car buflist))
-        (car buflist) (my/last-shellish-buffer (cdr buflist)))))
+
+  (defun my/last-shellish-buffer (buflist)
+    "Return most recently used shell-ish buffer in BUFLIST."
+    (when buflist
+      (if (my/shellish-buffer-p (car buflist))
+          (car buflist) (my/last-shellish-buffer (cdr buflist)))))
 
 (defun my/chdir (dir)
   "Change directory to DIR."

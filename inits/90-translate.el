@@ -1,5 +1,4 @@
 (use-package xah-lookup
-  :ensure t
   :bind (("C-c L j" . my-xah-lookup-weblio)
          ("C-c L a" . my-xah-lookup-all-dictionaries)
          ("C-c L g" . my-xah-lookup-google)

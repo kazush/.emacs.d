@@ -63,11 +63,9 @@
 (global-set-key (kbd "C-c e") #'get-eshell)
 (global-set-key (kbd "C-c E") #'myeshell)
 
-(use-package eshell-z
-  :ensure t)
+(use-package eshell-z)
 
 (use-package eshell-git-prompt
-  :ensure t
   :config
   (eshell-git-prompt-use-theme 'powerline))
 

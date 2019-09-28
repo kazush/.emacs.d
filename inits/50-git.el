@@ -1,17 +1,16 @@
 (use-package magit
-  :ensure t
   :commands (magit-status)
   :bind (("C-c m" . magit-status)))
 
 (use-package helm-ls-git
-  :ensure t
+  :if my/enable-helm
   :commands (helm-ls-git-ls helm-browse-project)
   :init
   (eval-after-load 'helm
     '(define-key helm-map (kbd "C-x C-d") 'helm-ls-git-ls)))
 
 (use-package helm-git-grep
-  :ensure t
+  :if my/enable-helm
   :commands (helm-git-grep helm-git-grep-from-helm)
   :bind (("C-c h g" . helm-git-grep))
   :init
@@ -21,11 +20,10 @@
     '(define-key helm-map (kbd "C-c h g") 'helm-git-grep-from-helm)))
 
 (use-package git-gutter
-  :ensure t
   :config
   (setq git-gutter:lighter "")
   (global-git-gutter-mode 1)
-;  (git-gutter:linum-setup)
+                                        ;  (git-gutter:linum-setup)
   (defhydra hydra-git-gutter (:body-pre (git-gutter-mode 1)
                                         :hint nil)
     "
@@ -60,5 +58,4 @@ Git gutter:
 ;;   :after magit
 ;;   :config (magithub-feature-autoinject t))
 
-(use-package git-timemachine
-  :ensure t)
+(use-package git-timemachine)

@@ -1,5 +1,5 @@
 (use-package helm
-  :ensure t
+  :if my/enable-helm
   :diminish helm-mode
   :init
   (require 'helm-config)
@@ -30,13 +30,13 @@
   )
 
 (use-package helm-descbinds
-  :ensure t
+  :if my/enable-helm
   :config (helm-descbinds-mode))
 
 (use-package helm-describe-modes
-  :ensure t
+  :if my/enable-helm
   :config (global-set-key [remap describe-mode] #'helm-describe-modes))
 
 (use-package helm-swoop
-  :ensure t
+  :if my/enable-helm
   :bind (("C-c O" . helm-swoop)))

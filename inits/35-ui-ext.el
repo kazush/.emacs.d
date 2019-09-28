@@ -4,7 +4,6 @@
 
 ;; perspeen
 (use-package perspeen
-  :ensure t
   :init
   (setq perspeen-use-tab nil)
   :config
@@ -16,7 +15,6 @@
 
 ;; neotree
 (use-package neotree
-  :ensure t
   :bind (("C-c I n" . neotree-toggle))
   :config
   (setq neo-theme (if (display-graphic-p) 'icons 'arrow)))
@@ -50,7 +48,6 @@
 
 ;; ace-jump-mode
 (use-package ace-jump-mode
-  :ensure t
   :bind (("C-c SPC" . ace-jump-char-mode)
          ("C-c j" . ace-jump-char-mode))
   :config
@@ -58,7 +55,6 @@
 
 ;; ace-window
 (use-package ace-window
-  :ensure t
   :init
   (define-prefix-command 'my-aw-map)
   (global-set-key (kbd "C-c w") 'my-aw-map)
@@ -117,7 +113,6 @@
 
 ;; fancy-narrow
 (use-package fancy-narrow
-  :ensure t
   :config
   (add-hook 'prog-mode-hook 'fancy-narrow-mode)
   (defhydra hydra-narrow (:hint nil)
@@ -136,12 +131,10 @@ Narrow To: _n_: region _p_: page    _d_: defun
     ("q" nil)))
 
 ;; emojify
-(use-package emojify
-  :ensure t)
+(use-package emojify)
 
 ;; transpose-frame
 (use-package transpose-frame
-  :ensure t
   :config
   (defhydra hydra-transpose-frame (:hint nil)
     "
