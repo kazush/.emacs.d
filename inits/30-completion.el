@@ -1,6 +1,4 @@
-
 (use-package ycmd
-  :ensure t
   :config
   (set-variable 'ycmd-server-command
                 (list "python"
@@ -10,7 +8,6 @@
   (add-hook 'after-init-hook #'global-ycmd-mode))
 
 (use-package company
-  :ensure t
   :hook ((prog-mode eshell-mode) . company-mode)
   :bind (:map company-active-map
               ("C-n" . company-select-next)
