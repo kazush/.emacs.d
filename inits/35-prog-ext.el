@@ -16,10 +16,6 @@
 ;;   :config
 ;;   (flycheck-popup-tip-mode))
 
-(use-package flycheck-ycmd
-  :config
-  (add-hook 'after-init-mode #'flycheck-ycmd-setup))
-
 ;; Do not use TAB for indentation in prog mode
 (add-hook 'prog-mode-hook
           '(lambda ()

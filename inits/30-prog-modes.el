@@ -1,5 +1,3 @@
-;; C/C++
-
 ;; Split window and display compilation buffer below the original window.
 ;; (add-to-list 'display-buffer-alist
 ;;              `(,(rx bos "*compilation" (* not-newline) "*" eos)
@@ -19,11 +17,11 @@
                (select-window (display-buffer b))))))))
 (global-set-key (kbd "\C-c C") #'my/get-compilation-buffer)
 
-;; elisp
-(add-hook 'emacs-lisp-mode-hook
-          '(lambda () (ycmd-mode 0)))
-
 ;; c/c++-mode
+(with-eval-after-load 'eglot
+  (add-to-list 'eglot-server-programs
+               '((c++-mode c-mode) "clangd")))
+(add-hook 'c-mode-common-hook 'eglot-ensure)
 (use-package google-c-style
   :config
   (add-hook 'c-mode-common-hook 'google-set-c-style)
@@ -32,9 +30,10 @@
   :config
   (modern-c++-font-lock-global-mode t))
 (use-package company-c-headers
+  :after (company)
   :config
-  (eval-after-load "company"
-    '(add-to-list 'company-backends 'company-c-headers)))
+  (add-to-list 'company-c-headers-path-system "/usr/include/c++/8/")
+  (add-to-list 'company-backends 'company-c-headers))
 (use-package clang-format
   :config
   (add-hook 'c-mode-common-hook
@@ -131,21 +130,21 @@
   :mode (("\\.go$" . go-mode))
   :config
   (add-hook 'go-mode-hook
-            '(lambda ()
-               (setq-local compile-command
-                           "go build -v && go test -v && go vet")
-               (setq-local gofmt-command "goimports")
-               (setq-local fill-column 100)
-               (setq-local c-basic-offset 4)
-               (setq-local tab-width 4)
-               (setq-local indent-tabs-mode 1)
-               (ycmd-mode)
-               (company-mode)
-               (flycheck-mode)
-               (go-guru-hl-identifier-mode)
-               (add-hook 'before-save-hook 'gofmt-before-save)
-               (local-set-key (kbd "M-.") 'godef-jump)
-               (local-set-key (kbd "M-*") 'pop-tag-mark))))
+            (lambda ()
+              (setq-local compile-command
+                          "go build -v && go test -v && go vet")
+              (setq-local gofmt-command "goimports")
+              (setq-local fill-column 100)
+              (setq-local c-basic-offset 4)
+              (setq-local tab-width 4)
+              (setq-local indent-tabs-mode 1)
+              (eglot-ensure)
+              (company-mode)
+              (flycheck-mode)
+              (go-guru-hl-identifier-mode)
+              (add-hook 'before-save-hook 'gofmt-before-save)
+              (local-set-key (kbd "M-.") 'godef-jump)
+              (local-set-key (kbd "M-*") 'pop-tag-mark))))
 
 ;; (use-package go-eldoc
 ;;   :ensure t

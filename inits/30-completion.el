@@ -1,12 +1,3 @@
-(use-package ycmd
-  :config
-  (set-variable 'ycmd-server-command
-                (list "python"
-                      (substitute-in-file-name "$HOME/ws/ycmd/ycmd/__main__.py")))
-  (setq request-message-level -1)
-  (setq url-show-status nil)
-  (add-hook 'after-init-hook #'global-ycmd-mode))
-
 (use-package company
   :hook ((prog-mode eshell-mode) . company-mode)
   :bind (:map company-active-map
@@ -90,8 +81,19 @@ In that case, insert the number."
         (company-complete-number (string-to-number k)))))
   )
 
-(use-package company-ycmd
-  :after (company ycmd)
+(use-package eglot
+  :after (projectile)
   :config
-  (company-ycmd-setup)
-  (setq company-ycmd-request-sync-timeout 0))
+  (with-eval-after-load 'project
+    (add-to-list 'project-find-functions
+                 '(lambda (dir)
+                    (let ((root (projectile-project-root dir)))
+                      (and root (cons 'transient root)))))))
+
+(use-package company-lsp
+  :config
+  (push 'company-lsp company-backends)
+  (setq company-lsp-cache-candidates 'auto)
+  (setq company-lsp-async t)
+  (setq company-lsp-enable-snippet t)
+  (setq company-lsp-enable-recompletion t))
