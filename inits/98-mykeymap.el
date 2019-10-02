@@ -14,5 +14,20 @@
 (define-key my-map (kbd "n") 'hydra-narrow/body)
 (define-key my-map (kbd "m") 'hydra-multiple-cursors/body)
 
+(when window-system
+  (global-set-key (kbd "s-h") #'windmove-left)
+  (global-set-key (kbd "s-j") #'windmove-down)
+  (global-set-key (kbd "s-k") #'windmove-up)
+  (global-set-key (kbd "s-l") #'windmove-right)
+  (global-set-key (kbd "s-<tab>") #'switch-to-last-buffer)
+  (global-set-key (kbd "s-n") #'switch-to-next-buffer)
+  (global-set-key (kbd "s-p") #'switch-to-prev-buffer)
+  (global-set-key (kbd "s-O") #'perspeen-goto-last-ws)
+  (global-set-key (kbd "s-C") #'kill-buffer-and-window)
+  (global-set-key (kbd "s-m") #'helm-mini)
+  (global-set-key (kbd "s-f") #'find-file-other-window)
+  (global-set-key (kbd "s-o") (lambda () (interactive)
+                                (my/get-shell 1))))
+
 (provide '98-mykeymap)
 ;;; 98-mykeymap.el ends here
