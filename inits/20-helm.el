@@ -40,3 +40,13 @@
 (use-package helm-swoop
   :if my/enable-helm
   :bind (("C-c O" . helm-swoop)))
+
+(use-package helm-xref
+  :if my/enable-helm
+  :config
+  ;; This is required to make xref-find-references work in helm-mode.  In
+  ;; helm-mode, it gives a prompt and asks the identifier (which has no text
+  ;; property) and then passes it to lsp-mode, which requires the text property
+  ;; at point to locate the references.
+  (setq xref-prompt-for-identifier '(not xref-find-definitions xref-find-definitions-other-window xref-find-definitions-other-frame xref-find-references spacemacs/jump-to-definition spacemacs/jump-to-reference))
+  (setq xref-show-xrefs-function 'helm-xref-show-xrefs))
