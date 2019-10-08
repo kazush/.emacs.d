@@ -81,6 +81,11 @@ In that case, insert the number."
         (company-complete-number (string-to-number k)))))
   )
 
+(use-package company-quickhelp
+  :after (company)
+  :config
+  (company-quickhelp-mode))
+
 (use-package eglot
   :after (projectile)
   :config
@@ -89,11 +94,3 @@ In that case, insert the number."
                  '(lambda (dir)
                     (let ((root (projectile-project-root dir)))
                       (and root (cons 'transient root)))))))
-
-(use-package company-lsp
-  :config
-  (push 'company-lsp company-backends)
-  (setq company-lsp-cache-candidates 'auto)
-  (setq company-lsp-async t)
-  (setq company-lsp-enable-snippet t)
-  (setq company-lsp-enable-recompletion t))
