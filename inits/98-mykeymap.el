@@ -14,6 +14,13 @@
 (define-key my-map (kbd "n") 'hydra-narrow/body)
 (define-key my-map (kbd "m") 'hydra-multiple-cursors/body)
 
+;; Define my keymap on "information/tips".
+(define-prefix-command 'my-info-map)
+(global-set-key (kbd "C-c i") 'my-info-map)
+
+(define-key my-info-map (kbd "m") 'helm-semantic-or-imenu)
+(define-key my-info-map (kbd "i") 'eldoc-box-eglot-help-at-point)
+
 (when window-system
   (global-set-key (kbd "s-h") #'windmove-left)
   (global-set-key (kbd "s-j") #'windmove-down)
