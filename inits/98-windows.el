@@ -41,13 +41,14 @@
          display-buffer-use-some-window
          display-buffer-pop-up-frame)))
 
-(define-advice helm-persistent-action-display-window
-    (:around (orig-fn &optional split-window) "always-no-split")
-  ;; (message "always-no-split called")
-  (let ((w (get-buffer-window helm-buffer)))
-    (if (window-dedicated-p w)
-        w
-      (orig-fn split-window))))
+;; Newer version of helm does not need this workaround.
+;; (define-advice helm-persistent-action-display-window
+;;     (:around (orig-fn &optional split-window) "always-no-split")
+;;   ;; (message "always-no-split called")
+;;   (let ((w (get-buffer-window helm-buffer)))
+;;     (if (window-dedicated-p w)
+;;         w
+;;       (orig-fn split-window))))
 
 ;; To open a new window below the current buffer.
 (add-to-list 'display-buffer-alist
