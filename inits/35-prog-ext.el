@@ -2,19 +2,25 @@
 (setq compilation-scroll-output 'first-error)
 
 ;; linum-mode
-;(setq linum-format "%4d\u2502")
-;(add-hook 'prog-mode-hook
-;          '(lambda () (linum-mode 1)))
+;; (setq linum-format "%4d\u2502")
+;; (add-hook 'prog-mode-hook
+;;           '(lambda () (linum-mode 1)))
+
+(use-package eldoc-box
+  :diminish
+  :hook ((prog-mode . eldoc-box-hover-mode))
+  :config
+  (setq eldoc-box-clear-with-C-g t))
 
 (use-package flycheck
   :config
   (add-hook 'prog-mode-hook 'flycheck-mode)
   (setq flycheck-indication-mode nil))
 
-;; (use-package flycheck-popup-tip
-;;   :ensure t
-;;   :config
-;;   (flycheck-popup-tip-mode))
+(use-package flycheck-popup-tip
+  :ensure t
+  :config
+  (flycheck-popup-tip-mode))
 
 ;; Do not use TAB for indentation in prog mode
 (add-hook 'prog-mode-hook
