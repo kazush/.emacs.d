@@ -85,13 +85,3 @@ In that case, insert the number."
   :after (company)
   :config
   (company-quickhelp-mode))
-
-(use-package eglot
-  :after (projectile)
-  :config
-  (add-hook 'eglot--managed-mode-hook (lambda () (flymake-mode -1)))
-  (with-eval-after-load 'project
-    (add-to-list 'project-find-functions
-                 '(lambda (dir)
-                    (let ((root (projectile-project-root dir)))
-                      (and root (cons 'transient root)))))))

@@ -6,6 +6,16 @@
 ;; (add-hook 'prog-mode-hook
 ;;           '(lambda () (linum-mode 1)))
 
+(use-package eglot
+  :after (projectile)
+  :config
+  (add-hook 'eglot--managed-mode-hook (lambda () (flycheck-mode -1)))
+  (with-eval-after-load 'project
+    (add-to-list 'project-find-functions
+                 '(lambda (dir)
+                    (let ((root (projectile-project-root dir)))
+                      (and root (cons 'transient root)))))))
+
 (use-package eldoc-box
   :diminish
   :hook ((prog-mode . eldoc-box-hover-mode))
@@ -21,6 +31,11 @@
   :ensure t
   :config
   (flycheck-popup-tip-mode))
+
+(use-package flymake-diagnostic-at-point
+  :after flymake
+  :config
+  (add-hook 'flymake-mode-hook #'flymake-diagnostic-at-point-mode))
 
 ;; Do not use TAB for indentation in prog mode
 (add-hook 'prog-mode-hook
