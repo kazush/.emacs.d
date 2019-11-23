@@ -89,6 +89,7 @@ In that case, insert the number."
 (use-package eglot
   :after (projectile)
   :config
+  (add-hook 'eglot--managed-mode-hook (lambda () (flymake-mode -1)))
   (with-eval-after-load 'project
     (add-to-list 'project-find-functions
                  '(lambda (dir)
