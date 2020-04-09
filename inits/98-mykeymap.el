@@ -20,6 +20,7 @@
 
 (define-key my-info-map (kbd "m") 'helm-semantic-or-imenu)
 (define-key my-info-map (kbd "i") 'eldoc-box-eglot-help-at-point)
+(define-key my-info-map (kbd "f") 'flymake-show-diagnostics-buffer)
 
 (when window-system
   (global-set-key (kbd "s-h") #'windmove-left)
@@ -35,6 +36,11 @@
   (global-set-key (kbd "s-f") #'find-file-other-window)
   (global-set-key (kbd "s-o") (lambda () (interactive)
                                 (my/get-shell 1))))
+
+(unless my/enable-helm
+  (progn
+    (global-set-key (kbd "C-x C-b") (lambda () (interactive)
+                                      (ibuffer)))))
 
 (provide '98-mykeymap)
 ;;; 98-mykeymap.el ends here
