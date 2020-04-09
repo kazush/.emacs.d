@@ -20,7 +20,6 @@
 
 (define-key my-info-map (kbd "m") 'helm-semantic-or-imenu)
 (define-key my-info-map (kbd "i") 'eldoc-box-eglot-help-at-point)
-(define-key my-info-map (kbd "f") 'flymake-show-diagnostics-buffer)
 
 (when window-system
   (global-set-key (kbd "s-h") #'windmove-left)
