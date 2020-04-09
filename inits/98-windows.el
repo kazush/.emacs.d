@@ -62,7 +62,9 @@
                (window-height . .25)))
 
 (add-to-list 'display-buffer-alist
-             `(,(rx bos "*" (or "Completion" "compilation" "helm") (* not-newline) "*" eos)
+             `(,(rx bos "*"
+                    (or "Completion" "compilation" "helm" "Buffer List" (regexp "build.*") "xref")
+                    (* not-newline) "*" eos)
                (lambda (buf alist)
                  (let ((win (get-buffer-window buf)))
                    (if win win
