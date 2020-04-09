@@ -17,12 +17,13 @@
                       (and root (cons 'transient root)))))))
 
 (use-package eldoc-box
-  :diminish
+  :diminish eldoc-box-hover-mode
   :hook ((prog-mode . eldoc-box-hover-mode))
   :config
   (setq eldoc-box-clear-with-C-g t))
 
 (use-package flycheck
+  :diminish
   :config
   (add-hook 'prog-mode-hook 'flycheck-mode)
   (setq flycheck-indication-mode nil))
@@ -131,6 +132,7 @@
   (add-hook 'emacs-lisp-mode-hook 'aggressive-indent-mode))
 
 (use-package symbol-overlay
+  :diminish
   :hook ((prog-mode) . symbol-overlay-mode)
   :config
   (setq symbol-overlay-idle-time 1.0))

@@ -1,4 +1,5 @@
 (use-package projectile
+  :diminish
   :hook ((prog-mode . projectile-mode)
          (comint-mode . (lambda () (projectile-mode 0))))
   :config
