@@ -57,3 +57,9 @@
   :config
   (add-hook 'prog-mode-hook 'ws-butler-mode)
   (setcar (cdr (assoc 'ws-butler-mode minor-mode-alist)) ""))
+
+;; volatile-highlights
+(use-package volatile-highlights
+  :diminish
+  :config
+  (volatile-highlights-mode t))
