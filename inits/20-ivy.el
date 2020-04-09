@@ -34,6 +34,7 @@
   ;; (define-key my-ivy-map (kbd "r") #'counsel-recentf)
   ;; (define-key my-ivy-map (kbd "g") #'counsel-grep)
 
+  (define-key counsel-find-file-map (kbd "C-l") 'counsel-up-directory)
   (setq counsel-find-file-ignore-regexp (regexp-opt '("./" "../")))
   (counsel-mode))
 
