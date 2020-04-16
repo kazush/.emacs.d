@@ -154,8 +154,8 @@ Transpose: _x_: transpose  _v_: flip      _h_: flop
   :config
   (setq beacon-size 30)
   (setq beacon-color "dark goldenrod")
-  (setq beacon-blink-duration 0.1)
-  (setq beacon-blink-delay 0.1)
+  (setq beacon-blink-duration 0.2)
+  (setq beacon-blink-delay 0.2)
   (setq beacon-blink-when-focused t)
   (beacon-mode 1))
 
