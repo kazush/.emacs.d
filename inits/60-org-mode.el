@@ -52,7 +52,8 @@
   (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
   )
 
-(use-package ob-ipython)
+(use-package ob-ipython
+  :disabled)
 (use-package ob-go)
 
 ;; helm support
@@ -70,3 +71,8 @@
 ;; org-cliplink
 (use-package org-cliplink
   :bind (("C-c o L" . org-cliplink)))
+
+(use-package ox-hugo
+  :after ox
+  :config
+  (setq org-hugo-default-section-directory "posts"))
