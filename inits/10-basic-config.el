@@ -7,6 +7,7 @@
 (define-key dired-mode-map "e" 'wdired-change-to-wdired-mode)
 
 ;; basic editor cutomistomization
+(setq ad-redefinition-action 'accept)
 (setq auto-window-vscroll nil)
 (setq-default bidi-display-reordering nil)
 (setq history-delete-duplicates t)
