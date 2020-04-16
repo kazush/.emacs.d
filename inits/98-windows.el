@@ -50,6 +50,8 @@
 ;;         w
 ;;       (orig-fn split-window))))
 
+(defvar my/side-window-height .4)
+
 ;; To open a new window below the current buffer.
 (add-to-list 'display-buffer-alist
              `(,(rx bos "*" (or "term" "shell" "eshell") (* not-newline) "*" eos)
@@ -59,7 +61,7 @@
                      (display-buffer-in-side-window buf alist))))
                (side . bottom) (slot . -1) (preserve-size . (nil . t))
                (window-parameters . ((no-other-window . t) (no-delete-other-windows . t)))
-               (window-height . .25)))
+               (window-height . ,my/side-window-height)))
 
 (add-to-list 'display-buffer-alist
              `(,(rx bos "*"
@@ -71,7 +73,7 @@
                      (display-buffer-in-side-window buf alist))))
                (side . bottom) (slot . 1) (preserve-size . (nil . t))
                (window-parameters . ((no-other-window . t) (no-delete-other-windows . t)))
-               (window-height . .25)))
+               (window-height . ,my/side-window-height)))
 
 (provide '98-windows)
 ;;; 98-windows.el ends here
