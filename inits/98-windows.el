@@ -8,7 +8,7 @@
 
 (defun my/display-buffer-action (buf alist)
   "Return a window to display buffer BUF.  ALIST is not used."
-  (if (< (count-windows) 4) nil
+  (if (< (count-windows) 4) (get-buffer-window "*scratch*")
     (let ((win (get-buffer-window buf))
           (buflist (reverse (buffer-list (selected-frame)))))
       (if win win
