@@ -6,30 +6,30 @@
 (setq window-resize-pixelwise t)
 (setq window-combination-resize t)
 
+(defvar my/dba-min-windows 3)
 (defun my/display-buffer-action (buf alist)
   "Return a window to display buffer BUF.  ALIST is not used."
-  (if (< (count-windows) 4) (get-buffer-window "*scratch*")
-    (let ((win (get-buffer-window buf))
-          (buflist (reverse (buffer-list (selected-frame)))))
-      (if win win
-        (setq win (get-buffer-window "*scratch*"))
-        (unless win
-          (while buflist
-            (let* ((b (car buflist))
-                   (w (get-buffer-window b)))
-              (if (or (eq b (current-buffer))
-                      (null w)
-                      (not (window-live-p w))
-                      (window-minibuffer-p w)
-                      (window-dedicated-p w)
-                      (seq-contains '(exwm-mode shell-mode eshell-mode term-mode)
-                                    (with-current-buffer b major-mode)))
-                  (setq buflist (cdr buflist))
-                (setq win w)
-                (setq buflist nil))))))
-      (if win
-          (set-window-buffer win buf))
-      win)))
+  (let ((win (get-buffer-window buf))
+        (buflist (reverse (buffer-list (selected-frame)))))
+    (if win win
+      (setq win (get-buffer-window "*scratch*"))
+      (unless (or win (< (count-windows) my/dba-min-windows))
+        (while buflist
+          (let* ((b (car buflist))
+                 (w (get-buffer-window b)))
+            (if (or (eq b (current-buffer))
+                    (null w)
+                    (not (window-live-p w))
+                    (window-minibuffer-p w)
+                    (window-dedicated-p w)
+                    (seq-contains '(exwm-mode shell-mode eshell-mode term-mode)
+                                  (with-current-buffer b major-mode)))
+                (setq buflist (cdr buflist))
+              (setq win w)
+              (setq buflist nil))))))
+    (if win
+        (set-window-buffer win buf))
+    win))
 
 (setq display-buffer-fallback-action
       '((display-buffer--maybe-same-window
