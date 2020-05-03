@@ -75,5 +75,18 @@
                (window-parameters . ((no-other-window . t) (no-delete-other-windows . t)))
                (window-height . ,my/side-window-height)))
 
+(defun my/display-buffer-in-bottom-window (bufname slot)
+  "Display buffer with name BUFNAME in a window with slot SLOT at the bottom."
+  (display-buffer-in-side-window (get-buffer-create bufname)
+                                 `((side . bottom) (slot . ,slot))))
+(global-set-key (kbd "C-c w l")
+                (lambda (bufname)
+                  (interactive "B")
+                  (my/display-buffer-in-bottom-window bufname -1)))
+(global-set-key (kbd "C-c w r")
+                (lambda (bufname)
+                  (interactive "B")
+                  (my/display-buffer-in-bottom-window bufname 1)))
+
 (provide '98-windows)
 ;;; 98-windows.el ends here
