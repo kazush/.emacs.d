@@ -102,4 +102,4 @@
 (setq epa-pinentry-mode 'loopback)
 
 ;; Use Helm if t, otherwise use Ivy.
-(setq my/enable-helm t)
+(setq my/enable-helm (null (getenv "use_ivy")))
