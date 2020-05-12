@@ -44,67 +44,79 @@
 ;;       (setq candidate (car color-list)))
 ;;     best-color))
 
-(defun my/set-default-faces ()
-  "Set default faces."
-  (interactive)
-  (require 'color)
-  (set-face-attribute 'default nil
-                      :background "gray15")
-  (set-face-attribute 'region nil
-                      :foreground 'unspecified
-                      :background "gray30")
-
-  (set-face-attribute 'mode-line-inactive nil
-                      :foreground (face-foreground 'mode-line)
-                      :background (color-darken-name
-                                   (face-background 'mode-line) 10)
-                      :inherit 'mode-line)
-  (set-face-attribute 'font-lock-comment-face nil
-                      :foreground "LightSlateGray"
-                      :slant 'italic
-                      :inherit 'default)
-  (set-face-attribute 'font-lock-comment-delimiter-face nil
-                      :slant 'unspecified
-                      :inherit 'font-lock-comment-face)
-  (set-face-attribute 'highlight nil
-                      :foreground "orange"
-                      :background 'unspecified
-                      :weight 'bold
-                      :inherit 'default)
-  (set-face-foreground 'font-lock-function-name-face
-                       (color-darken-name
-                        (face-foreground 'font-lock-type-face) 10))
-  (set-face-foreground 'font-lock-variable-name-face "khaki")
-  (set-face-foreground 'font-lock-preprocessor-face
-                       (color-lighten-name
-                        (face-foreground 'font-lock-keyword-face) 10))
-  )
-
-(my/set-default-faces)
-;; Re-initialize after init files are loaded.
-(add-hook 'emacs-startup-hook 'my/set-default-faces)
-
 (use-package zerodark-theme
   :config
   (load-theme 'zerodark t)
   ;; (zerodark-setup-modeline-format)
   )
 
+(defun my/set-default-faces ()
+  "Set default faces."
+  (interactive)
+  (set-face-attribute 'default nil
+                      :background "gray15")
+  (set-face-attribute 'region nil
+                      :foreground 'unspecified
+                      :background "gray30")
+  ;; (set-face-attribute 'font-lock-comment-face nil
+  ;;                     :foreground "LightSlateGray"
+  ;;                     :slant 'italic
+  ;;                     :inherit 'default)
+  ;; (set-face-attribute 'font-lock-comment-delimiter-face nil
+  ;;                     :slant 'unspecified
+  ;;                     :inherit 'font-lock-comment-face)
+  (set-face-attribute 'highlight nil
+                      :foreground "orange"
+                      :background 'unspecified
+                      :weight 'bold
+                      :inherit 'default)
+  (set-face-foreground 'font-lock-variable-name-face "khaki")
+  (unless (daemonp)
+    (require 'color)
+    (set-face-attribute 'mode-line-inactive nil
+                        :foreground (face-foreground 'mode-line)
+                        :background (color-darken-name
+                                     (face-background 'mode-line) 10)
+                        :inherit 'mode-line)
+    (set-face-foreground 'font-lock-function-name-face
+                         (color-darken-name
+                          (face-foreground 'font-lock-type-face) 10))
+    (set-face-foreground 'font-lock-preprocessor-face
+                         (color-lighten-name
+                          (face-foreground 'font-lock-keyword-face) 10)))
+  )
+
 ;; ;; Set face for hl-line-mode
 ;; (set-face-background hl-line-face "gray22")
 ;; (set-face-foreground hl-line-face nil)
 
-;; all-the-icons
 (use-package all-the-icons
-  :if window-system
   :config
   (setq inhibit-compacting-font-caches t))
 
 (use-package spaceline
   :config
-  (if (not window-system)
-      (setq powerline-default-separator 'utf-8))
-  (require 'spaceline-config)
-  (spaceline-spacemacs-theme)
-  ;; (spaceline-helm-mode)
-  (spaceline-info-mode))
+  (defun my/setup-spaceline ()
+    (if (not window-system)
+        (setq powerline-default-separator 'utf-8))
+    (require 'spaceline-config)
+    (spaceline-spacemacs-theme)
+    ;; (spaceline-helm-mode)
+    (spaceline-info-mode)))
+
+(defun my/setup-ui-theme ()
+  "Sets up UI theme."
+  (interactive)
+  (if (daemonp)
+      (load-theme 'zerodark t))
+  (my/setup-spaceline)
+  (my/set-default-faces))
+
+(if (daemonp)
+    (add-hook 'after-make-frame-functions
+              (lambda (frame)
+                (select-frame frame)
+                (my/setup-ui-theme)))
+  (add-hook 'emacs-startup-hook
+            (lambda ()
+              (my/setup-ui-theme))))
