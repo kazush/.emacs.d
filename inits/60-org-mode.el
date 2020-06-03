@@ -10,10 +10,12 @@
   (global-set-key "\C-com" '(lambda () (interactive) (org-capture nil "m")))
   (global-set-key "\C-cot" '(lambda () (interactive) (org-capture nil "t")))
   :config
-  (define-key org-mode-map (kbd "M-RET") 'org-meta-return)
-  (setq org-src-window-setup 'current-window)
-  (setq org-agenda-window-setup 'current-window)
+  (setq org-src-window-setup 'other-window)
+  (setq org-agenda-window-setup 'other-window)
   (setq org-hide-leading-stars t)
+  (setq org-src-fontify-natively t)
+  (setq org-confirm-babel-evaluate nil)
+  (setq org-hide-emphasis-markers t)
   (setq org-capture-templates
         '(("j" "Journal"
            entry (file+datetree "~/org/journal.org")
@@ -36,8 +38,11 @@
         '(("x" "Unscheduled TODO" tags-todo "-SCHEDULED>=\"<now>\"" nil)))
   (setq org-stuck-projects
         '("+PROJECT/-DONE-SOMEDAY" ("TODO" "WAIT")))
-  (setq org-src-fontify-natively t)
-  (setq org-confirm-babel-evaluate nil)
+  ;; (font-lock-add-keywords 'org-mode
+  ;;                         '(("^ *\\([-]\\) "
+  ;;                            (0 (prog1 ()
+  ;;                                 (compose-region (match-beginning 1)
+  ;;                                                 (match-end 1) "•"))))))
   ;; enable babel for languages
   (require 'ob-shell)
   (require 'ob-java)
