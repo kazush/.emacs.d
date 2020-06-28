@@ -179,6 +179,10 @@
   (eval-after-load "company"
     '(add-to-list 'company-backends 'company-anaconda)))
 
+(use-package pyvenv
+  :config
+  (pyvenv-mode 1))
+
 ;; https://github.com/jorgenschaefer/elpy/issues/887
 (defun python-shell-completion-native-try ()
   "Return non-nil if can trigger native completion."
