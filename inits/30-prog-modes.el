@@ -166,7 +166,10 @@
   :config
   ;; (add-hook 'python-mode-hook 'yapf-mode)
   (add-hook 'python-mode-hook
-            '(lambda () (local-set-key (kbd "C-c i b") 'yapfify-buffer))))
+            '(lambda ()
+               (local-set-key (kbd "C-c i b") 'yapfify-buffer)
+               (local-set-key (kbd "C-c i r") 'yapfify-region)
+               )))
 
 ;; anaconda-mode for python
 (use-package anaconda-mode
