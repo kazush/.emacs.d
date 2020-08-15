@@ -84,4 +84,6 @@ In that case, insert the number."
 (use-package company-quickhelp
   :after (company)
   :config
+  (customize-set-variable 'company-quickhelp-delay nil)
+  (define-key company-active-map (kbd "M-h") #'company-quickhelp-manual-begin)
   (company-quickhelp-mode))
