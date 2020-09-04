@@ -1,0 +1,7 @@
+#+title: Emacs post init configuration
+#+startup: content
+#+property: header-args :tangle yes
+
+#+begin_src emacs-lisp
+(message "Loading postinit config...")
+#+end_src

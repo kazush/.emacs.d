@@ -1,6 +1,6 @@
 /*
 !/.gitignore
-!/inits
+!/*.org
 !/init.el
 !/README.md
 !/LICENSE

@@ -1,0 +1,7 @@
+#+title: Emacs pre init configuration
+#+startup: content
+#+property: header-args :tangle yes
+
+#+begin_src emacs-lisp
+(message "Loading preinit config...")
+#+end_src
