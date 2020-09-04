@@ -159,5 +159,9 @@ Transpose: _x_: transpose  _v_: flip      _h_: flop
   (setq beacon-blink-when-focused t)
   (beacon-mode 1))
 
+(use-package which-key
+  :config
+  (which-key-mode))
+
 (provide '35-ui-ext)
 ;;; 35-ui-ext.el ends here
