@@ -1,12 +1,12 @@
 #+title: Emacs configuration
-#+startup: content
+#+startup: content indent
 #+property: header-args :tangle yes
 
 * Use-package
-  Install use-package first as the entire configuration makes use of the package
-  for package management. Basically I want to make sure evey package in the
-  configuration is installed at the first time the configuration is loaded, so I
-  set use-package-always-ensure here.
+Install ~use-package~ first as the entire configuration makes use of the package
+for package management. Basically I want to make sure evey package in the
+configuration is installed at the first time the configuration is loaded, so I
+set ~use-package-always-ensure~ here.
 
 #+begin_src emacs-lisp
 (unless (package-installed-p 'use-package)
@@ -19,7 +19,7 @@
 #+end_src
 
 * Pre Init Config
-	Load preinit.org if exists.
+Load preinit.org if exists.
 
 #+begin_src emacs-lisp
 (let ((preinit-file (expand-file-name "~/.emacs.d/preinit.org")))
@@ -27,9 +27,13 @@
     (org-babel-load-file preinit-file)))
 #+end_src
 
-* Global config
+* General config
+
+Miscellaneous buit-in features are configured and customzied here.
 
 ** Server
+Start emacs server function so emacsclient processes can connect to this
+instance. ~restart-server~ is a helper function to restart the server process.
 
 #+begin_src emacs-lisp
 (require 'server)
@@ -46,195 +50,209 @@
 #+end_src
 
 ** Dired
+Customize dired. Load wdired feature to make [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Wdired.html][edit functions]] available.
 
 #+begin_src emacs-lisp
-  (add-hook 'dired-mode-hook
-            '(lambda ()
-               (define-key dired-mode-map "k" 'dired-kill-subdir)))
-  (require 'wdired)
-  (setq wdired-allow-to-change-permissions t)
-  (define-key dired-mode-map "e" 'wdired-change-to-wdired-mode)
+(add-hook 'dired-mode-hook
+          '(lambda ()
+             (define-key dired-mode-map "k" 'dired-kill-subdir)))
+(require 'wdired)
+(setq wdired-allow-to-change-permissions t)
+(define-key dired-mode-map "e" 'wdired-change-to-wdired-mode)
 #+end_src
 
 ** General editor preferences
+Customization for miscellaneous built-in features.
 
 #+begin_src emacs-lisp
-  ;; Disable startup message.
-  (setq inhibit-startup-message t)
-  ;; Set additional load-path.
-  (add-to-list 'load-path "~/lib/elisp")
-  (setq ad-redefinition-action 'accept)
-  (setq auto-window-vscroll nil)
-  (setq-default bidi-display-reordering nil)
-  (setq history-delete-duplicates t)
-  (setq set-mark-command-repeat-pop t)
-  (global-auto-revert-mode)
-  (transient-mark-mode t)
-  (show-paren-mode 1)
-  (setq mouse-yank-at-point t)
-  (setq backup-inhibited t)
-  (setq next-line-add-newlines nil)
-  (setq kill-whole-line t)
-  (setq require-final-newline nil)
-  (setq enable-kinsoku t)
-  (setq message-log-max 10000)
-  (setq history-length 1000)
-  (setq history-delete-duplicates t)
-  ;; disable novice restrictions
-  (put 'upcase-region 'disabled nil)
-  (put 'downcase-region 'disabled nil)
-  (put 'narrow-to-region 'disabled nil)
-  ;; fill settings
-  ;; (add-hook 'text-mode-hook '(lambda () (auto-fill-mode 1)))
-  (setq-default fill-column 80)
-  (setq truncate-partial-width-windows nil)
-  ;; resolve symlinks
-  (setq find-file-visit-truename t)
+;; Disable startup message.
+(setq inhibit-startup-message t)
+;; Set additional load-path.
+(add-to-list 'load-path "~/lib/elisp")
+(setq ad-redefinition-action 'accept)
+(setq auto-window-vscroll nil)
+(setq-default bidi-display-reordering nil)
+(setq history-delete-duplicates t)
+(setq set-mark-command-repeat-pop t)
+(global-auto-revert-mode)
+(transient-mark-mode t)
+(show-paren-mode 1)
+(setq mouse-yank-at-point t)
+(setq backup-inhibited t)
+(setq next-line-add-newlines nil)
+(setq kill-whole-line t)
+(setq require-final-newline nil)
+(setq enable-kinsoku t)
+(setq message-log-max 10000)
+(setq history-length 1000)
+(setq history-delete-duplicates t)
+;; disable novice restrictions
+(put 'upcase-region 'disabled nil)
+(put 'downcase-region 'disabled nil)
+(put 'narrow-to-region 'disabled nil)
+;; fill settings
+;; (add-hook 'text-mode-hook '(lambda () (auto-fill-mode 1)))
+(setq-default fill-column 80)
+(setq truncate-partial-width-windows nil)
+;; resolve symlinks
+(setq find-file-visit-truename t)
+;; (require 'misc)
+;; (global-set-key (kbd "M-f") 'forward-to-word)
+;; (global-set-key (kbd "M-b") 'backward-word)
 
-  (require 'uniquify)
-  (setq uniquify-buffer-name-style 'forward)
-  (setq uniquify-separator "/")
-  (setq uniquify-after-kill-buffer-p t)
-  (setq uniquify-ignore-buffers-re "^\\*")
+;; display function name in mode line
+;; (which-function-mode 1)
 
-  ;; (require 'misc)
-  ;; (global-set-key (kbd "M-f") 'forward-to-word)
-  ;; (global-set-key (kbd "M-b") 'backward-word)
+;; language settings
+(set-language-environment "UTF-8")
+(prefer-coding-system 'utf-8)
 
-  (winner-mode 1)
-  (setq buffer-quit-function 'winner-undo)
+;; Enable winner-mode which does undo/redo of window configuration with C-c
+;; left/right.
+(winner-mode 1)
+#+end_src
 
-  ;; display function name in mode line
-  ;; (which-function-mode 1)
+Change the format of buffer name to /<unique dir suffix>/<filename>/.
 
-  ;; language settings
-  (set-language-environment "UTF-8")
-  (prefer-coding-system 'utf-8)
+#+begin_src emacs-lisp
+(require 'uniquify)
+(setq uniquify-buffer-name-style 'forward)
+(setq uniquify-separator "/")
+(setq uniquify-after-kill-buffer-p t)
+(setq uniquify-ignore-buffers-re "^\\*")
 #+end_src
 
 ** GC settings
-   Just GCMH is used.
+Just GCMH is used.
 
 #+begin_src emacs-lisp
-  (use-package gcmh
-    :defer t
-    :config
-    (gcmh-mode 1))
+(use-package gcmh
+  :defer t
+  :config
+  (gcmh-mode 1))
 #+end_src
 
-   The old setting was based on the suggestion described in the lsp-mode
-   page. The code snippet using minibuffer hooks is known as a technique to
-   attempt to minimize typing lag due to GC. I still keep it in case I want to
-   revert the setting to it.
+The old setting below was based on the suggestion described in the lsp-mode
+page. The code snippet using minibuffer hooks is known as a technique to attempt
+to minimize typing lag due to GC. I still keep it in case I want to revert the
+setting to it.
 
 #+begin_src emacs-lisp
-  ;; GC settings recommended by lsp-mode doc.
-  ;; (setq gc-cons-threshold 100000000)
-  ;; Old hack with minibuffer hooks.
-  ;; (defun my-minibuffer-setup-hook ()
-  ;;   (setq gc-cons-threshold most-positive-fixnum))
-  ;; (defun my-minibuffer-exit-hook ()
-  ;;   (setq gc-cons-threshold 800000))
-  ;; (add-hook 'minibuffer-setup-hook #'my-minibuffer-setup-hook)
-  ;; (add-hook 'minibuffer-exit-hook #'my-minibuffer-exit-hook)
+;; GC settings recommended by lsp-mode doc.
+;; (setq gc-cons-threshold 100000000)
+;; Old hack with minibuffer hooks.
+;; (defun my-minibuffer-setup-hook ()
+;;   (setq gc-cons-threshold most-positive-fixnum))
+;; (defun my-minibuffer-exit-hook ()
+;;   (setq gc-cons-threshold 800000))
+;; (add-hook 'minibuffer-setup-hook #'my-minibuffer-setup-hook)
+;; (add-hook 'minibuffer-exit-hook #'my-minibuffer-exit-hook)
 #+end_src
 
 ** Completion in minibuffer
-   I prefer the old behavior on completion, which is triggered by a space key.
+I prefer the old behavior on completion, which is triggered by a space key.
 
 #+begin_src emacs-lisp
-  ;; ;; enable completion in minibuffer by typing space
-  (if (boundp 'minibuffer-local-filename-completion-map)
-      (define-key minibuffer-local-filename-completion-map
-        " " 'minibuffer-complete-word))
-  (if (boundp 'minibuffer-local-must-match-filename-map)
-      (define-key minibuffer-local-must-match-filename-map
-        " " 'minibuffer-complete-word))
+;; ;; enable completion in minibuffer by typing space
+(if (boundp 'minibuffer-local-filename-completion-map)
+    (define-key minibuffer-local-filename-completion-map
+      " " 'minibuffer-complete-word))
+(if (boundp 'minibuffer-local-must-match-filename-map)
+    (define-key minibuffer-local-must-match-filename-map
+      " " 'minibuffer-complete-word))
 #+end_src
 
 ** Run chmod +x on save for script files
-   The code is copied from [[http://www.namazu.org/~tsuchiya/elisp/][here]].
+The code is copied from [[http://www.namazu.org/~tsuchiya/elisp/][here]].
 
 #+begin_src emacs-lisp
-  (add-hook 'after-save-hook
-            '(lambda ()
-               (save-restriction
-                 (widen)
-                 (if (string= "#!" (buffer-substring 1 (min 3 (point-max))))
-                     (let ((name (buffer-file-name)))
-                       (or
-                        (char-equal ?. (string-to-char
-                                        (file-name-nondirectory name)))
-                        (let ((mode (file-modes name)))
-                          (set-file-modes name
-                                          (logior mode (logand (/ mode 4) 73)))
-                          (message (concat "Wrote " name " (+x)"))))
-                       )))))
+(add-hook 'after-save-hook
+          '(lambda ()
+             (save-restriction
+               (widen)
+               (if (string= "#!" (buffer-substring 1 (min 3 (point-max))))
+                   (let ((name (buffer-file-name)))
+                     (or
+                      (char-equal ?. (string-to-char
+                                      (file-name-nondirectory name)))
+                      (let ((mode (file-modes name)))
+                        (set-file-modes name
+                                        (logior mode (logand (/ mode 4) 73)))
+                        (message (concat "Wrote " name " (+x)"))))
+                     )))))
 #+end_src
 
 ** jka-compr
-   Automatic compression/decompression for gzip files. I still keep this for
-   purely historical reasons.
+Automatic compression/decompression for gzip files. I still keep this for purely
+historical reasons.
 
 #+begin_src emacs-lisp
-  (require 'jka-compr)
-  (auto-compression-mode 1)
+(require 'jka-compr)
+(auto-compression-mode 1)
 #+end_src
 
 ** Tramp
 
 #+begin_src emacs-lisp
-  ;; tramp to access remote files transparently
-  (use-package tramp
-    :defer t
-    :config
-    (customize-set-variable 'tramp-default-method "ssh"))
+;; tramp to access remote files transparently
+(use-package tramp
+  :defer t
+  :config
+  (customize-set-variable 'tramp-default-method "ssh"))
 #+end_src
 
 ** Ediff
+TODO: watch [[https://protesilaos.com/codelog/2020-04-10-emacs-smerge-ediff/][this video]].
 
 #+begin_src emacs-lisp
-  (use-package ediff
-    :commands (ediff ediff3)
-    :custom
-    (ediff-window-setup-function 'ediff-setup-windows-plain)
-    (ediff-split-window-function 'split-window-horizontally))
+(use-package ediff
+  :commands (ediff ediff3)
+  :custom
+  (ediff-window-setup-function 'ediff-setup-windows-plain)
+  (ediff-split-window-function 'split-window-horizontally))
 #+end_src
 
 ** EasyPG
-   IIRC this is a workaround for some issues with authinfo that I don't
-   remember. Not sure if this is still needed to make authinfo work in my
-   environment.
+IIRC this is a workaround for some issues with authinfo that I don't
+remember. Not sure if this is still needed to make authinfo work in my
+environment.
 
 #+begin_src emacs-lisp
-  (require 'epa-file)
-  (setq epa-pinentry-mode 'loopback)
+(require 'epa-file)
+(setq epa-pinentry-mode 'loopback)
 #+end_src
 
 ** Browser Selection
-	 Set the appropriate path to the browser binary as per the
-	 environment. Probably ~croutonurlhandler~ can be removed now.
+Set the appropriate path to the browser binary as per the environment. Probably
+~croutonurlhandler~ can be removed now.
 
 #+begin_src emacs-lisp
-	(setq browse-url-browser-function 'browse-url-generic)
-	(setq browse-url-generic-program
-				(cond
-				 ;; Use a shell script to launch Chrome in Windows from WSL2.
-				 ((file-exists-p "~/bin/google-chrome")
-					(expand-file-name "~/bin/google-chrome"))
-				 ;; Use the default browser for X.
-				 ((eq window-system 'x)
-					"x-www-browser")
-				 ;; Crouton environment.
-				 ((file-exists-p "/usr/local/bin/croutonurlhandler")
-					"croutonurlhandler")
-				 ;; Fallback.
-				 (t "www-browser")))
+(setq browse-url-browser-function 'browse-url-generic)
+(setq browse-url-generic-program
+      (cond
+       ;; Use a shell script to launch Chrome in Windows from WSL2.
+       ((file-exists-p "~/bin/google-chrome")
+        (expand-file-name "~/bin/google-chrome"))
+       ;; Use the default browser for X.
+       ((eq window-system 'x) "x-www-browser")
+       ;; Crouton environment.
+       ((file-exists-p "/usr/local/bin/croutonurlhandler")
+        "croutonurlhandler")
+       ;; Fallback.
+       (t "www-browser")))
 #+end_src
 
 * User Interface
+Configure different features and settings that are related to user interface.
 
-** Fonts
+** Fonts and Faces
+Face related settings are always in progress. The ~unless (daemonp)~ part is
+probably a workaround to avoid errors when emacs is launched in daemon mode, but
+I don't remember the reason.
+
+Fonts and face settings are grouped into helper functions so that they can be
+called in hooks. Apparently these functions need to be called whenever a new
+emacsclient is connected hence ~after-make-frame-functions~ hook is set here.
 
 #+begin_src emacs-lisp
 (require 'font-lock)
@@ -261,6 +279,8 @@
                       :background 'unspecified
                       :weight 'bold
                       :inherit 'default)
+  (set-face-background 'whitespace-tab "gray15")
+  (set-face-background 'whitespace-trailing "gray25")
   (set-face-foreground 'font-lock-variable-name-face "khaki")
   (unless (daemonp)
     (require 'color)
@@ -276,9 +296,7 @@
                          (color-lighten-name
                           (face-foreground 'font-lock-keyword-face) 10)))
   )
-#+end_src
 
-#+begin_src emacs-lisp
 (defun setfont (size)
   (interactive "nFont size: ")
   (set-face-attribute 'default (selected-frame) :font (format "Monospace-%d" size)))
@@ -322,7 +340,8 @@
 (my/setup-fonts)
 #+end_src
 
-** Color themes and fonts
+** Color themes
+zerodark theme is a theme with classic dark mode colors.
 
 #+begin_src emacs-lisp
 (use-package zerodark-theme
@@ -333,6 +352,7 @@
 #+end_src
 
 ** Misc output tweaks
+Different tweaks on appearance.
 
 #+begin_src emacs-lisp
 (menu-bar-mode -1)
@@ -357,7 +377,7 @@
 
 ** Icons
 *** all-the-icons
-   Do not forget to run ~all-the-icons-install-fonts~ to install icon fonts.
+*NOTE:* Do not forget to run ~all-the-icons-install-fonts~ to install icon fonts.
 
 #+begin_src emacs-lisp
 (use-package all-the-icons
@@ -366,14 +386,16 @@
 #+end_src
 
 *** emojify
+I used to use this with elisp IRC clients. You need to call ~emojify-mode~ to
+activate emojify.
 
 #+begin_src emacs-lisp
 (use-package emojify)
 #+end_src
 
 ** Keymaps
-   Create a dedicated keymap to group various commands with the same key
-   prefix. This way which-key will be more useful.
+Create a dedicated keymap to group various commands with the same key
+prefix. This way which-key will be more useful.
 
 *** Editing
 
@@ -832,7 +854,7 @@
 (use-package ivy
   :unless my/enable-helm
   :diminish
-  bind (("C-x C-b" . ibuffer))
+  :bind (("C-x C-b" . ibuffer))
   :custom
   (ivy-use-virtual-buffers t)
   (enable-recursive-minibuffers t)
@@ -1872,27 +1894,10 @@
 #+begin_src emacs-lisp
 (use-package whitespace
   :diminish whitespace-mode
-  :hook ((after-change-major-mode . (lambda ()
-                                      (when (member major-mode
-                                                    '(emacs-lisp-mode
-                                                      c-mode
-                                                      c++-mode
-                                                      go-mode
-                                                      javascript-mode
-                                                      js-mode
-                                                      python-mode
-                                                      html-mode
-                                                      sgml-mode
-                                                      xml-mode
-                                                      ))
-                                        (whitespace-mode 1))))
-         (go-mode . (lambda ()
-                      (setq-local whitespace-style '(face trailing))))
-         (font-lock-mode . (lambda ()
-                             (set-face-background 'whitespace-tab "gray5")
-                             (set-face-background 'whitespace-trailing "gray25"))))
+  :hook (prog-mode . (lambda ()
+                       (whitespace-mode 1)))
   :custom
-  (whitespace-style '(face trailing tabs)))
+  (whitespace-style '(face trailing tabs tab-mark)))
 #+end_src
 
 *** Symbol overlay
@@ -2383,8 +2388,6 @@
 (use-package ob-async)
 
 (use-package org-bullets
-  :custom
-  (org-bullets-bullet-list '("◉" "◎" "⚫" "○" "►" "◇"))
   :hook (org-mode . (lambda () (org-bullets-mode 1))))
 
 (use-package org-cliplink
@@ -2747,7 +2750,7 @@
 #+end_src
 
 * Post Init Config
-	Load postinit.org if exists.
+Load postinit.org if exists.
 
 #+begin_src emacs-lisp
 (let ((postinit-file (expand-file-name "~/.emacs.d/postinit.org")))
