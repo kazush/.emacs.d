@@ -583,7 +583,7 @@ prefix. This way which-key will be more useful.
   "Move backward until encountering the end of a symbol.
   With argument, do this that many times."
   (interactive "^p")
-  (forward-to-symbol (- arg)))
+  (my/forward-to-symbol (- arg)))
 
 ;; Cursor movement
 (defhydra hydra-move (global-map "C-c v")
@@ -597,7 +597,9 @@ prefix. This way which-key will be more useful.
   ("n" forward-paragraph)
   ("p" backward-paragraph)
   ("SPC" scroll-up-command)
+  ("N" scroll-up-command)
   ("S-SPC" scroll-down-command)
+  ("P" scroll-down-command)
   ("q" nil))
 
 ;; window management
@@ -1409,7 +1411,7 @@ prefix. This way which-key will be more useful.
 ;;         w
 ;;       (orig-fn split-window))))
 
-(defvar my/side-window-height .4)
+(defvar my/side-window-height .3)
 
 ;; To open a new window below the current buffer.
 (add-to-list 'display-buffer-alist
