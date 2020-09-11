@@ -1760,15 +1760,17 @@ prefix. This way which-key will be more useful.
 
 #+begin_src emacs-lisp
 (use-package lsp-mode
-  :init
-  (setq lsp-keymap-prefix (kbd "C-c l"))
   :hook
-  ((lsp-mode . lsp-enable-which-key-integration))
+  ((lsp-mode . (lambda ()
+                 (lsp-enable-which-key-integration)
+                 (define-key lsp-mode-map (kbd "C-c l") lsp-command-map))))
   :commands lsp
-  :config
-  (define-key lsp-mode-map (kbd "C-c l") lsp-command-map))
+  :init
+  (setq lsp-keymap-prefix (kbd "C-c l")))
 
-(use-package lsp-pyright)
+(use-package lsp-pyright
+  :requires lsp-mode
+  :after lsp-mode)
 
 (defvar my/lsp-enabled-mode-hook-list '(python-mode-hook))
 (defun my/setup-lsp ()
