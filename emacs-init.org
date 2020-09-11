@@ -1763,10 +1763,19 @@ prefix. This way which-key will be more useful.
   :init
   (setq lsp-keymap-prefix (kbd "C-c l"))
   :hook
-  ((python-mode . lsp))
-  :commands lsp)
+  ((lsp-mode . lsp-enable-which-key-integration))
+  :commands lsp
+  :config
+  (define-key lsp-mode-map (kbd "C-c l") lsp-command-map))
 
 (use-package lsp-pyright)
+
+(defvar my/lsp-enabled-mode-hook-list '(python-mode-hook))
+(defun my/setup-lsp ()
+  "Set up hooks to enable lsp-mode."
+  (interactive)
+  (dolist (hook my/lsp-enabled-mode-hook-list)
+    (add-hook hook #'lsp)))
 #+end_src
 
 *** eglot
