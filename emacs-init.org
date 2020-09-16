@@ -1111,6 +1111,8 @@ prefix. This way which-key will be more useful.
 (use-package undo-tree
   :diminish undo-tree-mode
   :bind (("C-_" . undo-tree-visualize)
+         :map undo-tree-map
+         ("C-x u" . undo-tree-undo)
          :map my/edit-map
          ("u" . undo-tree-visualize))
   :custom
