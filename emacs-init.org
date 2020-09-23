@@ -2443,7 +2443,7 @@ prefix. This way which-key will be more useful.
                       (elfeed)))))
 
 (use-package elfeed-goodies
-  :requires elfeed
+  :after elfeed
   :custom
   (elfeed-goodies/entry-pane-position 'bottom)
   (elfeed-goodies/entry-pane-size 0.3))
@@ -2452,7 +2452,7 @@ prefix. This way which-key will be more useful.
 
 (use-package elfeed-org
   :defer t
-  :requires (elfeed org)
+  :after (elfeed org)
   :config
   (elfeed-org)
   (setq rmh-elfeed-org-files (list "~/.emacs.d/elfeed.org")))
@@ -2754,8 +2754,8 @@ prefix. This way which-key will be more useful.
     (exwm-enable)))
 
 (use-package helm-exwm
-  :if my/enable-helm  
-  :requires exwm  
+  :if my/enable-helm
+  :requires exwm
   :config
   (setq helm-exwm-emacs-buffers-source (helm-exwm-build-emacs-buffers-source))
   (setq helm-exwm-source (helm-exwm-build-source))
