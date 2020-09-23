@@ -1766,7 +1766,7 @@ prefix. This way which-key will be more useful.
   ((lsp-mode . (lambda ()
                  (lsp-enable-which-key-integration)
                  (define-key lsp-mode-map (kbd "C-c l") lsp-command-map))))
-  :commands lsp
+  :commands (lsp lsp-register-client)
   :init
   (setq lsp-keymap-prefix (kbd "C-c l")))
 
