@@ -1783,8 +1783,10 @@ prefix. This way which-key will be more useful.
   :init
   (setq lsp-keymap-prefix (kbd "C-c l")))
 
+(use-package lsp-ui
+  :after lsp-mode)
+
 (use-package lsp-pyright
-  :requires lsp-mode
   :after lsp-mode)
 
 (defvar my/lsp-enabled-mode-hook-list '(python-mode-hook))
