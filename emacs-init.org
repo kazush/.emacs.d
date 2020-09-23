@@ -856,6 +856,7 @@ prefix. This way which-key will be more useful.
 (use-package ivy
   :unless my/enable-helm
   :diminish
+  :defer nil
   :bind (("C-x C-b" . ibuffer))
   :custom
   (ivy-use-virtual-buffers t)
