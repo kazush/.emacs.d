@@ -834,7 +834,6 @@ prefix. This way which-key will be more useful.
 
 (use-package helm-descbinds
   :if my/enable-helm
-  :defer t
   :custom
   (helm-descbinds-window-style 'split-window)
   :config
@@ -842,7 +841,6 @@ prefix. This way which-key will be more useful.
 
 (use-package helm-describe-modes
   :if my/enable-helm
-  :defer t
   :config (global-set-key [remap describe-mode] #'helm-describe-modes))
 
 (use-package helm-swoop
@@ -881,14 +879,11 @@ prefix. This way which-key will be more useful.
   (ivy-mode))
 
 (use-package ivy-hydra
-  :unless my/enable-helm
-  :after ivy
-  :defer t)
+  :unless my/enable-helm)
 
 (use-package ivy-rich
   :unless my/enable-helm
   :diminish
-  :after ivy
   :config
   (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line)
   ;; (setq ivy-rich-path-style 'abbrev)
@@ -897,7 +892,6 @@ prefix. This way which-key will be more useful.
 (use-package counsel
   :unless my/enable-helm
   :diminish
-  :after ivy
   :bind (("C-c h r" . counsel-recentf)
          ("C-c h g" . counsel-ag))
   :custom
@@ -911,20 +905,17 @@ prefix. This way which-key will be more useful.
 
 (use-package swiper
   :unless my/enable-helm
-  :after ivy
   :bind (("C-s" . swiper)
          ("C-r" . swiper)))
 
 (use-package smex
   :unless my/enable-helm
-  :defer t
   :config
   (smex-initialize))
 
 (use-package counsel-projectile
   :unless my/enable-helm
-  :after projectile
-  :defer t
+  :after (counsel projectile)
   :config
   (counsel-projectile-mode))
 #+end_src
