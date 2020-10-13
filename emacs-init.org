@@ -197,8 +197,8 @@ historical reasons.
 ;; tramp to access remote files transparently
 (use-package tramp
   :defer t
-  :config
-  (customize-set-variable 'tramp-default-method "ssh"))
+  :custom
+  (tramp-default-method "ssh"))
 #+end_src
 
 ** Ediff
@@ -933,7 +933,7 @@ prefix. This way which-key will be more useful.
               ("C-p" . company-select-previous))
   :custom
   (company-show-numbers t)
-  (company-idle-delay 0.2)
+  (company-idle-delay 0.4)
   (company-echo-delay 0)
   (company-dabbrev-downcase nil)
   (company-tooltip-align-annotations t)
@@ -1020,7 +1020,6 @@ prefix. This way which-key will be more useful.
 
 (use-package company-quickhelp
   :after company
-  :defer t
   :custom
   (company-quickhelp-delay nil)
   :config
@@ -2442,11 +2441,11 @@ prefix. This way which-key will be more useful.
 (elfeed-goodies/setup)
 
 (use-package elfeed-org
-  :defer t
   :after (elfeed org)
+  :custom
+  (rmh-elfeed-org-files (list "~/.emacs.d/elfeed.org"))
   :config
-  (elfeed-org)
-  (setq rmh-elfeed-org-files (list "~/.emacs.d/elfeed.org")))
+  (elfeed-org))
 #+end_src
 
 *** Gnus
