@@ -2382,6 +2382,7 @@ prefix. This way which-key will be more useful.
    '(("x" "Unscheduled TODO" tags-todo "-SCHEDULED>=\"<now>\"" nil)))
   (org-stuck-projects
    '("+PROJECT/-DONE-SOMEDAY" ("TODO" "WAIT")))
+  :config
   ;; (font-lock-add-keywords 'org-mode
   ;;                         '(("^ *\\([-]\\) "
   ;;                            (0 (prog1 ()
