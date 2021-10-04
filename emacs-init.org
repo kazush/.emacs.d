@@ -263,17 +263,18 @@ emacsclient is connected hence ~after-make-frame-functions~ hook is set here.
   "Set default faces."
   (interactive)
   (set-face-attribute 'default nil
-                      :background "gray15")
+                      :background "gray10")
   (set-face-attribute 'region nil
                       :foreground 'unspecified
-                      :background "gray30")
-  ;; (set-face-attribute 'font-lock-comment-face nil
-  ;;                     :foreground "LightSlateGray"
-  ;;                     :slant 'italic
-  ;;                     :inherit 'default)
-  ;; (set-face-attribute 'font-lock-comment-delimiter-face nil
-  ;;                     :slant 'unspecified
-  ;;                     :inherit 'font-lock-comment-face)
+                      :background "RoyalBlue4")
+  (set-face-attribute 'font-lock-comment-face nil
+                      :foreground "azure4"
+                      :slant 'italic
+                      :inherit 'default)
+  (set-face-attribute 'font-lock-comment-delimiter-face nil
+                      :slant 'unspecified
+                      :weight 'bold
+                      :inherit 'font-lock-comment-face)
   (set-face-attribute 'highlight nil
                       :foreground "orange"
                       :background 'unspecified
@@ -373,6 +374,7 @@ Different tweaks on appearance.
 ;; add line number for open files
 ;; (add-hook 'find-file-hook (lambda () (linum-mode 1)))
 (setq use-dialog-box nil)
+(setq-default indicate-empty-lines t)
 #+end_src
 
 ** Icons
