@@ -10,12 +10,12 @@ set ~use-package-always-ensure~ here.
 
 #+begin_src emacs-lisp
 (unless (package-installed-p 'use-package)
-    (package-refresh-contents)
-    (package-install 'use-package))
-  (eval-when-compile
-    (require 'use-package)
-    (require 'use-package-ensure)
-    (setq use-package-always-ensure t))
+  (package-refresh-contents)
+  (package-install 'use-package))
+(eval-when-compile
+  (require 'use-package)
+  (require 'use-package-ensure)
+  (setq use-package-always-ensure t))
 #+end_src
 
 * Pre Init Config
@@ -298,35 +298,39 @@ emacsclient is connected hence ~after-make-frame-functions~ hook is set here.
                           (face-foreground 'font-lock-keyword-face) 10)))
   )
 
-(defun setfont (size)
+(defun my/setfont (size)
   (interactive "nFont size: ")
-  (set-face-attribute 'default (selected-frame) :font (format "Monospace-%d" size)))
+  (set-face-attribute 'default nil
+                      :family "Monospace"
+                      :height (* size 10)))
 
 (defun my/setup-fonts ()
   "Set up fonts."
   (interactive)
-  ;; (setq use-default-font-for-symbols nil)
-  ;; (set-default-font "Cousine for Powerline-10" nil t)
+  (setq use-default-font-for-symbols nil)
+
   (set-face-attribute 'default nil
                       :family "Monospace"
                       :height 110)
-  (let ((fontspec (font-spec :family "Noto Sans Mono CJK JP")))
-    (add-to-list 'face-font-rescale-alist `(,fontspec . 1.2))
-    ;; (set-fontset-font t 'japanese-jisx0208 fontspec)
-    ;; (set-fontset-font t 'japanese-jisx0208-1978 fontspec)
-    ;; (set-fontset-font t 'japanese-jisx0212 fontspec)
-    ;; (set-fontset-font t 'japanese-jisx0213-1 fontspec)
-    ;; (set-fontset-font t 'japanese-jisx0213-2 fontspec)
-    ;; (set-fontset-font t 'japanese-jisx0213.2004-1 fontspec)
-    ;; (set-fontset-font t 'katakana-jisx0201 fontspec)
-    ;; (set-fontset-font t 'jisx0201 fontspec)
-    (set-fontset-font t 'symbol fontspec nil 'prepend)
-    ;; (set-fontset-font t 'kana fontspec nil 'prepend)
-    ;; (set-fontset-font t 'cjk-misc fontspec)
-    (set-fontset-font t 'unicode-bmp fontspec))
+  ;; (let ((fontspec (font-spec :family "Noto Sans Mono CJK JP")))
+  ;;   (add-to-list 'face-font-rescale-alist `(,fontspec . 1.2))
+  ;;   ;; (set-fontset-font t 'japanese-jisx0208 fontspec)
+  ;;   ;; (set-fontset-font t 'japanese-jisx0208-1978 fontspec)
+  ;;   ;; (set-fontset-font t 'japanese-jisx0212 fontspec)
+  ;;   ;; (set-fontset-font t 'japanese-jisx0213-1 fontspec)
+  ;;   ;; (set-fontset-font t 'japanese-jisx0213-2 fontspec)
+  ;;   ;; (set-fontset-font t 'japanese-jisx0213.2004-1 fontspec)
+  ;;   ;; (set-fontset-font t 'katakana-jisx0201 fontspec)
+  ;;   ;; (set-fontset-font t 'jisx0201 fontspec)
+  ;;   (set-fontset-font t 'symbol fontspec nil 'prepend)
+  ;;   ;; (set-fontset-font t 'kana fontspec nil 'prepend)
+  ;;   ;; (set-fontset-font t 'cjk-misc fontspec)
+  ;;   (set-fontset-font t 'unicode-bmp fontspec))
 
-  (set-fontset-font t 'symbol (font-spec
-                               :family "Noto Color Emoji") nil 'append)
+  (add-to-list 'face-font-rescale-alist '("Ricty Diminished.*" . 1.1))
+  (add-to-list 'face-font-rescale-alist '("Noto Color Emoji.*" . 0.9))
+
+  (set-fontset-font t 'symbol (font-spec :family "Noto Color Emoji"))
 
   (custom-theme-set-faces
    'user
@@ -2122,6 +2126,7 @@ prefix. This way which-key will be more useful.
   (c++-mode . modern-c++-font-lock-mode))
 
 (use-package company-c-headers
+  :disabled
   :after (company)
   :hook (c-mode-common . (lambda ()
                            (add-to-list (make-local-variable 'company-backends)
@@ -2349,6 +2354,8 @@ prefix. This way which-key will be more useful.
   :bind (("C-c o a" . org-agenda)
          ("C-c o b" . org-iswitchb)
          ("C-c o c" . org-capture)
+         ("C-c o h" . org-insert-heading)
+         ("C-c o H" . org-insert-subheading)
          ("C-c o l" . org-store-link)
          ("C-c o j" . (lambda ()
                         (interactive) (org-capture nil "j")))
@@ -2426,6 +2433,40 @@ prefix. This way which-key will be more useful.
   (org-hugo-default-section-directory "posts"))
 #+end_src
 
+** Org-download
+
+As of 3/19/2022, this does not work with Chrome. Works well with Firefox.
+
+#+begin_src emacs-lisp
+(use-package org-download
+  :hook ((org-mode . org-download-enable)
+         (dired-mode . org-download-enable))
+  :config
+  (setq-default org-download-image-dir "~/org/images"))
+#+end_src
+
+** Automatic Screenshort Insertion
+
+Copied from [[https://orgmode.org/worg/org-hacks.html#org8431aea][here.]]
+
+#+begin_src emacs-lisp
+(defun my-org-screenshot ()
+  "Take a screenshot into a time stamped unique-named file in the
+same directory as the org-buffer and insert a link to this file."
+  (interactive)
+  (setq filename
+        (concat
+         (make-temp-name
+          (concat (buffer-file-name)
+                  "_"
+                  (format-time-string "%Y%m%d_%H%M%S_")) ) ".png"))
+  (call-process "import" nil nil nil filename)
+  (insert (concat "[[" filename "]]"))
+  (org-display-inline-images))
+(with-eval-after-load "org"
+  (define-key org-mode-map (kbd "C-c o i") #'my-org-screenshot))
+#+end_src
+
 * Internet
 
 ** RSS
@@ -2479,6 +2520,7 @@ prefix. This way which-key will be more useful.
 ** Translate
 #+begin_src emacs-lisp
 (use-package xah-lookup
+  :disabled
   :bind (("C-c L j" . my-xah-lookup-weblio)
          ("C-c L a" . my-xah-lookup-all-dictionaries)
          ("C-c L g" . my-xah-lookup-google)
