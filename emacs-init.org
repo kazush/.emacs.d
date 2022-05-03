@@ -2608,200 +2608,221 @@ same directory as the org-buffer and insert a link to this file."
 * EXWM
 
 #+begin_src emacs-lisp
-  (use-package exwm
-    :if (and (eq window-system 'x)
-             (member (getenv "use_exwm") '("1" "yes")))
-    :config
-    (require 'exwm-config)
+(use-package exwm
+  :if (and (eq window-system 'x)
+           (member (getenv "use_exwm") '("1" "yes")))
+  :config
+  (require 'exwm-config)
 
-    ;; Allow non-floating resizing with mouse.
-    (setq window-divider-default-bottom-width 2
-          window-divider-default-right-width 2)
-    (window-divider-mode)
+  ;; Allow non-floating resizing with mouse.
+  (setq window-divider-default-bottom-width 2
+        window-divider-default-right-width 2)
+  (window-divider-mode)
 
-    (setq exwm-workspace-number 4)
+  (setq exwm-workspace-number 4)
 
-    ;; Make X windows visible in all workspaces.
-    (setq exwm-workspace-show-all-buffers t)
-    (setq exwm-layout-show-all-buffers t)
+  ;; Make X windows visible in all workspaces.
+  (setq exwm-workspace-show-all-buffers t)
+  (setq exwm-layout-show-all-buffers t)
 
-    ;; Enable char-mode by default.
-    (setq exwm-manage-configurations '((t char-mode t)))
+  ;; Enable char-mode by default.
+  (setq exwm-manage-configurations '((t char-mode t)))
 
-    ;; Run startup script.
-    ;; (start-process "" nil (concat (getenv "HOME") "/bin/s.sh"))
+  ;; Run startup script.
+  ;; (start-process "" nil (concat (getenv "HOME") "/bin/s.sh"))
 
-    ;; Rename buffer to window title.
-    (defun exwm-rename-buffer-to-title () (exwm-workspace-rename-buffer exwm-title))
-    (add-hook 'exwm-update-title-hook 'exwm-rename-buffer-to-title)
+  ;; Rename buffer to window title.
+  (defun my/exwm-rename-buffer-to-title ()
+    (exwm-workspace-rename-buffer exwm-title))
+  (add-hook 'exwm-update-title-hook 'my/exwm-rename-buffer-to-title)
 
-    ;; Do not show mode-line for floating windows.
-    (add-hook 'exwm-floating-setup-hook #'exwm-layout-hide-mode-line)
-    (add-hook 'exwm-floating-exit-hook #'exwm-layout-show-mode-line)
+  ;; Do not show mode-line for floating windows.
+  (add-hook 'exwm-floating-setup-hook #'exwm-layout-hide-mode-line)
+  (add-hook 'exwm-floating-exit-hook #'exwm-layout-show-mode-line)
 
-    (exwm-input-set-key (kbd "s-h") #'windmove-left)
-    (exwm-input-set-key (kbd "s-j") #'windmove-down)
-    (exwm-input-set-key (kbd "s-k") #'windmove-up)
-    (exwm-input-set-key (kbd "s-l") #'windmove-right)
+  (exwm-input-set-key (kbd "s-h") #'windmove-left)
+  (exwm-input-set-key (kbd "s-j") #'windmove-down)
+  (exwm-input-set-key (kbd "s-k") #'windmove-up)
+  (exwm-input-set-key (kbd "s-l") #'windmove-right)
 
-    (defun exwm-layout-toggle-fullscreen-or-single-window ()
-      (interactive)
-      (if (eq major-mode 'exwm-mode)
-          (call-interactively 'exwm-layout-toggle-fullscreen)
-        (require 'functions)
-        (toggle-single-window)))
-    (exwm-input-set-key (kbd "s-f") #'exwm-layout-toggle-fullscreen-or-single-window)
+  (defun my/exwm-layout-toggle-fullscreen-or-single-window ()
+    (interactive)
+    (if (eq major-mode 'exwm-mode)
+        (call-interactively 'exwm-layout-toggle-fullscreen)
+      (require 'functions)
+      (my/toggle-single-window)))
+  (exwm-input-set-key (kbd "s-f")
+                      #'my/exwm-layout-toggle-fullscreen-or-single-window)
 
-    (defvar single-window--last-configuration nil "Last window configuration before calling `delete-other-windows'.")
-    (defun toggle-single-window ()
-      "Un-maximize current window.
+  (defvar my/single-window--last-configuration nil
+    "Last window configuration before calling `delete-other-windows'.")
+  (defun my/toggle-single-window ()
+    "Un-maximize current window.
     If multiple windows are active, save window configuration and
     delete other windows.  If only one window is active and a window
     configuration was previously save, restore that configuration."
-      (interactive)
-      (if (= (count-windows) 1)
-          (when single-window--last-configuration
-            (set-window-configuration single-window--last-configuration))
-        (setq single-window--last-configuration (current-window-configuration))
-        (delete-other-windows)))
+    (interactive)
+    (if (= (count-windows) 1)
+        (when my/single-window--last-configuration
+          (set-window-configuration my/single-window--last-configuration))
+      (setq my/single-window--last-configuration (current-window-configuration))
+      (delete-other-windows)))
 
-    (defun switch-to-last-buffer ()
-      "Switch to last open buffer in current window."
-      (interactive)
-      (let* ((b (other-buffer (current-buffer) 1))
-             (w (get-buffer-window b)))
-        (if w (select-window w) (switch-to-buffer b))))
+  (defun my/switch-to-last-buffer ()
+    "Switch to last open buffer in current window."
+    (interactive)
+    (let* ((b (other-buffer (current-buffer) 1))
+           (w (get-buffer-window b)))
+      (if w (select-window w) (switch-to-buffer b))))
 
-    (exwm-input-set-key (kbd "s-<tab>") #'switch-to-last-buffer)
+  (exwm-input-set-key (kbd "s-<tab>") #'my/switch-to-last-buffer)
 
-    (exwm-input-set-key (kbd "s-<return>")
-                        #'(lambda ()
-                            (interactive)
-                            (start-process "" nil "gnome-terminal")))
-    (exwm-input-set-key (kbd "s-b")
-                        #'(lambda ()
-                            (interactive)
-                            (start-process "" nil "google-chrome")))
-    (exwm-input-set-key (kbd "s-B")
-                        #'(lambda ()
-                            (interactive)
-                            (select-window (split-window-horizontally nil (selected-window)))
-                            (start-process "" nil "google-chrome")))
-    (exwm-input-set-key (kbd "s-L")
-                        #'(lambda ()
-                            (interactive)
-                            (start-process "lock" (get-buffer-create "*tmp*") "xautolock" "-locknow")))
+  (exwm-input-set-key (kbd "s-<return>")
+                      #'(lambda ()
+                          (interactive)
+                          (start-process "" nil "lxterminal")))
+  (exwm-input-set-key (kbd "s-b")
+                      #'(lambda ()
+                          (interactive)
+                          (start-process "" nil "google-chrome")))
+  (exwm-input-set-key (kbd "s-B")
+                      #'(lambda ()
+                          (interactive)
+                          (select-window (split-window-horizontally))
+                          (start-process "" nil "google-chrome")))
+  (exwm-input-set-key (kbd "s-L")
+                      #'(lambda ()
+                          (interactive)
+                          (start-process "" nil
+                                         "xscreensaver-command" "-lock")))
 
-    ;; Make class name the buffer name
-    ;; (add-hook 'exwm-update-class-hook
-    ;;           (lambda ()
-    ;;             (exwm-workspace-rename-buffer exwm-class-name)))
+  ;; Make class name the buffer name
+  ;; (add-hook 'exwm-update-class-hook
+  ;;           (lambda ()
+  ;;             (exwm-workspace-rename-buffer exwm-class-name)))
 
-    ;; 's-r': Reset
-    (exwm-input-set-key (kbd "s-r") #'exwm-reset)
-    ;; 's-w': Switch workspace
-    (exwm-input-set-key (kbd "s-w") #'exwm-workspace-switch)
-    ;; 's-N': Switch to Nth workspace
-    (dotimes (i 10)
-      (exwm-input-set-key (kbd (format "s-%d" i))
-                          `(lambda ()
-                             (interactive)
-                             (exwm-workspace-switch-create ,i))))
+  ;; 's-r': Reset
+  (exwm-input-set-key (kbd "s-r") #'exwm-reset)
+  ;; 's-w': Switch workspace
+  (exwm-input-set-key (kbd "s-w") #'exwm-workspace-switch)
+  ;; 's-N': Switch to Nth workspace
+  (dotimes (i 10)
+    (exwm-input-set-key (kbd (format "s-%d" i))
+                        `(lambda ()
+                           (interactive)
+                           (exwm-workspace-switch-create ,i))))
 
-    ;; 's-!': Launch application
-    (exwm-input-set-key (kbd "s-!")
-                        #'(lambda (command)
-                            (interactive (list (read-shell-command "$ ")))
-                            (start-process-shell-command command nil command)))
+  ;; 's-!': Launch application
+  (exwm-input-set-key (kbd "s-!")
+                      #'(lambda (command)
+                          (interactive (list (read-shell-command "$ ")))
+                          (start-process-shell-command command nil command)))
 
-    (push 'XF86AudioMute exwm-input-prefix-keys)
-    (push 'XF86AudioLowerVolume exwm-input-prefix-keys)
-    (push 'XF86AudioRaiseVolume exwm-input-prefix-keys)
-    (push 'XF86MonBrightnessDown exwm-input-prefix-keys)
-    (push 'XF86MonBrightnessUp exwm-input-prefix-keys)
+  (push 'XF86AudioMute exwm-input-prefix-keys)
+  (push 'XF86AudioLowerVolume exwm-input-prefix-keys)
+  (push 'XF86AudioRaiseVolume exwm-input-prefix-keys)
+  (push 'XF86MonBrightnessDown exwm-input-prefix-keys)
+  (push 'XF86MonBrightnessUp exwm-input-prefix-keys)
 
-    (exwm-input-set-key (kbd "<XF86MonBrightnessDown>")
-                        #'(lambda ()
-                            (interactive)
-                            (start-process "" nil "light" "-U" "10")))
+  (exwm-input-set-key (kbd "<XF86MonBrightnessDown>")
+                      #'(lambda ()
+                          (interactive)
+                          (start-process "" nil "light" "-U" "10")))
 
-    (exwm-input-set-key (kbd "<XF86MonBrightnessUp>")
-                        #'(lambda ()
-                            (interactive)
-                            (start-process "" nil "light" "-A" "10")))
+  (exwm-input-set-key (kbd "<XF86MonBrightnessUp>")
+                      #'(lambda ()
+                          (interactive)
+                          (start-process "" nil "light" "-A" "10")))
 
-    (exwm-input-set-key (kbd "s-n") #'switch-to-next-buffer)
-    (exwm-input-set-key (kbd "s-p") #'switch-to-prev-buffer)
-    (exwm-input-set-key (kbd "s-O") #'perspeen-goto-last-ws)
-    (exwm-input-set-key (kbd "s-C") #'kill-buffer-and-window)
-    (exwm-input-set-key (kbd "s-F") #'exwm-floating-toggle-floating)
+  (defun my/exwm-set-input-focus ()
+    "Workaround for losing input focus after switch-to-next/prev-buffer"
+    (interactive)
+    (let ((window (selected-window)))
+      (x-focus-frame (window-frame window))
+      (exwm-input--set-active-window)
+      (xcb:flush exwm--connection)))
 
-    (exwm-input-set-key (kbd "s-m") #'helm-mini)
-    (exwm-input-set-key (kbd "s-f") #'find-file-other-window)
+  (exwm-input-set-key (kbd "s-n") #'(lambda ()
+                                      (interactive)
+                                      (switch-to-next-buffer)
+                                      (my/exwm-set-input-focus)))
+  (exwm-input-set-key (kbd "s-p")  #'(lambda ()
+                                       (interactive)
+                                       (switch-to-prev-buffer)
+                                       (my/exwm-set-input-focus)))
+  (exwm-input-set-key (kbd "s-O") #'perspeen-goto-last-ws)
+  (exwm-input-set-key (kbd "s-C") #'kill-buffer-and-window)
+  (exwm-input-set-key (kbd "s-F") #'exwm-floating-toggle-floating)
 
-    (defvar exwm-workspace-previous-index 0 "The previous active workspace index.")
-    (defun exwm-workspace--current-to-previous-index (frame-or-index &optional force)
-      "Save the current active workspace index."
-      (if (numberp frame-or-index)
-          (setq exwm-workspace-previous-index exwm-workspace-current-index)))
-    (add-hook 'exwm-init-hook
-              #'(lambda ()
-                  (advice-add 'exwm-workspace-switch :before #'exwm-workspace--current-to-previous-index)))
-    (defun exwm-workspace-switch-to-previous ()
-      (interactive)
-      "Switch to the previous active workspace."
-      (let ((index exwm-workspace-previous-index))
-        (exwm-workspace-switch index)))
-    (exwm-input-set-key (kbd "s-;") #'exwm-workspace-switch-to-previous)
-    (exwm-input-set-key (kbd "s-N") #'(lambda () (interactive)
-                                        (switch-to-buffer-other-frame
+  (exwm-input-set-key (kbd "s-m") #'helm-mini)
+  (exwm-input-set-key (kbd "s-f") #'find-file-other-window)
+
+  (defvar my/exwm-workspace-previous-index 0
+    "The previous active workspace index.")
+  (defun my/exwm-workspace--current-to-previous-index
+      (frame-or-index &optional force)
+    "Save the current active workspace index."
+    (if (numberp frame-or-index)
+        (setq my/exwm-workspace-previous-index exwm-workspace-current-index)))
+  (add-hook 'exwm-init-hook
+            #'(lambda ()
+                (advice-add 'exwm-workspace-switch :before
+                            #'my/exwm-workspace--current-to-previous-index)))
+  (defun my/exwm-workspace-switch-to-previous ()
+    (interactive)
+    "Switch to the previous active workspace."
+    (let ((index my/exwm-workspace-previous-index))
+      (exwm-workspace-switch index)))
+  (exwm-input-set-key (kbd "s-;") #'my/exwm-workspace-switch-to-previous)
+  (exwm-input-set-key (kbd "s-N") #'(lambda () (interactive)
+                                      (switch-to-buffer-other-frame
                                        (get-buffer-create "*scratch*"))))
-    (exwm-input-set-key (kbd "s-o") #'(lambda () (interactive)
-                                        (my/get-shell 1)))
+  (exwm-input-set-key (kbd "s-o") #'(lambda () (interactive)
+                                      (my/get-shell 1)))
 
-    (push ?\C-q exwm-input-prefix-keys)
-    (define-key exwm-mode-map [?\C-q] #'exwm-input-send-next-key)
+  (push ?\C-q exwm-input-prefix-keys)
+  (define-key exwm-mode-map [?\C-q] #'exwm-input-send-next-key)
 
-    ;; Line-editing shortcuts
-    (exwm-input-set-simulation-keys
-     '(
-       ;; ([?\C-b] . left)
-       ;; ([?\C-f] . right)
-       ;; ([?\C-p] . up)
-       ;; ([?\C-n] . down)
-       ;; ([?\C-a] . home)
-       ;; ([?\C-e] . end)
-       ;; ([?\M-v] . prior)
-       ;; ([?\C-v] . next)
-       ;; ([?\C-d] . delete)
-       ;; ([?\C-k] . (S-end delete))
-       ))
-    ;; Other configurations
-    (exwm-config-misc)
+  ;; Line-editing shortcuts
+  (exwm-input-set-simulation-keys
+   '(
+     ;; ([?\C-b] . left)
+     ;; ([?\C-f] . right)
+     ;; ([?\C-p] . up)
+     ;; ([?\C-n] . down)
+     ;; ([?\C-a] . home)
+     ;; ([?\C-e] . end)
+     ;; ([?\M-v] . prior)
+     ;; ([?\C-v] . next)
+     ;; ([?\C-d] . delete)
+     ;; ([?\C-k] . (S-end delete))
+     ))
+  ;; Other configurations
+  (exwm-config-misc)
 
-    ;; systemtray
-    ;; (require 'exwm-systemtray)
-    ;; (exwm-systemtray-enable)
+  ;; systemtray
+  ;; (require 'exwm-systemtray)
+  ;; (exwm-systemtray-enable)
 
-    ;; xrandr
-    ;; (require 'exwm-randr)
-    ;; (setq exwm-randr-workspace-output-plist '(0 "DvI-I-1" 1 "DP-1"))
-    ;; (exwm-randr-enable)
+  ;; xrandr
+  ;; (require 'exwm-randr)
+  ;; (setq exwm-randr-workspace-output-plist '(0 "DvI-I-1" 1 "DP-1"))
+  ;; (exwm-randr-enable)
 
-    ;; Enable EXWM
-    (when (null (getenv "noexwm"))
-      (exwm-enable)))
+  ;; Enable EXWM
+  (when (null (getenv "noexwm"))
+    (exwm-enable)))
 
-  (use-package helm-exwm
-    :if my/enable-helm
-    :requires exwm
-    :config
-    (setq helm-exwm-emacs-buffers-source (helm-exwm-build-emacs-buffers-source))
-    (setq helm-exwm-source (helm-exwm-build-source))
-    (setq helm-mini-default-sources `(helm-exwm-emacs-buffers-source
-                                      helm-exwm-source
-                                      helm-source-recentf))
-    (exwm-input-set-key (kbd "s-i") #'helm-exwm))
+(use-package helm-exwm
+  :if my/enable-helm
+  :requires exwm
+  :config
+  (setq helm-exwm-emacs-buffers-source (helm-exwm-build-emacs-buffers-source))
+  (setq helm-exwm-source (helm-exwm-build-source))
+  (setq helm-mini-default-sources `(helm-exwm-emacs-buffers-source
+                                    helm-exwm-source
+                                    helm-source-recentf))
+  (exwm-input-set-key (kbd "s-i") #'helm-exwm))
 #+end_src
 
 * Device Control and Management
