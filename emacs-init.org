@@ -2801,8 +2801,8 @@ same directory as the org-buffer and insert a link to this file."
   (exwm-config-misc)
 
   ;; systemtray
-  ;; (require 'exwm-systemtray)
-  ;; (exwm-systemtray-enable)
+  (require 'exwm-systemtray)
+  (exwm-systemtray-enable)
 
   ;; xrandr
   ;; (require 'exwm-randr)
