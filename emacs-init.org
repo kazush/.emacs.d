@@ -269,11 +269,10 @@ emacsclient is connected hence ~after-make-frame-functions~ hook is set here.
                       :background "RoyalBlue4")
   (set-face-attribute 'font-lock-comment-face nil
                       :foreground "azure4"
-                      :slant 'italic
-                      :inherit 'default)
+                      :background 'unspecified
+                      :slant 'italic)
   (set-face-attribute 'font-lock-comment-delimiter-face nil
-                      :slant 'unspecified
-                      :weight 'bold
+                      ;; :weight 'bold
                       :inherit 'font-lock-comment-face)
   (set-face-attribute 'highlight nil
                       :foreground "orange"
@@ -298,10 +297,15 @@ emacsclient is connected hence ~after-make-frame-functions~ hook is set here.
                           (face-foreground 'font-lock-keyword-face) 10)))
   )
 
+;; Configure default font and other faces such as emojis.
+
+(setq-default my/default-font-family "Monospace")
+(setq-default my/default-font-size 11)
+
 (defun my/setfont (size)
   (interactive "nFont size: ")
   (set-face-attribute 'default nil
-                      :family "Monospace"
+                      :family my/default-font-family
                       :height (* size 10)))
 
 (defun my/setup-fonts ()
@@ -309,32 +313,13 @@ emacsclient is connected hence ~after-make-frame-functions~ hook is set here.
   (interactive)
   (setq use-default-font-for-symbols nil)
 
-  (set-face-attribute 'default nil
-                      :family "Monospace"
-                      :height 110)
-  ;; (let ((fontspec (font-spec :family "Noto Sans Mono CJK JP")))
-  ;;   (add-to-list 'face-font-rescale-alist `(,fontspec . 1.2))
-  ;;   ;; (set-fontset-font t 'japanese-jisx0208 fontspec)
-  ;;   ;; (set-fontset-font t 'japanese-jisx0208-1978 fontspec)
-  ;;   ;; (set-fontset-font t 'japanese-jisx0212 fontspec)
-  ;;   ;; (set-fontset-font t 'japanese-jisx0213-1 fontspec)
-  ;;   ;; (set-fontset-font t 'japanese-jisx0213-2 fontspec)
-  ;;   ;; (set-fontset-font t 'japanese-jisx0213.2004-1 fontspec)
-  ;;   ;; (set-fontset-font t 'katakana-jisx0201 fontspec)
-  ;;   ;; (set-fontset-font t 'jisx0201 fontspec)
-  ;;   (set-fontset-font t 'symbol fontspec nil 'prepend)
-  ;;   ;; (set-fontset-font t 'kana fontspec nil 'prepend)
-  ;;   ;; (set-fontset-font t 'cjk-misc fontspec)
-  ;;   (set-fontset-font t 'unicode-bmp fontspec))
-
-  (add-to-list 'face-font-rescale-alist '("Ricty Diminished.*" . 1.1))
-  (add-to-list 'face-font-rescale-alist '("Noto Color Emoji.*" . 0.9))
+  (my/setfont my/default-font-size)
 
   (set-fontset-font t 'symbol (font-spec :family "Noto Color Emoji"))
 
   (custom-theme-set-faces
    'user
-   '(variable-pitch ((t (:family "Noto Sans")))))
+   '(variable-pitch ((t (:family "Sans")))))
   )
 
 (when (daemonp)
@@ -342,7 +327,9 @@ emacsclient is connected hence ~after-make-frame-functions~ hook is set here.
             #'(lambda (frame)
                 (select-frame frame)
                 (my/setup-fonts))))
-(my/setup-fonts)
+
+(with-eval-after-load "emacs-init"
+  (my/setup-fonts))
 #+end_src
 
 ** Color themes
@@ -947,10 +934,11 @@ prefix. This way which-key will be more useful.
   (company-echo-delay 0)
   (company-dabbrev-downcase nil)
   (company-tooltip-align-annotations t)
-  (company-backends '((company-files
+  (company-backends '((company-capf
                        company-keywords
-                       company-capf
-                       )
+                       :with
+                       company-dabbrev-code
+                       company-semantic)
                       (company-abbrev
                        company-dabbrev)))
   :config
@@ -1076,8 +1064,8 @@ prefix. This way which-key will be more useful.
     (add-to-list 'org-src-lang-modes '("plantuml" . plantuml))
     (require 'ob-plantuml)))
 #+end_src
-
-** Graphviz Dot
+*
+* Graphviz Dot
 
 #+begin_src emacs-lisp
 (use-package graphviz-dot-mode
@@ -1592,11 +1580,13 @@ prefix. This way which-key will be more useful.
       (select-window (display-buffer term-buffer))))
   )
 
-(defun my/shellish-buffer-p (buf)
+(defun my/shellish-buffer-p (buf &optional filter)
   "Return if BUF is a shell-ish buffer."
-  (let ((mode (with-current-buffer buf major-mode)))
+  (let ((mode (with-current-buffer buf major-mode))
+        (shell-pattern (if filter filter
+                         (rx (or "term" "shell" "eshell")))))
     (and (string-match-p
-          (rx bos "*" (or "term" "shell" "eshell") (* not-newline) "*" eos)
+          (concat "\\`\\*" shell-pattern ".*\\*\\'")
           (buffer-name buf))
          (seq-contains '(shell-mode eshell-mode term-mode) mode))))
 
@@ -1608,15 +1598,15 @@ prefix. This way which-key will be more useful.
         (let ((buflist (mapcar
                         #'buffer-name
                         (cl-remove-if-not 'my/shellish-buffer-p (buffer-list)))))
-          (message "cdr buflist:%s car buflist:%s" (cdr buflist) (car buflist))
+          ;; (message "cdr buflist:%s car buflist:%s" (cdr buflist) (car buflist))
           (append (cdr buflist) (list (car buflist))))))))
 
 
-(defun my/last-shellish-buffer (buflist)
-  "Return most recently used shell-ish buffer in BUFLIST."
+(defun my/find-last-shellish-buffer (buflist shell-str)
+  "Return most recently used shell-ish buffer containing SHELL-STR in BUFLIST."
   (when buflist
-    (if (my/shellish-buffer-p (car buflist))
-        (car buflist) (my/last-shellish-buffer (cdr buflist)))))
+    (if (my/shellish-buffer-p (car buflist) shell-str)
+        (car buflist) (my/find-last-shellish-buffer (cdr buflist) shell-str))))
 
 (defun my/chdir (dir)
   "Change directory to DIR."
@@ -1635,44 +1625,53 @@ prefix. This way which-key will be more useful.
   (interactive)
   (my/helm-buffers-list my/helm-source-shellish-buffers-list))
 
-(defvar my/shellish-last-buffer nil)
-(defun my/get-shellish (arg shellfunc)
+(defvar my/last-non-shellish-buffer nil)
+
+(defun my/remember-last-non-shellish-buffer ()
+  "Remember last non-shellish buffer."
+  (let ((buf (current-buffer)))
+    (unless (my/shellish-buffer-p buf)
+      (setq my/last-non-shellish-buffer buf))))
+
+(defun my/get-shellish (arg shellfunc shell-str)
   "Switch to the shell-ish buffer last used or create new without prefix (ARG).
-  Close the window if the current buffer is already a shell-ish
-  buffer.  With prefix show Helm buffers list.  Create a new one if
-  double prefixes by calling SHELLFUNC."
+  - Close the window if the current buffer is already a shell-ish buffer of
+    the same type.
+  - With single prefix, jump to the last non-shellish buffer.
+  - With double prefixes, show Helm buffers list.
+  - With triple prefixes, unconditionally create new one by calling SHELLFUNC."
   (interactive "p")
-  (let ((cwd default-directory)
-        (b (my/last-shellish-buffer (buffer-list (selected-frame)))))
+  (let ((b (my/find-last-shellish-buffer (buffer-list (selected-frame))
+                                         shell-str)))
     (cond ((or (not b) (= arg 64))
-           (setq my/shellish-last-buffer (current-buffer))
+           (my/remember-last-non-shellish-buffer)
            (funcall shellfunc))
           ((and (= arg 4) b)
-           (select-window (display-buffer my/shellish-last-buffer)))
+           (select-window (display-buffer my/last-non-shellish-buffer)))
           ((= arg 16)
            (my/helm-shellish-buffers-list))
-          ((my/shellish-buffer-p (current-buffer))
-           (when my/shellish-last-buffer
-             (delete-window (get-buffer-window b))
-             (select-window (display-buffer my/shellish-last-buffer))))
+          ((my/shellish-buffer-p (current-buffer) shell-str)
+           (when my/last-non-shellish-buffer
+             (delete-window (get-buffer-window (current-buffer)))
+             (select-window (display-buffer my/last-non-shellish-buffer))))
           (b
-           (setq my/shellish-last-buffer (current-buffer))
+           (my/remember-last-non-shellish-buffer)
            (select-window (display-buffer b))))))
 
 (defun my/newshell ()
   "Create a new shell with base directory name."
   (interactive)
-  (if (my/last-shellish-buffer (buffer-list (selected-frame)))
+  (if (my/find-last-shellish-buffer (buffer-list (selected-frame)) "shell")
       (shell (format "*shell<%s>*" (read-string "Shell buffer name: ")))
     (shell)))
 
 (defun my/get-shell (arg)
   (interactive "p")
-  (my/get-shellish arg 'my/newshell))
+  (my/get-shellish arg 'my/newshell "shell"))
 
 (defun my/get-term (arg)
   (interactive "p")
-  (my/get-shellish arg 'multi-term))
+  (my/get-shellish arg 'multi-term "term"))
 
 ;; Key bindings
 (global-set-key (kbd "C-c s") #'my/get-shell)
@@ -2654,6 +2653,14 @@ same directory as the org-buffer and insert a link to this file."
   (exwm-input-set-key (kbd "s-f")
                       #'my/exwm-layout-toggle-fullscreen-or-single-window)
 
+  (defun my/exwm-set-input-focus ()
+    "Workaround for losing input focus after switch-to-next/prev-buffer"
+    (interactive)
+    (let ((window (selected-window)))
+      (x-focus-frame (window-frame window))
+      (exwm-input--set-active-window)
+      (xcb:flush exwm--connection)))
+
   (defvar my/single-window--last-configuration nil
     "Last window configuration before calling `delete-other-windows'.")
   (defun my/toggle-single-window ()
@@ -2673,7 +2680,10 @@ same directory as the org-buffer and insert a link to this file."
     (interactive)
     (let* ((b (other-buffer (current-buffer) 1))
            (w (get-buffer-window b)))
-      (if w (select-window w) (switch-to-buffer b))))
+      (if w (select-window w)
+        (progn
+          (switch-to-buffer b)
+          (my/exwm-set-input-focus)))))
 
   (exwm-input-set-key (kbd "s-<tab>") #'my/switch-to-last-buffer)
 
@@ -2733,14 +2743,6 @@ same directory as the org-buffer and insert a link to this file."
                       #'(lambda ()
                           (interactive)
                           (start-process "" nil "light" "-A" "10")))
-
-  (defun my/exwm-set-input-focus ()
-    "Workaround for losing input focus after switch-to-next/prev-buffer"
-    (interactive)
-    (let ((window (selected-window)))
-      (x-focus-frame (window-frame window))
-      (exwm-input--set-active-window)
-      (xcb:flush exwm--connection)))
 
   (exwm-input-set-key (kbd "s-n") #'(lambda ()
                                       (interactive)
@@ -2805,9 +2807,10 @@ same directory as the org-buffer and insert a link to this file."
   (exwm-systemtray-enable)
 
   ;; xrandr
-  ;; (require 'exwm-randr)
-  ;; (setq exwm-randr-workspace-output-plist '(0 "DvI-I-1" 1 "DP-1"))
-  ;; (exwm-randr-enable)
+  (when (getenv "CHROME_REMOTE_DESKTOP_SESSION")
+    (require 'exwm-randr)
+    (setq exwm-randr-workspace-output-plist '(0 "Screen"))
+    (exwm-randr-enable))
 
   ;; Enable EXWM
   (when (null (getenv "noexwm"))
@@ -2848,3 +2851,8 @@ Load postinit.org if exists.
     (org-babel-load-file postinit-file)))
 #+end_src
 
+* EOF
+
+#+begin_src emacs-lisp
+(provide 'emacs-init)
+#+end_src

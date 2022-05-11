@@ -1,7 +1,29 @@
 #+title: Emacs post init configuration
-#+startup: content
+#+startup: content indent
 #+property: header-args :tangle yes
 
 #+begin_src emacs-lisp
 (message "Loading postinit config...")
+#+end_src
+
+* UI
+
+Configure font.
+
+#+begin_src emacs-lisp
+;; Use Noto Sans Mono CJK JP for Japanese character set.
+(let ((fontspec (font-spec :family "Noto Sans Mono CJK JP")))
+  (set-fontset-font t 'japanese-jisx0208 fontspec)
+  (set-fontset-font t 'japanese-jisx0208-1978 fontspec)
+  (set-fontset-font t 'japanese-jisx0212 fontspec)
+  (set-fontset-font t 'japanese-jisx0213-1 fontspec)
+  (set-fontset-font t 'japanese-jisx0213-2 fontspec)
+  (set-fontset-font t 'japanese-jisx0213.2004-1 fontspec)
+  (set-fontset-font t 'katakana-jisx0201 fontspec)
+  (set-fontset-font t 'jisx0201 fontspec)
+  ;; Scale the font to nicely align with Inconsolata/Ricty.
+  (add-to-list 'face-font-rescale-alist `(,fontspec . 1.1))
+  )
+
+(add-to-list 'face-font-rescale-alist '("Noto Color Emoji.*" . 0.9))
 #+end_src
