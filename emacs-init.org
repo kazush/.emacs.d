@@ -2720,7 +2720,10 @@ same directory as the org-buffer and insert a link to this file."
     (exwm-input-set-key (kbd (format "s-%d" i))
                         `(lambda ()
                            (interactive)
-                           (exwm-workspace-switch-create ,i))))
+                           (exwm-workspace-switch-create ,i)
+                           (let ((window (get-buffer-window (current-buffer))))
+                             (select-window window)
+                             (x-focus-frame (window-frame window))))))
 
   ;; 's-!': Launch application
   (exwm-input-set-key (kbd "s-!")
