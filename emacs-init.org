@@ -802,7 +802,8 @@ prefix. This way which-key will be more useful.
   (require 'helm-config)
   (helm-mode 1)
   (global-set-key "\C-ch" 'helm-command-prefix)
-  :bind (("C-c h o" . helm-occur)
+  :bind (("C-c h m" . helm-mini)
+         ("C-c h o" . helm-occur)
          ("C-c h r" . helm-recentf)
          ("C-c h %" . helm-regexp)
          ("C-c g" . helm-do-grep-ag)
@@ -2613,12 +2614,15 @@ same directory as the org-buffer and insert a link to this file."
   :config
   (require 'exwm-config)
 
+  ;; Override C-z (suspend-frame)
+  (exwm-input-set-key (kbd "C-z") #'keyboard-escape-quit)
+
   ;; Allow non-floating resizing with mouse.
   (setq window-divider-default-bottom-width 2
         window-divider-default-right-width 2)
   (window-divider-mode)
 
-  (setq exwm-workspace-number 4)
+  (setq exwm-workspace-number 1)
 
   ;; Make X windows visible in all workspaces.
   (setq exwm-workspace-show-all-buffers t)
