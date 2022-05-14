@@ -1200,7 +1200,7 @@ prefix. This way which-key will be more useful.
 (use-package perspeen
   :init
   (setq perspeen-use-tab nil)
-  :bind (("s-O" . perspeen-goto-last-ws)
+  :bind (("C-z" . perspeen-mode)
          :map my/wm-map
          ("z c" . perspeen-create-ws)
          ("z k" . perspeen-delete-ws)
@@ -1211,9 +1211,7 @@ prefix. This way which-key will be more useful.
          ("o" . perspeen-goto-last-ws)
          ("C-p" . perspeen-tab-prev)
          ("C-n" . perspeen-tab-next)
-         ("C-d" . perspeen-tab-del))
-  :config
-  (perspeen-mode))
+         ("C-d" . perspeen-tab-del)))
 #+end_src
 
 ** Dedicated window
@@ -2613,9 +2611,6 @@ same directory as the org-buffer and insert a link to this file."
            (member (getenv "use_exwm") '("1" "yes")))
   :config
   (require 'exwm-config)
-
-  ;; Override C-z (suspend-frame)
-  (exwm-input-set-key (kbd "C-z") #'keyboard-escape-quit)
 
   ;; Allow non-floating resizing with mouse.
   (setq window-divider-default-bottom-width 2
