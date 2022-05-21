@@ -37,9 +37,6 @@ instance. ~restart-server~ is a helper function to restart the server process.
 
 #+begin_src emacs-lisp
 (require 'server)
-(unless (server-running-p)
-  (server-start))
-
 (defun restart-server ()
   "Restarts server."
   (interactive)
@@ -47,6 +44,10 @@ instance. ~restart-server~ is a helper function to restart the server process.
   (server-force-stop)
   (server-force-delete)
   (server-start))
+
+(when (getenv "CHROME_REMOTE_DESKTOP_SESSION")
+  (setq server-name "crd"))
+(restart-server)
 #+end_src
 
 ** Dired
@@ -1675,8 +1676,6 @@ prefix. This way which-key will be more useful.
 ;; Key bindings
 (global-set-key (kbd "C-c s") #'my/get-shell)
 (global-set-key (kbd "C-c t") #'my/get-term)
-(global-set-key (kbd "s-o") #'(lambda () (interactive)
-                                (my/get-shell 1)))
 #+end_src
 
 ** Eshell
@@ -2683,6 +2682,11 @@ same directory as the org-buffer and insert a link to this file."
                           (interactive)
                           (start-process "" nil
                                          "xscreensaver-command" "-lock")))
+  (exwm-input-set-key (kbd "s-S")
+                      #'(lambda ()
+                          (interactive)
+                          (start-process "" nil
+                                         "gnome-screenshot" "-i")))
 
   ;; Make class name the buffer name
   ;; (add-hook 'exwm-update-class-hook
@@ -2760,8 +2764,8 @@ same directory as the org-buffer and insert a link to this file."
   (exwm-input-set-key (kbd "s-N") #'(lambda () (interactive)
                                       (switch-to-buffer-other-frame
                                        (get-buffer-create "*scratch*"))))
-  (exwm-input-set-key (kbd "s-o") #'(lambda () (interactive)
-                                      (my/get-shell 1)))
+  (exwm-input-set-key (kbd "s-o") #'my/get-shell)
+  (exwm-input-set-key (kbd "s-e") #'my/get-eshell)
 
   (push ?\C-q exwm-input-prefix-keys)
   (define-key exwm-mode-map [?\C-q] #'exwm-input-send-next-key)
@@ -2793,9 +2797,10 @@ same directory as the org-buffer and insert a link to this file."
     (setq exwm-randr-workspace-output-plist '(0 "Screen"))
     (exwm-randr-enable))
 
-  ;; Enable EXWM
-  (when (null (getenv "noexwm"))
-    (exwm-enable)))
+  ;; Enable EXWM at the end of the initialization.
+  (with-eval-after-load "emacs-init"
+    (exwm-enable))
+  )
 
 (use-package helm-exwm
   :if my/enable-helm
