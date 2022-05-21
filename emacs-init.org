@@ -1714,36 +1714,15 @@ prefix. This way which-key will be more useful.
                 (setq-local company-idle-delay 1.0)
                 (setq-local company-backends '(company-capf)))))
 
-(defun eshell-cwd ()
-  (interactive)
-  (let ((cwd default-directory))
-    (eshell)
-    ;; (switch-to-buffer "*eshell*")
-    (cd cwd)))
-
-(defun myeshell ()
+(defun my/neweshell ()
   (interactive)
   (eshell "new"))
 
-(defun last-eshell-buffer (l)
-  "Return most recently used eshell buffer."
-  (when l
-    (if (eq 'eshell-mode (with-current-buffer (car l) major-mode))
-        (car l) (last-eshell-buffer (cdr l)))))
-
-(defun get-eshell (arg)
-  "Switch to the eshell buffer last used, or create a new one if
-      none exists, or if the current buffer is already a eshell."
+(defun my/get-eshell (arg)
   (interactive "p")
-  (let ((b (last-eshell-buffer (buffer-list))))
-    (if (or (not b) (= arg 4))
-        (eshell-cwd)
-      (if (eq 'eshell-mode major-mode)
-          (delete-window)
-        (select-window (display-buffer b))))))
+  (my/get-shellish arg 'my/neweshell "eshell"))
 
-(global-set-key (kbd "C-c e") #'get-eshell)
-(global-set-key (kbd "C-c E") #'myeshell)
+(global-set-key (kbd "C-c e") #'my/get-eshell)
 
 (use-package eshell-git-prompt
   :config
