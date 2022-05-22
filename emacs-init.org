@@ -1656,9 +1656,7 @@ prefix. This way which-key will be more useful.
           ((= arg 16)
            (my/helm-shellish-buffers-list))
           ((my/shellish-buffer-p (current-buffer) shell-str)
-           (delete-window (get-buffer-window (current-buffer)))
-           (if (memq my/last-non-shellish-buffer (buffer-list))
-             (select-window (display-buffer my/last-non-shellish-buffer))))
+           (delete-window (get-buffer-window (current-buffer))))
           (b
            (my/remember-last-non-shellish-buffer)
            (select-window (display-buffer b))))))
