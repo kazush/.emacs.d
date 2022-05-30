@@ -2651,9 +2651,7 @@ same directory as the org-buffer and insert a link to this file."
     "Workaround for losing input focus after switch-to-next/prev-buffer"
     (interactive)
     (let ((window (selected-window)))
-      (x-focus-frame (window-frame window))
-      (exwm-input--set-active-window)
-      (xcb:flush exwm--connection)))
+      (x-focus-frame (window-frame window))))
 
   (defvar my/single-window--last-configuration nil
     "Last window configuration before calling `delete-other-windows'.")
@@ -2692,7 +2690,9 @@ same directory as the org-buffer and insert a link to this file."
   (exwm-input-set-key (kbd "s-B")
                       #'(lambda ()
                           (interactive)
-                          (select-window (split-window-horizontally))
+                          (split-window-right)
+                          (redisplay)
+                          (windmove-right)
                           (start-process "" nil "google-chrome")))
   (exwm-input-set-key (kbd "s-L")
                       #'(lambda ()
@@ -2755,6 +2755,7 @@ same directory as the org-buffer and insert a link to this file."
                                        (switch-to-prev-buffer)
                                        (my/exwm-set-input-focus)))
   (exwm-input-set-key (kbd "s-O") #'perspeen-goto-last-ws)
+  (exwm-input-set-key (kbd "s-c") #'delete-window)
   (exwm-input-set-key (kbd "s-C") #'kill-buffer-and-window)
   (exwm-input-set-key (kbd "s-F") #'exwm-floating-toggle-floating)
 
