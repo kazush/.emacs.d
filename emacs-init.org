@@ -1195,6 +1195,14 @@ prefix. This way which-key will be more useful.
   :bind ("C-c I p" . projectile-speedbar-open-current-buffer-in-tree))
 #+end_src
 
+** audo-sudoedit
+
+#+begin_src emacs-lisp
+(use-package auto-sudoedit
+  :config
+  (auto-sudoedit-mode 1))
+#+end_src
+
 * Window and workspace management
 
 ** Perspeen
