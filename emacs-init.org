@@ -1697,6 +1697,13 @@ prefix. This way which-key will be more useful.
 (global-set-key (kbd "C-c t") #'my/get-term)
 #+end_src
 
+*** tramp-term
+
+#+begin_src emacs-lisp
+(use-package tramp-term
+  :bind (("C-c T" . tramp-term)))
+#+end_src
+
 ** Eshell
    I don't use eshell often (I use shell instead) so there is a chance that this
    config does not perfectly work.
