@@ -2623,9 +2623,6 @@ same directory as the org-buffer and insert a link to this file."
   ;; Enable char-mode by default.
   (setq exwm-manage-configurations '((t char-mode t)))
 
-  ;; Run startup script.
-  ;; (start-process "" nil (concat (getenv "HOME") "/bin/s.sh"))
-
   ;; Rename buffer to window title.
   (defun my/exwm-rename-buffer-to-title ()
     (exwm-workspace-rename-buffer exwm-title))
@@ -2646,8 +2643,6 @@ same directory as the org-buffer and insert a link to this file."
         (call-interactively 'exwm-layout-toggle-fullscreen)
       (require 'functions)
       (my/toggle-single-window)))
-  (exwm-input-set-key (kbd "s-f")
-                      #'my/exwm-layout-toggle-fullscreen-or-single-window)
 
   (defun my/exwm-set-input-focus ()
     "Workaround for losing input focus after switch-to-next/prev-buffer"
@@ -2760,9 +2755,11 @@ same directory as the org-buffer and insert a link to this file."
   (exwm-input-set-key (kbd "s-c") #'delete-window)
   (exwm-input-set-key (kbd "s-C") #'kill-buffer-and-window)
   (exwm-input-set-key (kbd "s-F") #'exwm-floating-toggle-floating)
+  (exwm-input-set-key (kbd "s-f")
+                      #'my/exwm-layout-toggle-fullscreen-or-single-window)
 
   (exwm-input-set-key (kbd "s-m") #'helm-mini)
-  (exwm-input-set-key (kbd "s-f") #'find-file-other-window)
+  (exwm-input-set-key (kbd "s-o") #'find-file-other-window)
 
   (defvar my/exwm-workspace-previous-index 0
     "The previous active workspace index.")
@@ -2784,8 +2781,10 @@ same directory as the org-buffer and insert a link to this file."
   (exwm-input-set-key (kbd "s-N") #'(lambda () (interactive)
                                       (switch-to-buffer-other-frame
                                        (get-buffer-create "*scratch*"))))
-  (exwm-input-set-key (kbd "s-o") #'my/get-shell)
+  (exwm-input-set-key (kbd "s-s") #'my/get-shell)
   (exwm-input-set-key (kbd "s-e") #'my/get-eshell)
+  ;; Note that s-t does not work in exwm mode for some unknown reason.
+  (exwm-input-set-key (kbd "s-t") #'my/get-term)
 
   (push ?\C-q exwm-input-prefix-keys)
   (define-key exwm-mode-map [?\C-q] #'exwm-input-send-next-key)
@@ -2808,8 +2807,9 @@ same directory as the org-buffer and insert a link to this file."
   (exwm-config-misc)
 
   ;; systemtray
-  (require 'exwm-systemtray)
-  (exwm-systemtray-enable)
+  (when (member (getenv "use_exwm_systray") '("1" "yes"))
+    (require 'exwm-systemtray)
+    (exwm-systemtray-enable))
 
   ;; xrandr
   (when (getenv "CHROME_REMOTE_DESKTOP_SESSION")
