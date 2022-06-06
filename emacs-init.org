@@ -1510,7 +1510,9 @@ prefix. This way which-key will be more useful.
          (remove-hook 'comint-preoutput-filter-functions
                       'shell-procfs-dirtrack t))))
 
-(add-hook 'shell-mode-hook #'(lambda () (shell-procfs-dirtrack-mode 1)))
+;; Temporarily comment out to make my/get-shell work with remote (i.e. in tramp
+;; format) default-directory.
+;; (add-hook 'shell-mode-hook #'(lambda () (shell-procfs-dirtrack-mode 1)))
 
 ;; custom dir track list
 ;; (add-hook 'shell-mode-hook
