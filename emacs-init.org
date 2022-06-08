@@ -2683,7 +2683,7 @@ same directory as the org-buffer and insert a link to this file."
           (switch-to-buffer b)
           (my/exwm-set-input-focus)))))
 
-  (exwm-input-set-key (kbd "s-<tab>") #'my/switch-to-last-buffer)
+  (exwm-input-set-key (kbd "s-`") #'my/switch-to-last-buffer)
 
   (exwm-input-set-key (kbd "s-<return>")
                       #'(lambda ()
@@ -2718,8 +2718,18 @@ same directory as the org-buffer and insert a link to this file."
 
   ;; 's-r': Reset
   (exwm-input-set-key (kbd "s-r") #'exwm-reset)
-  ;; 's-w': Switch workspace
-  (exwm-input-set-key (kbd "s-w") #'exwm-workspace-switch)
+  ;; 's-w': Move window to other workspace
+  (exwm-input-set-key (kbd "s-w") #'exwm-workspace-move-window)
+  ;; 's-<tab>': Switch to next workspace
+  (defun my/exwm-cycle-workspace ()
+    "Cycle workspace to the next one."
+    (interactive)
+    (let ((next-idx (1+ exwm-workspace-current-index)))
+      (if (>= next-idx (length exwm-workspace--list))
+          (setq next-idx 0))
+      (exwm-workspace-switch next-idx)))
+  (exwm-input-set-key (kbd "s-<tab>") #'my/exwm-cycle-workspace)
+
   ;; 's-N': Switch to Nth workspace
   (dotimes (i 10)
     (exwm-input-set-key (kbd (format "s-%d" i))
@@ -2786,6 +2796,7 @@ same directory as the org-buffer and insert a link to this file."
     "Switch to the previous active workspace."
     (let ((index my/exwm-workspace-previous-index))
       (exwm-workspace-switch index)))
+
   (exwm-input-set-key (kbd "s-;") #'my/exwm-workspace-switch-to-previous)
   (exwm-input-set-key (kbd "s-N") #'(lambda () (interactive)
                                       (switch-to-buffer-other-frame
@@ -2832,6 +2843,7 @@ same directory as the org-buffer and insert a link to this file."
   )
 
 (use-package helm-exwm
+  :disabled
   :if my/enable-helm
   :requires exwm
   :config
@@ -2841,6 +2853,34 @@ same directory as the org-buffer and insert a link to this file."
                                     helm-exwm-source
                                     helm-source-recentf))
   (exwm-input-set-key (kbd "s-i") #'helm-exwm))
+
+
+;; Select inactive EXWM buffers with Helm.
+(when my/enable-helm
+  (defun my/get-inactive-exwm-buffers ()
+    "Return a list of inactive EXWM buffers or nil if none."
+    (mapcar
+     #'buffer-name
+     (cl-remove-if-not #'(lambda (buf)
+                           (let ((window (get-buffer-window buf t)))
+                             (and
+                              (null window)
+                              (with-current-buffer buf
+                                (derived-mode-p 'exwm-mode)))))
+                       (buffer-list))))
+
+  (defun my/helm-exwm ()
+    "Dispatch Helm with inactive EXWM buffers."
+    (interactive)
+    (if (my/get-inactive-exwm-buffers)
+        (my/helm-buffers-list
+         (helm-make-source "Inactive EXWM buffers" 'helm-source-buffers
+           :buffer-list
+           #'my/get-inactive-exwm-buffers))
+      (message "No inactive EXWM buffers found")))
+
+  ;; Override s-i.
+  (exwm-input-set-key (kbd "s-i") #'my/helm-exwm))
 #+end_src
 
 * Device Control and Management
