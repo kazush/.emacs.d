@@ -931,7 +931,7 @@ prefix. This way which-key will be more useful.
 #+begin_src emacs-lisp
 (use-package company
   :diminish
-  :hook ((prog-mode shell-mode eshell-mode) . company-mode)
+  :hook ((prog-mode shell-mode eshell-mode org-mode) . company-mode)
   :bind (:map company-active-map
               ("C-n" . company-select-next)
               ("C-p" . company-select-previous))
