@@ -1564,7 +1564,6 @@ prefix. This way which-key will be more useful.
                               (xterm-color-filter string))))))))
 
 (use-package multi-term
-  :commands (multi-term-get-buffer multi-term-internal)
   :custom
   (multi-term-dedicated-close-back-to-open-buffer-p nil)
   (multi-term-dedicated-select-after-open-p t)
