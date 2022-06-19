@@ -2626,30 +2626,33 @@ same directory as the org-buffer and insert a link to this file."
 
   (setq exwm-workspace-number 1)
 
-  ;; Make X windows visible in all workspaces.
-  (setq exwm-workspace-show-all-buffers t)
-  (setq exwm-layout-show-all-buffers t)
+  ;; Try to isolate EXWM buffers per frame.
+  (setq exwm-workspace-show-all-buffers nil)
+  (setq exwm-layout-show-all-buffers nil)
 
   ;; Enable char-mode by default.
-  (setq exwm-manage-configurations '((t char-mode t)))
+  ;; (setq exwm-manage-configurations '((t char-mode t)))
 
   ;; Rename buffer to window title.
-  (defun my/exwm-rename-buffer-to-title ()
-    (exwm-workspace-rename-buffer exwm-title))
-  (add-hook 'exwm-update-title-hook 'my/exwm-rename-buffer-to-title)
+  (add-hook 'exwm-update-title-hook
+            #'(lambda () (exwm-workspace-rename-buffer exwm-title)))
+  ;; (add-hook 'exwm-update-class-hook
+  ;;           #'(lambda () (exwm-workspace-rename-buffer exwm-class-name)))
 
   ;; Do not show mode-line for floating windows.
   (add-hook 'exwm-floating-setup-hook #'exwm-layout-hide-mode-line)
   (add-hook 'exwm-floating-exit-hook #'exwm-layout-show-mode-line)
 
-  (exwm-input-set-key (kbd "s-h") #'windmove-left)
-  (exwm-input-set-key (kbd "s-j") #'windmove-down)
-  (exwm-input-set-key (kbd "s-k") #'windmove-up)
-  (exwm-input-set-key (kbd "s-l") #'windmove-right)
+  ;; Make sure that modeline is updated for the active window.
+  (add-hook 'exwm-workspace-switch-hook
+            #'(lambda ()
+                (run-with-timer 1 nil
+                                #'(lambda ()
+                                    (select-window (selected-window))))))
 
   (defun my/exwm-layout-toggle-fullscreen-or-single-window ()
     (interactive)
-    (if (eq major-mode 'exwm-mode)
+    (if (derived-mode-p 'exwm-mode)
         (call-interactively 'exwm-layout-toggle-fullscreen)
       (require 'functions)
       (my/toggle-single-window)))
@@ -2684,8 +2687,48 @@ same directory as the org-buffer and insert a link to this file."
           (switch-to-buffer b)
           (my/exwm-set-input-focus)))))
 
-  (exwm-input-set-key (kbd "s-`") #'my/switch-to-last-buffer)
+  ;; Add a new EXWM window to the current perspective.
+  (when (and (fboundp 'persp-mode) persp-mode)
+    (add-hook 'exwm-manage-finish-hook
+              #'(lambda () (persp-add-buffer
+                            (current-buffer) (get-current-persp)))))
 
+  ;; === Key bindings working in line-mode. ===
+
+  ;; Clear key bindings for line-mode to unmap C-c.
+  (setq exwm-mode-map (make-sparse-keymap))
+
+  ;; Make C-c a prefix key.
+  (push ?\C-c exwm-input-prefix-keys)
+  ;; Send C-c by typing C-c C-c.
+  (define-key exwm-mode-map (kbd "C-c C-c") #'(lambda () (interactive)
+                                                (exwm-input--fake-key 3)))
+
+  ;; Send C-x (cut) by typing C-x C-x.
+  (define-key exwm-mode-map (kbd "C-x C-x") #'(lambda () (interactive)
+                                                (exwm-input--fake-key 24)))
+  ;; Make C-z a prefix key.
+  (push ?\C-z exwm-input-prefix-keys)
+  ;; Send C-z (undo) by typing C-z C-z.
+  (defun my/send-ctrl-z () (interactive) (exwm-input--fake-key 26))
+  (define-key exwm-mode-map (kbd "C-z C-z") #'my/send-ctrl-z)
+  (when (eq (lookup-key (current-global-map) (kbd "C-z")) 'suspend-frame)
+    (global-set-key (kbd "C-z") #'my/send-ctrl-z))
+
+  ;; Make C-q a quoted insert.
+  (push ?\C-q exwm-input-prefix-keys)
+  (define-key exwm-mode-map [?\C-q] #'exwm-input-send-next-key)
+
+  ;; === Key bindings working in both char-mode and line-mode. ===
+
+  (exwm-input-set-key (kbd "s-'") #'exwm-input-toggle-keyboard)
+
+  (exwm-input-set-key (kbd "s-h") #'windmove-left)
+  (exwm-input-set-key (kbd "s-j") #'windmove-down)
+  (exwm-input-set-key (kbd "s-k") #'windmove-up)
+  (exwm-input-set-key (kbd "s-l") #'windmove-right)
+
+  (exwm-input-set-key (kbd "s-`") #'my/switch-to-last-buffer)
   (exwm-input-set-key (kbd "s-<return>")
                       #'(lambda ()
                           (interactive)
@@ -2711,12 +2754,6 @@ same directory as the org-buffer and insert a link to this file."
                           (interactive)
                           (start-process "" nil
                                          "gnome-screenshot" "-i")))
-
-  ;; Make class name the buffer name
-  ;; (add-hook 'exwm-update-class-hook
-  ;;           (lambda ()
-  ;;             (exwm-workspace-rename-buffer exwm-class-name)))
-
   ;; 's-r': Reset
   (exwm-input-set-key (kbd "s-r") #'exwm-reset)
   ;; 's-w': Move window to other workspace
@@ -2737,31 +2774,13 @@ same directory as the org-buffer and insert a link to this file."
                         `(lambda ()
                            (interactive)
                            (exwm-workspace-switch-create ,i)
-                           (let ((window (get-buffer-window (current-buffer))))
-                             (select-window window)
-                             (x-focus-frame (window-frame window))))))
+                           (my/exwm-set-input-focus))))
 
   ;; 's-!': Launch application
   (exwm-input-set-key (kbd "s-!")
                       #'(lambda (command)
                           (interactive (list (read-shell-command "$ ")))
                           (start-process-shell-command command nil command)))
-
-  (push 'XF86AudioMute exwm-input-prefix-keys)
-  (push 'XF86AudioLowerVolume exwm-input-prefix-keys)
-  (push 'XF86AudioRaiseVolume exwm-input-prefix-keys)
-  (push 'XF86MonBrightnessDown exwm-input-prefix-keys)
-  (push 'XF86MonBrightnessUp exwm-input-prefix-keys)
-
-  (exwm-input-set-key (kbd "<XF86MonBrightnessDown>")
-                      #'(lambda ()
-                          (interactive)
-                          (start-process "" nil "light" "-U" "10")))
-
-  (exwm-input-set-key (kbd "<XF86MonBrightnessUp>")
-                      #'(lambda ()
-                          (interactive)
-                          (start-process "" nil "light" "-A" "10")))
 
   (exwm-input-set-key (kbd "s-n") #'(lambda ()
                                       (interactive)
@@ -2771,8 +2790,6 @@ same directory as the org-buffer and insert a link to this file."
                                        (interactive)
                                        (switch-to-prev-buffer)
                                        (my/exwm-set-input-focus)))
-  (exwm-input-set-key (kbd "s-O") #'perspeen-goto-last-ws)
-  (exwm-input-set-key (kbd "s-c") #'delete-window)
   (exwm-input-set-key (kbd "s-C") #'kill-buffer-and-window)
   (exwm-input-set-key (kbd "s-F") #'exwm-floating-toggle-floating)
   (exwm-input-set-key (kbd "s-f")
@@ -2807,23 +2824,6 @@ same directory as the org-buffer and insert a link to this file."
   ;; Note that s-t does not work in exwm mode for some unknown reason.
   (exwm-input-set-key (kbd "s-t") #'my/get-term)
 
-  (push ?\C-q exwm-input-prefix-keys)
-  (define-key exwm-mode-map [?\C-q] #'exwm-input-send-next-key)
-
-  ;; Line-editing shortcuts
-  (exwm-input-set-simulation-keys
-   '(
-     ;; ([?\C-b] . left)
-     ;; ([?\C-f] . right)
-     ;; ([?\C-p] . up)
-     ;; ([?\C-n] . down)
-     ;; ([?\C-a] . home)
-     ;; ([?\C-e] . end)
-     ;; ([?\M-v] . prior)
-     ;; ([?\C-v] . next)
-     ;; ([?\C-d] . delete)
-     ;; ([?\C-k] . (S-end delete))
-     ))
   ;; Other configurations
   (exwm-config-misc)
 
@@ -2866,6 +2866,7 @@ same directory as the org-buffer and insert a link to this file."
                            (let ((window (get-buffer-window buf t)))
                              (and
                               (null window)
+                              (not (string-prefix-p " " (buffer-name buf)))
                               (with-current-buffer buf
                                 (derived-mode-p 'exwm-mode)))))
                        (buffer-list))))
@@ -2885,17 +2886,45 @@ same directory as the org-buffer and insert a link to this file."
 #+end_src
 
 * Device Control and Management
+
 ** PulseAudio
+
+Disabled atm as new distro is adopting pipewire.
 
 #+begin_src emacs-lisp
 (use-package pulseaudio-control
+  :disabled
   :if (eq window-system 'x)
   :requires exwm
   :config
+  (push 'XF86AudioMute exwm-input-prefix-keys)
+  (push 'XF86AudioLowerVolume exwm-input-prefix-keys)
+  (push 'XF86AudioRaiseVolume exwm-input-prefix-keys)
+
   (exwm-input-set-key (kbd "<XF86AudioRaiseVolume>") #'pulseaudio-control-increase-volume)
   (exwm-input-set-key (kbd "<XF86AudioLowerVolume>") #'pulseaudio-control-decrease-volume)
   (exwm-input-set-key (kbd "<XF86AudioMute>") #'pulseaudio-control-toggle-current-sink-mute)
   )
+#+end_src
+
+** Brightness
+
+#+begin_src emacs-lisp
+(when (and (eq window-system 'x)
+           (member (getenv "use_exwm") '("1" "yes")))
+  (push 'XF86MonBrightnessDown exwm-input-prefix-keys)
+  (push 'XF86MonBrightnessUp exwm-input-prefix-keys)
+
+  (exwm-input-set-key (kbd "<XF86MonBrightnessDown>")
+                      #'(lambda ()
+                          (interactive)
+                          (start-process "" nil "light" "-U" "10")))
+
+  (exwm-input-set-key (kbd "<XF86MonBrightnessUp>")
+                      #'(lambda ()
+                          (interactive)
+                          (start-process "" nil "light" "-A" "10")))
+)
 #+end_src
 
 * Post Init Config
