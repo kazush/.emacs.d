@@ -27,3 +27,21 @@ Configure font.
 
 (add-to-list 'face-font-rescale-alist '("Noto Color Emoji.*" . 0.9))
 #+end_src
+
+Enable debug-on-error.
+
+#+begin_src emacs-lisp
+(toggle-debug-on-error)
+#+end_src
+
+
+* Workspace
+
+** Persp-mode
+Create main perspective and add scratch buffer to the perspective.
+
+#+begin_src emacs-lisp
+(when (and (fboundp 'persp-mode) persp-mode)
+  (persp-frame-switch "main")
+  (persp-add-buffer (current-buffer)))
+#+end_src
