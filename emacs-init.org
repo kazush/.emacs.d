@@ -1199,6 +1199,7 @@ prefix. This way which-key will be more useful.
 
 #+begin_src emacs-lisp
 (use-package auto-sudoedit
+  :diminish
   :custom
   (auto-sudoedit-ask t)
   :config
