@@ -2723,7 +2723,7 @@ same directory as the org-buffer and insert a link to this file."
   (setq exwm-layout-show-all-buffers nil)
 
   ;; Enable char-mode by default.
-  ;; (setq exwm-manage-configurations '((t char-mode t)))
+  (setq exwm-manage-configurations '((t char-mode t)))
 
   ;; Rename buffer to window title.
   (add-hook 'exwm-update-title-hook
