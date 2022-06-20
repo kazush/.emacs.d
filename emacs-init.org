@@ -1225,7 +1225,7 @@ Use Persp-mode to isolate buffers based on workspace or project.
   (persp-auto-save-opt 0)
   (persp-auto-save-opt 0)
   (persp-auto-resume-time -1)
-  (persp-init-new-frame-behaviour-override 'prompt)
+  (persp-init-new-frame-behaviour-override t)
   (persp-buffer-list-restricted-filter-functions
    persp-common-buffer-filter-functions)
   :init
