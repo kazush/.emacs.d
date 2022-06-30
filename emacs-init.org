@@ -2052,10 +2052,13 @@ Disabled at the moment while trying out persp-mode.
 
 #+begin_src emacs-lisp
 (use-package highlight-indent-guides
-  :disabled
-  :hook (prog-mode . highlight-indent-guides-mode)
+  :hook (yaml-mode . highlight-indent-guides-mode)
   :diminish highlight-indent-guides-mode
-  :custom (highlight-indent-guides-method 'character))
+  :custom (highlight-indent-guides-method 'bitmap)
+  :config
+  (set-face-background 'highlight-indent-guides-odd-face "darkgray")
+  (set-face-background 'highlight-indent-guides-even-face "dimgray")
+  (set-face-foreground 'highlight-indent-guides-character-face "dimgray"))
 #+end_src
 
 *** Diff HL mode
