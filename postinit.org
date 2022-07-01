@@ -41,7 +41,7 @@ Enable debug-on-error.
 Create main perspective and add scratch buffer to the perspective.
 
 #+begin_src emacs-lisp
-(when (and (fboundp 'persp-mode) persp-mode)
+(when (and (featurep 'persp-mode) persp-mode)
   (persp-frame-switch "main")
   (persp-add-buffer (current-buffer)))
 #+end_src

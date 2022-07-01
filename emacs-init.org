@@ -1212,8 +1212,13 @@ prefix. This way which-key will be more useful.
 
 Use Persp-mode to isolate buffers based on workspace or project.
 
+Unfortunately disabled this as I found frame handling in this package conflicts
+with EXWM. For example, this package manipulates frame params on dialog windows
+(e.g. open file dialog on Chrome).
+
 #+begin_src emacs-lisp
 (use-package persp-mode
+  :disabled
   :bind (("C-x b" . my/persp-switch-to-buffer)
          ("C-x C-b" . my/persp-list-buffers)
          ("C-x k" . persp-kill-buffer)
@@ -1225,7 +1230,6 @@ Use Persp-mode to isolate buffers based on workspace or project.
   (persp-auto-save-opt 0)
   (persp-auto-save-opt 0)
   (persp-auto-resume-time -1)
-  (persp-init-new-frame-behaviour-override t)
   (persp-autokill-buffer-on-remove t)
   (persp-buffer-list-restricted-filter-functions
    persp-common-buffer-filter-functions)
@@ -2795,7 +2799,7 @@ same directory as the org-buffer and insert a link to this file."
           (my/exwm-set-input-focus)))))
 
   ;; Add a new EXWM window to the current perspective.
-  (when (and (fboundp 'persp-mode) persp-mode)
+  (when (and (featurep 'persp-mode) persp-mode)
     (add-hook 'exwm-manage-finish-hook
               #'(lambda () (persp-add-buffer
                             (current-buffer) (get-current-persp)))))
