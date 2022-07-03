@@ -1043,7 +1043,8 @@ prefix. This way which-key will be more useful.
   :config
   (add-hook 'yaml-mode-hook
             #'(lambda ()
-                (define-key yaml-mode-map "\C-m" 'newline-and-indent))))
+                (define-key yaml-mode-map "\C-m" 'newline-and-indent)))
+  (setq lsp-yaml-schemas '((Kubernetes . "*k8s*/*.yaml"))))
 #+end_src
 
 ** Markdown
