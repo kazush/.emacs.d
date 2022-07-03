@@ -936,7 +936,7 @@ prefix. This way which-key will be more useful.
               ("C-n" . company-select-next)
               ("C-p" . company-select-previous))
   :custom
-  (compnay-minimum-prefix-length 1)
+  (company-minimum-prefix-length 1)
   (company-show-numbers t)
   (company-idle-delay 0.2)
   (company-echo-delay 0)
