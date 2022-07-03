@@ -1206,6 +1206,18 @@ prefix. This way which-key will be more useful.
   (auto-sudoedit-mode 1))
 #+end_src
 
+** spellcheck
+
+The configuration below is borrowed from https://home.hirosaki-u.ac.jp/heroic-2020/1575/.
+Do not forget to install aspell.
+
+#+begin_src emacs-lisp
+(setq-default ispell-program-name "aspell")
+(with-eval-after-load "ispell"
+  (setq ispell-local-dictionary "en_US")
+  (add-to-list 'ispell-skip-region-alist '("[^\000-\377]+")))
+#+end_src
+
 * Window and workspace management
 
 ** Persp-mode
