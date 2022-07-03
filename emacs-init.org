@@ -1374,14 +1374,22 @@ Disabled at the moment while trying out persp-mode.
 ** Tree view
    TBH I don't use this often.
 
+*** neotree
 #+begin_src emacs-lisp
 (use-package neotree
+  :disabled
   :bind (:map my/wm-map
               ("T" . neotree-toggle))
   :config
   (setq neo-theme (if (display-graphic-p) 'icons 'arrow)))
 #+end_src
 
+*** treemacs
+#+begin_src emacs-lisp
+(use-package treemacs
+  :bind (:map my/wm-map
+              ("T" . treemacs)))
+#+end_src
 ** Ace jump
    This is potentially very useful for quickly jumping to a position in the
    buffer by selecting a character assigned to each position.
@@ -1914,7 +1922,10 @@ Disabled at the moment while trying out persp-mode.
 (use-package lsp-pyright
   :after lsp-mode)
 
-(defvar my/lsp-enabled-mode-hook-list '(python-mode-hook))
+(use-package lsp-treemacs
+  :after lsp-mode)
+
+(defvar my/lsp-enabled-mode-hook-list '(python-mode-hook yaml-mode-hook))
 (defun my/setup-lsp ()
   "Set up hooks to enable lsp-mode."
   (interactive)
