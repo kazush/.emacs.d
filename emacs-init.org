@@ -362,7 +362,14 @@ Different tweaks on appearance.
 (when (not (window-system))
   (display-time))
 (setq visible-bell t)
-(global-hl-line-mode 1)
+
+;; Selectivly use hl-line-mode.
+(dolist (mode '(org-mode-hook
+                prog-mode-hook
+                text-mode-hook
+                yaml-mode-hook))
+  (add-hook mode #'hl-line-mode))
+
 ;; add line number for open files
 ;; (add-hook 'find-file-hook (lambda () (linum-mode 1)))
 (setq use-dialog-box nil)
