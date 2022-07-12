@@ -1896,6 +1896,13 @@ Disabled at the moment while trying out persp-mode.
 
 ** VTerm
 
+Do not forget to add the following code to .bashrc
+#+begin_src shell
+if [[ "$INSIDE_EMACS" = 'vterm' ]]; then
+  . ~/.emacs.d/27.1/elpa/vterm-22*/etc/emacs-vterm-bash.sh
+fi
+#+end_src
+
 #+begin_src emacs-lisp
 (use-package vterm
   :config
