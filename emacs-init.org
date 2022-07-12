@@ -1899,12 +1899,14 @@ Disabled at the moment while trying out persp-mode.
 Do not forget to add the following code to .bashrc
 #+begin_src shell
 if [[ "$INSIDE_EMACS" = 'vterm' ]]; then
-  . ~/.emacs.d/27.1/elpa/vterm-22*/etc/emacs-vterm-bash.sh
+  . ~/.emacs.d/27.1/elpa/vterm-20*/etc/emacs-vterm-bash.sh
 fi
 #+end_src
 
 #+begin_src emacs-lisp
 (use-package vterm
+  :bind (("C-c s" . my/get-vterm))
+  :commands (vterm)
   :config
   (defun my/newvterm ()
     "Create a new vterm with specified buffer name."
@@ -1917,8 +1919,6 @@ fi
   (defun my/get-vterm (arg)
     (interactive "p")
     (my/get-shellish arg 'my/newvterm "vterm"))
-
-  (global-set-key (kbd "C-c s") #'my/get-vterm)
   )
 #+end_src
 
