@@ -1561,7 +1561,7 @@ Disabled at the moment while trying out persp-mode.
 
 ;; To open a new window below the current buffer.
 (add-to-list 'display-buffer-alist
-             `(,(rx bos "*" (or "term" "shell" "eshell") (* not-newline) "*" eos)
+             `(,(rx bos "*" (or "term" "shell" "eshell" "vterm") (* not-newline) "*" eos)
                (lambda (buf alist)
                  (let ((win (get-buffer-window buf)))
                    (if win win
@@ -1737,15 +1737,15 @@ Disabled at the moment while trying out persp-mode.
   "Return if BUF is a shell-ish buffer."
   (let ((mode (with-current-buffer buf major-mode))
         (shell-pattern (if filter filter
-                         (rx (or "term" "shell" "eshell")))))
+                         (rx (or "term" "shell" "eshell" "vterm")))))
     (and (string-match-p
           (concat "\\`\\*" shell-pattern ".*\\*\\'")
           (buffer-name buf))
-         (seq-contains '(shell-mode eshell-mode term-mode) mode))))
+         (seq-contains '(shell-mode eshell-mode term-mode vterm-mode) mode))))
 
 (when my/enable-helm
   (defvar my/helm-source-shellish-buffers-list
-    (helm-make-source "Shell/Eshell/Term Buffers" 'helm-source-buffers
+    (helm-make-source "Shell/Eshell/Term/VTerm Buffers" 'helm-source-buffers
       :buffer-list
       (lambda ()
         (let ((buflist (mapcar
@@ -1810,7 +1810,7 @@ Disabled at the moment while trying out persp-mode.
            (select-window (display-buffer b))))))
 
 (defun my/newshell ()
-  "Create a new shell with base directory name."
+  "Create a new shell with specified buffer name."
   (interactive)
   (if (my/find-last-shellish-buffer (buffer-list (selected-frame)) "shell")
       (shell (format "*shell<%s>*" (read-string "Shell buffer name: ")))
@@ -1821,7 +1821,7 @@ Disabled at the moment while trying out persp-mode.
   (my/get-shellish arg 'my/newshell "shell"))
 
 (defun my/newterm ()
-  "Create a new shell with base directory name."
+  "Create a new shell with specified buffer name."
   (interactive)
   (if (my/find-last-shellish-buffer (buffer-list (selected-frame)) "term")
       (multi-term (format "*terminal<%s>*"
@@ -1833,7 +1833,7 @@ Disabled at the moment while trying out persp-mode.
   (my/get-shellish arg 'my/newterm "term"))
 
 ;; Key bindings
-(global-set-key (kbd "C-c s") #'my/get-shell)
+(global-set-key (kbd "C-c S") #'my/get-shell)  ;; C-c s is now mapped to vterm
 (global-set-key (kbd "C-c t") #'my/get-term)
 #+end_src
 
@@ -1893,6 +1893,28 @@ Disabled at the moment while trying out persp-mode.
   :config
   (eshell-git-prompt-use-theme 'powerline))
 #+end_src
+
+** VTerm
+
+#+begin_src emacs-lisp
+(use-package vterm
+  :config
+  (defun my/newvterm ()
+    "Create a new vterm with specified buffer name."
+    (interactive)
+    (if (my/find-last-shellish-buffer (buffer-list (selected-frame)) "vterm")
+        (vterm (format "*vterm<%s>*"
+                       (read-string "Shell buffer name: ")))
+      (vterm)))
+
+  (defun my/get-vterm (arg)
+    (interactive "p")
+    (my/get-shellish arg 'my/newvterm "vterm"))
+
+  (global-set-key (kbd "C-c s") #'my/get-vterm)
+  )
+#+end_src
+
 
 * Software Development
 ** Misc preferences
@@ -2962,7 +2984,7 @@ same directory as the org-buffer and insert a link to this file."
   (exwm-input-set-key (kbd "s-N") #'(lambda () (interactive)
                                       (switch-to-buffer-other-frame
                                        (get-buffer-create "*scratch*"))))
-  (exwm-input-set-key (kbd "s-s") #'my/get-shell)
+  (exwm-input-set-key (kbd "s-s") #'my/get-vterm)
   (exwm-input-set-key (kbd "s-e") #'my/get-eshell)
   ;; Note that s-t does not work in exwm mode for some unknown reason.
   (exwm-input-set-key (kbd "s-t") #'my/get-term)
