@@ -300,8 +300,8 @@ emacsclient is connected hence ~after-make-frame-functions~ hook is set here.
 
 ;; Configure default font and other faces such as emojis.
 
-(setq-default my/default-font-family "Monospace")
-(setq-default my/default-font-size 11)
+(defvar my/default-font-family "Monospace")
+(defvar my/default-font-size 11)
 
 (defun my/setfont (size)
   (interactive "nFont size: ")
