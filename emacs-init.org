@@ -1529,7 +1529,7 @@ Disabled at the moment while trying out persp-mode.
                     (not (window-live-p w))
                     (window-minibuffer-p w)
                     (window-dedicated-p w)
-                    (seq-contains '(exwm-mode shell-mode eshell-mode term-mode)
+                    (seq-contains '(exwm-mode shell-mode eshell-mode term-mode vterm-mode)
                                   (with-current-buffer b major-mode)))
                 (setq buflist (cdr buflist))
               (setq win w)
