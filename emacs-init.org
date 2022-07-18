@@ -792,19 +792,258 @@ Otherwise the same UI setup functions are called via ~emacs-startup-hook~.
 #+end_src
 
 * Completion
-  Helm is my choice for incremental completion and narrowing framework, but helm
-  sometimes breaks emacs after a package update hence there is some knob to
-  switch to Ivy.
+Started trying out vertico and related packages.
+
+Helm is my choice for incremental completion and narrowing framework, but helm
+sometimes breaks emacs after a package update hence there is some knob to
+switch to Ivy.
 
 #+begin_src emacs-lisp
-(setq my/enable-helm (not (member (getenv "use_ivy") '("1" "yes"))))
+(setq my/completion-ui
+      (let ((ui-pkg (getenv "emacs_completion_ui")))
+        (cond
+         ((string= ui-pkg "vertico") 'vertico)
+         ((string= ui-pkg "ivy") 'ivy)
+         (t 'helm))))
+#+end_src
+
+** Vertico
+
+#+begin_src emacs-lisp
+(use-package vertico
+  :if (eq my/completion-ui 'vertico)
+  :diminish vertico-mode
+  :init
+  (vertico-mode)
+  :config
+  ;; Add prompt indicator to `completing-read-multiple'.
+  ;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
+  (defun crm-indicator (args)
+    (cons (format "[CRM%s] %s"
+                  (replace-regexp-in-string
+                   "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
+                   crm-separator)
+                  (car args))
+          (cdr args)))
+  (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
+
+  ;; Do not allow the cursor in the minibuffer prompt
+  (setq minibuffer-prompt-properties
+        '(read-only t cursor-intangible t face minibuffer-prompt))
+  (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
+
+  ;; Emacs 28: Hide commands in M-x which do not work in the current mode.
+  ;; Vertico commands are hidden in normal buffers.
+  ;; (setq read-extended-command-predicate
+  ;;       #'command-completion-default-include-p)
+
+  ;; Enable recursive minibuffers
+  (setq enable-recursive-minibuffers t))
+
+(use-package savehist
+  :diminish savehist-mode
+  :init
+  (savehist-mode))
+
+(use-package orderless
+  :init
+  ;; Configure a custom style dispatcher (see the Consult wiki)
+  ;; (setq orderless-style-dispatchers '(+orderless-dispatch)
+  ;;       orderless-component-separator #'orderless-escapable-split-on-space)
+  (setq completion-styles '(orderless basic)
+        completion-category-defaults nil
+        completion-category-overrides '((file (styles partial-completion)))))
+#+end_src
+
+*** Consult
+
+#+begin_src emacs-lisp
+(use-package consult
+  ;; Replace bindings. Lazily loaded due by `use-package'.
+  :bind (;; C-c bindings (mode-specific-map)
+         ("C-c h" . consult-history)
+         ("C-c m" . consult-mode-command)
+         ("C-c k" . consult-kmacro)
+         ;; C-x bindings (ctl-x-map)
+         ("C-x M-:" . consult-complex-command)     ;; orig. repeat-complex-command
+         ("C-x b" . consult-buffer)                ;; orig. switch-to-buffer
+         ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
+         ("C-x 5 b" . consult-buffer-other-frame)  ;; orig. switch-to-buffer-other-frame
+         ("C-x r b" . consult-bookmark)            ;; orig. bookmark-jump
+         ("C-x p b" . consult-project-buffer)      ;; orig. project-switch-to-buffer
+         ;; Custom M-# bindings for fast register access
+         ("M-#" . consult-register-load)
+         ("M-'" . consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
+         ("C-M-#" . consult-register)
+         ;; Other custom bindings
+         ("M-y" . consult-yank-pop)                ;; orig. yank-pop
+         ("<help> a" . consult-apropos)            ;; orig. apropos-command
+         ;; M-g bindings (goto-map)
+         ("M-g e" . consult-compile-error)
+         ("M-g f" . consult-flymake)               ;; Alternative: consult-flycheck
+         ("M-g g" . consult-goto-line)             ;; orig. goto-line
+         ("M-g M-g" . consult-goto-line)           ;; orig. goto-line
+         ("M-g o" . consult-outline)               ;; Alternative: consult-org-heading
+         ("M-g m" . consult-mark)
+         ("M-g k" . consult-global-mark)
+         ("M-g i" . consult-imenu)
+         ("M-g I" . consult-imenu-multi)
+         ;; M-s bindings (search-map)
+         ("M-s d" . consult-find)
+         ("M-s D" . consult-locate)
+         ("M-s g" . consult-grep)
+         ("M-s G" . consult-git-grep)
+         ("M-s r" . consult-ripgrep)
+         ("M-s l" . consult-line)
+         ("M-s L" . consult-line-multi)
+         ("M-s m" . consult-multi-occur)
+         ("M-s k" . consult-keep-lines)
+         ("M-s u" . consult-focus-lines)
+         ;; Isearch integration
+         ("M-s e" . consult-isearch-history)
+         :map isearch-mode-map
+         ("M-e" . consult-isearch-history)         ;; orig. isearch-edit-string
+         ("M-s e" . consult-isearch-history)       ;; orig. isearch-edit-string
+         ("M-s l" . consult-line)                  ;; needed by consult-line to detect isearch
+         ("M-s L" . consult-line-multi)            ;; needed by consult-line to detect isearch
+         ;; Minibuffer history
+         :map minibuffer-local-map
+         ("M-s" . consult-history)                 ;; orig. next-matching-history-element
+         ("M-r" . consult-history))                ;; orig. previous-matching-history-element
+
+  ;; Enable automatic preview at point in the *Completions* buffer. This is
+  ;; relevant when you use the default completion UI.
+  :hook (completion-list-mode . consult-preview-at-point-mode)
+  :commands (consult-buffer)
+
+  ;; The :init configuration is always executed (Not lazy)
+  :init
+
+  ;; Optionally configure the register formatting. This improves the register
+  ;; preview for `consult-register', `consult-register-load',
+  ;; `consult-register-store' and the Emacs built-ins.
+  (setq register-preview-delay 0.5
+        register-preview-function #'consult-register-format)
+
+  ;; Optionally tweak the register preview window.
+  ;; This adds thin lines, sorting and hides the mode line of the window.
+  (advice-add #'register-preview :override #'consult-register-window)
+
+  ;; Use Consult to select xref locations with preview
+  (setq xref-show-xrefs-function #'consult-xref
+        xref-show-definitions-function #'consult-xref)
+
+  ;; Configure other variables and modes in the :config section,
+  ;; after lazily loading the package.
+  :config
+
+  ;; Optionally configure preview. The default value
+  ;; is 'any, such that any key triggers the preview.
+  ;; (setq consult-preview-key 'any)
+  ;; (setq consult-preview-key (kbd "M-."))
+  ;; (setq consult-preview-key (list (kbd "<S-down>") (kbd "<S-up>")))
+  ;; For some commands and buffer sources it is useful to configure the
+  ;; :preview-key on a per-command basis using the `consult-customize' macro.
+  (consult-customize
+   consult-theme
+   :preview-key '(:debounce 0.2 any)
+   consult-ripgrep consult-git-grep consult-grep
+   consult-bookmark consult-recent-file consult-xref
+   consult--source-bookmark consult--source-recent-file
+   consult--source-project-recent-file
+   :preview-key (kbd "M-."))
+
+  ;; Optionally configure the narrowing key.
+  ;; Both < and C-+ work reasonably well.
+  (setq consult-narrow-key "<") ;; (kbd "C-+")
+
+  ;; Optionally make narrowing help available in the minibuffer.
+  ;; You may want to use `embark-prefix-help-command' or which-key instead.
+  ;; (define-key consult-narrow-map (vconcat consult-narrow-key "?") #'consult-narrow-help)
+
+  ;; By default `consult-project-function' uses `project-root' from project.el.
+  ;; Optionally configure a different project root function.
+  ;; There are multiple reasonable alternatives to chose from.
+  ;;;; 1. project.el (the default)
+  ;; (setq consult-project-function #'consult--default-project--function)
+  ;;;; 2. projectile.el (projectile-project-root)
+  ;; (autoload 'projectile-project-root "projectile")
+  ;; (setq consult-project-function (lambda (_) (projectile-project-root)))
+  ;;;; 3. vc.el (vc-root-dir)
+  ;; (setq consult-project-function (lambda (_) (vc-root-dir)))
+  ;;;; 4. locate-dominating-file
+  ;; (setq consult-project-function (lambda (_) (locate-dominating-file "." ".git")))
+
+  (defun consult-exwm-preview-fix (buf-or-name &optional norecord force-same-window)
+    "Kludge to stop EXWM buffers from stealing focus during Consult previews."
+    (when (derived-mode-p 'exwm-mode)
+      (when-let ((mini (active-minibuffer-window)))
+        (select-window (active-minibuffer-window)))))
+
+  (advice-add
+   #'switch-to-buffer :after #'consult-exwm-preview-fix)
+  )
+#+end_src
+
+*** Marginalia
+
+#+begin_src emacs-lisp
+;; Enable richer annotations using the Marginalia package
+(use-package marginalia
+  ;; Either bind `marginalia-cycle` globally or only in the minibuffer
+  :bind (("M-A" . marginalia-cycle)
+         :map minibuffer-local-map
+         ("M-A" . marginalia-cycle))
+
+  ;; The :init configuration is always executed (Not lazy!)
+  :init
+
+  ;; Must be in the :init section of use-package such that the mode gets
+  ;; enabled right away. Note that this forces loading the package.
+  (marginalia-mode))
 #+end_src
  
+*** Embark
+
+#+begin_src emacs-lisp
+(use-package embark
+  :ensure t
+
+  :bind
+  (("C-." . embark-act)         ;; pick some comfortable binding
+   ("C-;" . embark-dwim)        ;; good alternative: M-.
+   ("C-h B" . embark-bindings)) ;; alternative for `describe-bindings'
+
+  :init
+
+  ;; Optionally replace the key help with a completing-read interface
+  (setq prefix-help-command #'embark-prefix-help-command)
+
+  :config
+
+  ;; Hide the mode line of the Embark live/completions buffers
+  (add-to-list 'display-buffer-alist
+               '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
+                 nil
+                 (window-parameters (mode-line-format . none)))))
+
+;; Consult users will also want the embark-consult package.
+(use-package embark-consult
+  :ensure t
+  :after (embark consult)
+  :demand t ; only necessary if you have the hook below
+  ;; if you want to have consult previews as you move around an
+  ;; auto-updating embark collect buffer
+  :hook
+  (embark-collect-mode . consult-preview-at-point-mode))
+#+end_src
+
+
 ** Helm
 
 #+begin_src emacs-lisp
 (use-package helm
-  :if my/enable-helm
+  :if (eq my/completion-ui 'helm)
   :diminish helm-mode
   :init
   (require 'helm-config)
@@ -839,22 +1078,22 @@ Otherwise the same UI setup functions are called via ~emacs-startup-hook~.
   )
 
 (use-package helm-descbinds
-  :if my/enable-helm
+  :if (eq my/completion-ui 'helm)
   :custom
   (helm-descbinds-window-style 'split-window)
   :config
   (helm-descbinds-mode))
 
 (use-package helm-describe-modes
-  :if my/enable-helm
+  :if (eq my/completion-ui 'helm)
   :config (global-set-key [remap describe-mode] #'helm-describe-modes))
 
 (use-package helm-swoop
-  :if my/enable-helm
+  :if (eq my/completion-ui 'helm)
   :bind (("C-c O" . helm-swoop)))
 
 (use-package helm-xref
-  :if my/enable-helm
+  :if (eq my/completion-ui 'helm)
   :custom
   ;; This is required to make xref-find-references work in helm-mode.  In
   ;; helm-mode, it gives a prompt and asks the identifier (which has no text
@@ -870,7 +1109,7 @@ Otherwise the same UI setup functions are called via ~emacs-startup-hook~.
 
 #+begin_src emacs-lisp
 (use-package ivy
-  :unless my/enable-helm
+  :if (eq my/completion-ui 'ivy)
   :diminish
   :defer nil
   :bind (("C-x C-b" . ibuffer))
@@ -885,10 +1124,10 @@ Otherwise the same UI setup functions are called via ~emacs-startup-hook~.
   (ivy-mode))
 
 (use-package ivy-hydra
-  :unless my/enable-helm)
+  :if (eq my/completion-ui 'ivy))
 
 (use-package ivy-rich
-  :unless my/enable-helm
+  :if (eq my/completion-ui 'ivy)
   :diminish
   :config
   (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line)
@@ -896,7 +1135,7 @@ Otherwise the same UI setup functions are called via ~emacs-startup-hook~.
   (ivy-rich-mode 1))
 
 (use-package counsel
-  :unless my/enable-helm
+  :if (eq my/completion-ui 'ivy)
   :diminish
   :bind (("C-c h r" . counsel-recentf)
          ("C-c h g" . counsel-ag))
@@ -910,17 +1149,17 @@ Otherwise the same UI setup functions are called via ~emacs-startup-hook~.
   (counsel-mode))
 
 (use-package swiper
-  :unless my/enable-helm
+  :if (eq my/completion-ui 'ivy)
   :bind (("C-s" . swiper)
          ("C-r" . swiper)))
 
 (use-package smex
-  :unless my/enable-helm
+  :if (eq my/completion-ui 'ivy)
   :config
   (smex-initialize))
 
 (use-package counsel-projectile
-  :unless my/enable-helm
+  :if (eq my/completion-ui 'ivy)
   :after (counsel projectile)
   :config
   (counsel-projectile-mode))
@@ -1114,7 +1353,7 @@ Otherwise the same UI setup functions are called via ~emacs-startup-hook~.
 (use-package wgrep :diminish)
 (use-package wgrep-ag :diminish)
 (use-package wgrep-helm
-  :if my/enable-helm
+  :if (eq my/completion-ui 'helm)
   :diminish)
 #+end_src
 
@@ -1175,7 +1414,7 @@ Otherwise the same UI setup functions are called via ~emacs-startup-hook~.
 (use-package yasnippet-snippets)
 (use-package go-snippets)
 (use-package java-snippets)
-(use-package helm-c-yasnippet :if my/enable-helm)
+(use-package helm-c-yasnippet :if (eq my/completion-ui 'helm))
 #+end_src
 
 ** Projectile
@@ -1188,12 +1427,11 @@ Otherwise the same UI setup functions are called via ~emacs-startup-hook~.
   :hook ((prog-mode . projectile-mode)
          (comint-mode . (lambda () (projectile-mode 0))))
   :custom
-  (projectile-mode-line '(:eval (format " [%s]" (projectile-project-name))))
-  (projectile-completion-system (if my/enable-helm 'helm 'ivy)))
+  (projectile-mode-line '(:eval (format " [%s]" (projectile-project-name)))))
 
 (use-package helm-projectile
   :disabled
-  :if my/enable-helm
+  :if (eq my/completion-ui 'helm)
   :config (helm-projectile-on))
 
 (use-package projectile-speedbar
@@ -1287,7 +1525,7 @@ with EXWM. For example, this package manipulates frame params on dialog windows
     (interactive)
     (persp-frame-switch (car persp-names-cache)))
 
-  (when my/enable-helm
+  (when (eq my/completion-ui 'helm)
     (defvar my/helm-source-persp-buffers-list
       (helm-make-source "Persp Buffers" 'helm-source-buffers
         :buffer-list
@@ -1302,7 +1540,7 @@ with EXWM. For example, this package manipulates frame params on dialog windows
 
   (defun my/persp-switch-to-buffer (arg)
     (interactive "p")
-    (if my/enable-helm
+    (if (eq my/completion-ui 'helm)
         (my/helm-maybe-persp-buffers-list arg)
       (call-interactively
        (if (= arg 4)
@@ -1311,7 +1549,7 @@ with EXWM. For example, this package manipulates frame params on dialog windows
 
   (defun my/persp-list-buffers (arg)
     (interactive "p")
-    (if my/enable-helm
+    (if (eq my/completion-ui 'helm)
         (my/helm-maybe-persp-buffers-list arg)
       (if (=arg 4)
           (list-buffers)
@@ -1740,7 +1978,7 @@ Disabled at the moment while trying out persp-mode.
           (buffer-name buf))
          (seq-contains '(shell-mode eshell-mode term-mode vterm-mode) mode))))
 
-(when my/enable-helm
+(when (eq my/completion-ui 'helm)
   (defvar my/helm-source-shellish-buffers-list
     (helm-make-source "Shell/Eshell/Term/VTerm Buffers" 'helm-source-buffers
       :buffer-list
@@ -2192,14 +2430,14 @@ fi
 
 #+begin_src emacs-lisp
 (use-package helm-ls-git
-  :if my/enable-helm
+  :if (eq my/completion-ui 'helm)
   :commands (helm-ls-git-ls helm-browse-project)
   :init
   (eval-after-load 'helm
     '(define-key helm-map (kbd "C-x C-d") 'helm-ls-git-ls)))
 
 (use-package helm-git-grep
-  :if my/enable-helm
+  :if (eq my/completion-ui 'helm)
   :commands (helm-git-grep helm-git-grep-from-helm)
   :bind (("C-c h g" . helm-git-grep))
   :init
@@ -2217,7 +2455,7 @@ fi
   :mode ("\\.http\\'" . restclient-mode))
 
 (use-package restclient-helm
-  :if my/enable-helm)
+  :if (eq my/completion-ui 'helm))
 
 (use-package company-restclient
   :hook (restclient-mode . (lambda ()
@@ -2389,7 +2627,7 @@ fi
   :commands golint)
 
 (use-package helm-go-package
-  :if my/enable-helm
+  :if (eq my/completion-ui 'helm)
   :after go-mode
   :init
   (eval-after-load 'go-mode
@@ -2591,7 +2829,7 @@ fi
 (use-package ob-ipython :disabled)
 (use-package ob-go)
 
-(use-package helm-org-rifle :if my/enable-helm)
+(use-package helm-org-rifle :if (eq my/completion-ui 'helm))
 
 (use-package ob-async)
 
@@ -2815,10 +3053,9 @@ same directory as the org-buffer and insert a link to this file."
   ;; Make sure that modeline is updated for the active window.
   (add-hook 'exwm-workspace-switch-hook
             #'(lambda ()
-                (run-with-timer 1 nil
-                                #'(lambda ()
-                                    (select-window (selected-window))))))
-
+                (run-with-idle-timer 0.1 nil
+                                     #'my/exwm-set-input-focus)))
+  
   (defun my/exwm-layout-toggle-fullscreen-or-single-window ()
     (interactive)
     (if (derived-mode-p 'exwm-mode)
@@ -2829,8 +3066,13 @@ same directory as the org-buffer and insert a link to this file."
   (defun my/exwm-set-input-focus ()
     "Workaround for losing input focus after switch-to-next/prev-buffer"
     (interactive)
-    (let ((window (selected-window)))
-      (x-focus-frame (window-frame window))))
+    (unless (active-minibuffer-window)
+      (let ((window (selected-window)))
+        (select-window window)
+        (x-focus-frame (window-frame window)))))
+  ;; (exwm-input--set-focus
+  ;;  (exwm--buffer->id (window-buffer window))))))
+
 
   (defvar my/single-window--last-configuration nil
     "Last window configuration before calling `delete-other-windows'.")
@@ -2964,7 +3206,12 @@ same directory as the org-buffer and insert a link to this file."
   (exwm-input-set-key (kbd "s-f")
                       #'my/exwm-layout-toggle-fullscreen-or-single-window)
 
-  (exwm-input-set-key (kbd "s-m") #'helm-mini)
+  (exwm-input-set-key (kbd "s-m")
+                      (cond
+                       ((eq my/completion-ui 'helm) #'helm-mini)
+                       ((eq my/completion-ui 'vertico) #'consult-buffer)
+                       (t #'ibuffer)))
+
   (exwm-input-set-key (kbd "s-o") #'find-file-other-window)
 
   (defvar my/exwm-workspace-previous-index 0
@@ -3010,23 +3257,7 @@ same directory as the org-buffer and insert a link to this file."
   ;; Enable EXWM at the end of the initialization.
   (with-eval-after-load "emacs-init"
     (exwm-enable))
-  )
 
-(use-package helm-exwm
-  :disabled
-  :if my/enable-helm
-  :requires exwm
-  :config
-  (setq helm-exwm-emacs-buffers-source (helm-exwm-build-emacs-buffers-source))
-  (setq helm-exwm-source (helm-exwm-build-source))
-  (setq helm-mini-default-sources `(helm-exwm-emacs-buffers-source
-                                    helm-exwm-source
-                                    helm-source-recentf))
-  (exwm-input-set-key (kbd "s-i") #'helm-exwm))
-
-
-;; Select inactive EXWM buffers with Helm.
-(when my/enable-helm
   (defun my/get-inactive-exwm-buffers ()
     "Return a list of inactive EXWM buffers or nil if none."
     (mapcar
@@ -3040,18 +3271,45 @@ same directory as the org-buffer and insert a link to this file."
                                 (derived-mode-p 'exwm-mode)))))
                        (buffer-list))))
 
-  (defun my/helm-exwm ()
-    "Dispatch Helm with inactive EXWM buffers."
-    (interactive)
-    (if (my/get-inactive-exwm-buffers)
-        (my/helm-buffers-list
-         (helm-make-source "Inactive EXWM buffers" 'helm-source-buffers
-           :buffer-list
-           #'my/get-inactive-exwm-buffers))
-      (message "No inactive EXWM buffers found")))
+  ;; Select inactive EXWM buffers with Vertico/Consult.
+  (when (eq my/completion-ui 'vertico)
+    (defvar my/consult-source-inactive-exwm-buffer
+      `(:name "EXWM"
+              :hidden t
+              :narrow ?x
+              :category buffer
+              :state ,#'consult--buffer-state
+              :items ,#'my/get-inactive-exwm-buffers))
 
-  ;; Override s-i.
-  (exwm-input-set-key (kbd "s-i") #'my/helm-exwm))
+    (setq my/consult-exwm-buffer-source
+          (list
+           `(:hidden nil :narrow ?x ,@my/consult-source-inactive-exwm-buffer)))
+
+    (defun my/consult-inactive-exwm-buffers ()
+      (interactive)
+      (if (my/get-inactive-exwm-buffers)
+          (consult-buffer my/consult-exwm-buffer-source)
+        (message "No inactive EXWM buffers found")))
+
+    ;; Override s-i.
+    (exwm-input-set-key (kbd "s-i") #'my/consult-inactive-exwm-buffers)
+    )
+
+  ;; Select inactive EXWM buffers with Helm.
+  (when (eq my/completion-ui 'helm)
+    (defun my/helm-exwm ()
+      "Dispatch Helm with inactive EXWM buffers."
+      (interactive)
+      (if (my/get-inactive-exwm-buffers)
+          (my/helm-buffers-list
+           (helm-make-source "Inactive EXWM buffers" 'helm-source-buffers
+                             :buffer-list
+                             #'my/get-inactive-exwm-buffers))
+        (message "No inactive EXWM buffers found")))
+
+    ;; Override s-i.
+    (exwm-input-set-key (kbd "s-i") #'my/helm-exwm))
+  )
 #+end_src
 
 * Device Control and Management
