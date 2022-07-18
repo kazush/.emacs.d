@@ -841,11 +841,13 @@ switch to Ivy.
   (setq enable-recursive-minibuffers t))
 
 (use-package savehist
+  :if (eq my/completion-ui 'vertico)
   :diminish savehist-mode
   :init
   (savehist-mode))
 
 (use-package orderless
+  :if (eq my/completion-ui 'vertico)
   :init
   ;; Configure a custom style dispatcher (see the Consult wiki)
   ;; (setq orderless-style-dispatchers '(+orderless-dispatch)
@@ -859,6 +861,7 @@ switch to Ivy.
 
 #+begin_src emacs-lisp
 (use-package consult
+  :if (eq my/completion-ui 'vertico)
   ;; Replace bindings. Lazily loaded due by `use-package'.
   :bind (;; C-c bindings (mode-specific-map)
          ("C-c h" . consult-history)
@@ -990,6 +993,7 @@ switch to Ivy.
 #+begin_src emacs-lisp
 ;; Enable richer annotations using the Marginalia package
 (use-package marginalia
+  :if (eq my/completion-ui 'vertico)
   ;; Either bind `marginalia-cycle` globally or only in the minibuffer
   :bind (("M-A" . marginalia-cycle)
          :map minibuffer-local-map
@@ -1007,8 +1011,7 @@ switch to Ivy.
 
 #+begin_src emacs-lisp
 (use-package embark
-  :ensure t
-
+  :if (eq my/completion-ui 'vertico)
   :bind
   (("C-." . embark-act)         ;; pick some comfortable binding
    ("C-;" . embark-dwim)        ;; good alternative: M-.
@@ -1029,7 +1032,7 @@ switch to Ivy.
 
 ;; Consult users will also want the embark-consult package.
 (use-package embark-consult
-  :ensure t
+  :if (eq my/completion-ui 'vertico)
   :after (embark consult)
   :demand t ; only necessary if you have the hook below
   ;; if you want to have consult previews as you move around an
