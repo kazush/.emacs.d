@@ -252,8 +252,7 @@ probably a workaround to avoid errors when emacs is launched in daemon mode, but
 I don't remember the reason.
 
 Fonts and face settings are grouped into helper functions so that they can be
-called in hooks. Apparently these functions need to be called whenever a new
-emacsclient is connected hence ~after-make-frame-functions~ hook is set here.
+called in hooks.
 
 #+begin_src emacs-lisp
 (require 'font-lock)
@@ -322,15 +321,6 @@ emacsclient is connected hence ~after-make-frame-functions~ hook is set here.
    'user
    '(variable-pitch ((t (:family "Sans")))))
   )
-
-(when (daemonp)
-  (add-hook 'after-make-frame-functions
-            #'(lambda (frame)
-                (select-frame frame)
-                (my/setup-fonts))))
-
-(with-eval-after-load "emacs-init"
-  (my/setup-fonts))
 #+end_src
 
 ** Color themes
@@ -524,6 +514,10 @@ prefix. This way which-key will be more useful.
 
 ** Hooks to forcibly reset UI for new frames when running in daemon mode
 
+When running as daemon, apparently these functions need to be called whenever a
+new emacsclient is connected hence ~server-after-make-frame-hook~ is set here.
+Otherwise the same UI setup functions are called via ~emacs-startup-hook~.
+
 #+begin_src emacs-lisp
 (defun my/setup-frame ()
   "Sets up frame appearence."
@@ -544,12 +538,13 @@ prefix. This way which-key will be more useful.
   (my/set-default-faces))
 
 (if (daemonp)
-    (add-hook 'after-make-frame-functions
-              #'(lambda (frame)
-                  (select-frame frame)
+    (add-hook 'server-after-make-frame-hook
+              #'(lambda ()
+                  (my/setup-fonts)
                   (my/setup-ui-theme)))
   (add-hook 'emacs-startup-hook
             #'(lambda ()
+                (my/setup-fonts)
                 (my/setup-ui-theme))))
 #+end_src
 
@@ -1004,7 +999,9 @@ prefix. This way which-key will be more useful.
                           :slant 'unspecified
                           :inherit 'default)
       ))
-  (add-hook 'emacs-startup-hook 'my/set-company-tooltip-faces)
+  (if (daemonp)
+      (add-hook 'server-after-make-frame-hook 'my/set-company-tooltip-faces)
+    (add-hook 'emacs-startup-hook 'my/set-company-tooltip-faces))
 
   ;; quoted from https://oremacs.com/2017/12/27/company-numbers/
   (let ((map company-active-map))
