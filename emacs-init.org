@@ -823,181 +823,181 @@ switch to Ivy.
 ** Vertico
 
 #+begin_src emacs-lisp
-(use-package vertico
-  :if (eq my/completion-ui 'vertico)
-  :diminish vertico-mode
-  :init
-  (vertico-mode)
-  :config
-  ;; Add prompt indicator to `completing-read-multiple'.
-  ;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
-  (defun crm-indicator (args)
-    (cons (format "[CRM%s] %s"
-                  (replace-regexp-in-string
-                   "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
-                   crm-separator)
-                  (car args))
-          (cdr args)))
-  (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
+(when (eq my/completion-ui 'vertico)
+  (use-package vertico
+    :diminish vertico-mode
+    :init
+    (vertico-mode)
+    :config
+    ;; Add prompt indicator to `completing-read-multiple'.
+    ;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
+    (defun crm-indicator (args)
+      (cons (format "[CRM%s] %s"
+                    (replace-regexp-in-string
+                     "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
+                     crm-separator)
+                    (car args))
+            (cdr args)))
+    (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
 
-  ;; Do not allow the cursor in the minibuffer prompt
-  (setq minibuffer-prompt-properties
-        '(read-only t cursor-intangible t face minibuffer-prompt))
-  (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
+    ;; Do not allow the cursor in the minibuffer prompt
+    (setq minibuffer-prompt-properties
+          '(read-only t cursor-intangible t face minibuffer-prompt))
+    (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
 
-  ;; Emacs 28: Hide commands in M-x which do not work in the current mode.
-  ;; Vertico commands are hidden in normal buffers.
-  ;; (setq read-extended-command-predicate
-  ;;       #'command-completion-default-include-p)
+    ;; Emacs 28: Hide commands in M-x which do not work in the current mode.
+    ;; Vertico commands are hidden in normal buffers.
+    ;; (setq read-extended-command-predicate
+    ;;       #'command-completion-default-include-p)
 
-  ;; Enable recursive minibuffers
-  (setq enable-recursive-minibuffers t))
+    ;; Enable recursive minibuffers
+    (setq enable-recursive-minibuffers t))
 
-(use-package savehist
-  :if (eq my/completion-ui 'vertico)
-  :diminish savehist-mode
-  :init
-  (savehist-mode))
+  (use-package savehist
+    :diminish savehist-mode
+    :init
+    (savehist-mode))
 
-(use-package orderless
-  :if (eq my/completion-ui 'vertico)
-  :init
-  ;; Configure a custom style dispatcher (see the Consult wiki)
-  ;; (setq orderless-style-dispatchers '(+orderless-dispatch)
-  ;;       orderless-component-separator #'orderless-escapable-split-on-space)
-  (setq completion-styles '(orderless basic)
-        completion-category-defaults nil
-        completion-category-overrides '((file (styles partial-completion)))))
+  (use-package orderless
+    :init
+    ;; Configure a custom style dispatcher (see the Consult wiki)
+    ;; (setq orderless-style-dispatchers '(+orderless-dispatch)
+    ;;       orderless-component-separator #'orderless-escapable-split-on-space)
+    (setq completion-styles '(orderless basic)
+          completion-category-defaults nil
+          completion-category-overrides '((file (styles partial-completion)))))
+  )
 #+end_src
 
 *** Consult
 
 #+begin_src emacs-lisp
-(use-package consult
-  :if (eq my/completion-ui 'vertico)
-  ;; Replace bindings. Lazily loaded due by `use-package'.
-  :bind (;; C-c bindings (mode-specific-map)
-         ("C-c h" . consult-history)
-         ("C-c m" . consult-mode-command)
-         ("C-c k" . consult-kmacro)
-         ;; C-x bindings (ctl-x-map)
-         ("C-x M-:" . consult-complex-command)     ;; orig. repeat-complex-command
-         ("C-x b" . consult-buffer)                ;; orig. switch-to-buffer
-         ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
-         ("C-x 5 b" . consult-buffer-other-frame)  ;; orig. switch-to-buffer-other-frame
-         ("C-x r b" . consult-bookmark)            ;; orig. bookmark-jump
-         ("C-x p b" . consult-project-buffer)      ;; orig. project-switch-to-buffer
-         ;; Custom M-# bindings for fast register access
-         ("M-#" . consult-register-load)
-         ("M-'" . consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
-         ("C-M-#" . consult-register)
-         ;; Other custom bindings
-         ("M-y" . consult-yank-pop)                ;; orig. yank-pop
-         ("<help> a" . consult-apropos)            ;; orig. apropos-command
-         ;; M-g bindings (goto-map)
-         ("M-g e" . consult-compile-error)
-         ("M-g f" . consult-flymake)               ;; Alternative: consult-flycheck
-         ("M-g g" . consult-goto-line)             ;; orig. goto-line
-         ("M-g M-g" . consult-goto-line)           ;; orig. goto-line
-         ("M-g o" . consult-outline)               ;; Alternative: consult-org-heading
-         ("M-g m" . consult-mark)
-         ("M-g k" . consult-global-mark)
-         ("M-g i" . consult-imenu)
-         ("M-g I" . consult-imenu-multi)
-         ;; M-s bindings (search-map)
-         ("M-s d" . consult-find)
-         ("M-s D" . consult-locate)
-         ("M-s g" . consult-grep)
-         ("M-s G" . consult-git-grep)
-         ("M-s r" . consult-ripgrep)
-         ("M-s l" . consult-line)
-         ("M-s L" . consult-line-multi)
-         ("M-s m" . consult-multi-occur)
-         ("M-s k" . consult-keep-lines)
-         ("M-s u" . consult-focus-lines)
-         ;; Isearch integration
-         ("M-s e" . consult-isearch-history)
-         :map isearch-mode-map
-         ("M-e" . consult-isearch-history)         ;; orig. isearch-edit-string
-         ("M-s e" . consult-isearch-history)       ;; orig. isearch-edit-string
-         ("M-s l" . consult-line)                  ;; needed by consult-line to detect isearch
-         ("M-s L" . consult-line-multi)            ;; needed by consult-line to detect isearch
-         ;; Minibuffer history
-         :map minibuffer-local-map
-         ("M-s" . consult-history)                 ;; orig. next-matching-history-element
-         ("M-r" . consult-history))                ;; orig. previous-matching-history-element
+(when (eq my/completion-ui 'vertico)
+  (use-package consult
+    ;; Replace bindings. Lazily loaded due by `use-package'.
+    :bind (;; C-c bindings (mode-specific-map)
+           ("C-c h" . consult-history)
+           ("C-c m" . consult-mode-command)
+           ("C-c k" . consult-kmacro)
+           ;; C-x bindings (ctl-x-map)
+           ("C-x M-:" . consult-complex-command)     ;; orig. repeat-complex-command
+           ("C-x b" . consult-buffer)                ;; orig. switch-to-buffer
+           ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
+           ("C-x 5 b" . consult-buffer-other-frame)  ;; orig. switch-to-buffer-other-frame
+           ("C-x r b" . consult-bookmark)            ;; orig. bookmark-jump
+           ("C-x p b" . consult-project-buffer)      ;; orig. project-switch-to-buffer
+           ;; Custom M-# bindings for fast register access
+           ("M-#" . consult-register-load)
+           ("M-'" . consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
+           ("C-M-#" . consult-register)
+           ;; Other custom bindings
+           ("M-y" . consult-yank-pop)                ;; orig. yank-pop
+           ("<help> a" . consult-apropos)            ;; orig. apropos-command
+           ;; M-g bindings (goto-map)
+           ("M-g e" . consult-compile-error)
+           ("M-g f" . consult-flymake)               ;; Alternative: consult-flycheck
+           ("M-g g" . consult-goto-line)             ;; orig. goto-line
+           ("M-g M-g" . consult-goto-line)           ;; orig. goto-line
+           ("M-g o" . consult-outline)               ;; Alternative: consult-org-heading
+           ("M-g m" . consult-mark)
+           ("M-g k" . consult-global-mark)
+           ("M-g i" . consult-imenu)
+           ("M-g I" . consult-imenu-multi)
+           ;; M-s bindings (search-map)
+           ("M-s d" . consult-find)
+           ("M-s D" . consult-locate)
+           ("M-s g" . consult-grep)
+           ("M-s G" . consult-git-grep)
+           ("M-s r" . consult-ripgrep)
+           ("M-s l" . consult-line)
+           ("M-s L" . consult-line-multi)
+           ("M-s m" . consult-multi-occur)
+           ("M-s k" . consult-keep-lines)
+           ("M-s u" . consult-focus-lines)
+           ;; Isearch integration
+           ("M-s e" . consult-isearch-history)
+           :map isearch-mode-map
+           ("M-e" . consult-isearch-history)         ;; orig. isearch-edit-string
+           ("M-s e" . consult-isearch-history)       ;; orig. isearch-edit-string
+           ("M-s l" . consult-line)                  ;; needed by consult-line to detect isearch
+           ("M-s L" . consult-line-multi)            ;; needed by consult-line to detect isearch
+           ;; Minibuffer history
+           :map minibuffer-local-map
+           ("M-s" . consult-history)                 ;; orig. next-matching-history-element
+           ("M-r" . consult-history))                ;; orig. previous-matching-history-element
 
-  ;; Enable automatic preview at point in the *Completions* buffer. This is
-  ;; relevant when you use the default completion UI.
-  :hook (completion-list-mode . consult-preview-at-point-mode)
-  :commands (consult-buffer)
+    ;; Enable automatic preview at point in the *Completions* buffer. This is
+    ;; relevant when you use the default completion UI.
+    :hook (completion-list-mode . consult-preview-at-point-mode)
+    :commands (consult-buffer)
 
-  ;; The :init configuration is always executed (Not lazy)
-  :init
+    ;; The :init configuration is always executed (Not lazy)
+    :init
 
-  ;; Optionally configure the register formatting. This improves the register
-  ;; preview for `consult-register', `consult-register-load',
-  ;; `consult-register-store' and the Emacs built-ins.
-  (setq register-preview-delay 0.5
-        register-preview-function #'consult-register-format)
+    ;; Optionally configure the register formatting. This improves the register
+    ;; preview for `consult-register', `consult-register-load',
+    ;; `consult-register-store' and the Emacs built-ins.
+    (setq register-preview-delay 0.5
+          register-preview-function #'consult-register-format)
 
-  ;; Optionally tweak the register preview window.
-  ;; This adds thin lines, sorting and hides the mode line of the window.
-  (advice-add #'register-preview :override #'consult-register-window)
+    ;; Optionally tweak the register preview window.
+    ;; This adds thin lines, sorting and hides the mode line of the window.
+    (advice-add #'register-preview :override #'consult-register-window)
 
-  ;; Use Consult to select xref locations with preview
-  (setq xref-show-xrefs-function #'consult-xref
-        xref-show-definitions-function #'consult-xref)
+    ;; Use Consult to select xref locations with preview
+    (setq xref-show-xrefs-function #'consult-xref
+          xref-show-definitions-function #'consult-xref)
 
-  ;; Configure other variables and modes in the :config section,
-  ;; after lazily loading the package.
-  :config
+    ;; Configure other variables and modes in the :config section,
+    ;; after lazily loading the package.
+    :config
 
-  ;; Optionally configure preview. The default value
-  ;; is 'any, such that any key triggers the preview.
-  ;; (setq consult-preview-key 'any)
-  ;; (setq consult-preview-key (kbd "M-."))
-  ;; (setq consult-preview-key (list (kbd "<S-down>") (kbd "<S-up>")))
-  ;; For some commands and buffer sources it is useful to configure the
-  ;; :preview-key on a per-command basis using the `consult-customize' macro.
-  (consult-customize
-   consult-theme
-   :preview-key '(:debounce 0.2 any)
-   consult-ripgrep consult-git-grep consult-grep
-   consult-bookmark consult-recent-file consult-xref
-   consult--source-bookmark consult--source-recent-file
-   consult--source-project-recent-file
-   :preview-key (kbd "M-."))
+    ;; Optionally configure preview. The default value
+    ;; is 'any, such that any key triggers the preview.
+    ;; (setq consult-preview-key 'any)
+    ;; (setq consult-preview-key (kbd "M-."))
+    ;; (setq consult-preview-key (list (kbd "<S-down>") (kbd "<S-up>")))
+    ;; For some commands and buffer sources it is useful to configure the
+    ;; :preview-key on a per-command basis using the `consult-customize' macro.
+    (consult-customize
+     consult-theme
+     :preview-key '(:debounce 0.2 any)
+     consult-ripgrep consult-git-grep consult-grep
+     consult-bookmark consult-recent-file consult-xref
+     consult--source-bookmark consult--source-recent-file
+     consult--source-project-recent-file
+     :preview-key (kbd "M-."))
 
-  ;; Optionally configure the narrowing key.
-  ;; Both < and C-+ work reasonably well.
-  (setq consult-narrow-key "<") ;; (kbd "C-+")
+    ;; Optionally configure the narrowing key.
+    ;; Both < and C-+ work reasonably well.
+    (setq consult-narrow-key "<") ;; (kbd "C-+")
 
-  ;; Optionally make narrowing help available in the minibuffer.
-  ;; You may want to use `embark-prefix-help-command' or which-key instead.
-  ;; (define-key consult-narrow-map (vconcat consult-narrow-key "?") #'consult-narrow-help)
+    ;; Optionally make narrowing help available in the minibuffer.
+    ;; You may want to use `embark-prefix-help-command' or which-key instead.
+    ;; (define-key consult-narrow-map (vconcat consult-narrow-key "?") #'consult-narrow-help)
 
-  ;; By default `consult-project-function' uses `project-root' from project.el.
-  ;; Optionally configure a different project root function.
-  ;; There are multiple reasonable alternatives to chose from.
+    ;; By default `consult-project-function' uses `project-root' from project.el.
+    ;; Optionally configure a different project root function.
+    ;; There are multiple reasonable alternatives to chose from.
   ;;;; 1. project.el (the default)
-  ;; (setq consult-project-function #'consult--default-project--function)
+    ;; (setq consult-project-function #'consult--default-project--function)
   ;;;; 2. projectile.el (projectile-project-root)
-  ;; (autoload 'projectile-project-root "projectile")
-  ;; (setq consult-project-function (lambda (_) (projectile-project-root)))
+    ;; (autoload 'projectile-project-root "projectile")
+    ;; (setq consult-project-function (lambda (_) (projectile-project-root)))
   ;;;; 3. vc.el (vc-root-dir)
-  ;; (setq consult-project-function (lambda (_) (vc-root-dir)))
+    ;; (setq consult-project-function (lambda (_) (vc-root-dir)))
   ;;;; 4. locate-dominating-file
-  ;; (setq consult-project-function (lambda (_) (locate-dominating-file "." ".git")))
+    ;; (setq consult-project-function (lambda (_) (locate-dominating-file "." ".git")))
 
-  (defun consult-exwm-preview-fix (buf-or-name &optional norecord force-same-window)
-    "Kludge to stop EXWM buffers from stealing focus during Consult previews."
-    (when (derived-mode-p 'exwm-mode)
-      (when-let ((mini (active-minibuffer-window)))
-        (select-window (active-minibuffer-window)))))
+    (defun consult-exwm-preview-fix (buf-or-name &optional norecord force-same-window)
+      "Kludge to stop EXWM buffers from stealing focus during Consult previews."
+      (when (derived-mode-p 'exwm-mode)
+        (when-let ((mini (active-minibuffer-window)))
+          (select-window (active-minibuffer-window)))))
 
-  (advice-add
-   #'switch-to-buffer :after #'consult-exwm-preview-fix)
+    (advice-add
+     #'switch-to-buffer :after #'consult-exwm-preview-fix)
+    )
   )
 #+end_src
 
@@ -1005,180 +1005,173 @@ switch to Ivy.
 
 #+begin_src emacs-lisp
 ;; Enable richer annotations using the Marginalia package
-(use-package marginalia
-  :if (eq my/completion-ui 'vertico)
-  ;; Either bind `marginalia-cycle` globally or only in the minibuffer
-  :bind (("M-A" . marginalia-cycle)
-         :map minibuffer-local-map
-         ("M-A" . marginalia-cycle))
+(when (eq my/completion-ui 'vertico)
+  (use-package marginalia
+    ;; Either bind `marginalia-cycle` globally or only in the minibuffer
+    :bind (("M-A" . marginalia-cycle)
+           :map minibuffer-local-map
+           ("M-A" . marginalia-cycle))
 
-  ;; The :init configuration is always executed (Not lazy!)
-  :init
+    ;; The :init configuration is always executed (Not lazy!)
+    :init
 
-  ;; Must be in the :init section of use-package such that the mode gets
-  ;; enabled right away. Note that this forces loading the package.
-  (marginalia-mode))
+    ;; Must be in the :init section of use-package such that the mode gets
+    ;; enabled right away. Note that this forces loading the package.
+    (marginalia-mode))
+  )
 #+end_src
  
 *** Embark
 
 #+begin_src emacs-lisp
-(use-package embark
-  :if (eq my/completion-ui 'vertico)
-  :bind
-  (("C-." . embark-act)         ;; pick some comfortable binding
-   ("C-;" . embark-dwim)        ;; good alternative: M-.
-   ("C-h B" . embark-bindings)) ;; alternative for `describe-bindings'
+(when (eq my/completion-ui 'vertico)
+  (use-package embark
+    :bind
+    (("C-." . embark-act)         ;; pick some comfortable binding
+     ("C-;" . embark-dwim)        ;; good alternative: M-.
+     ("C-h B" . embark-bindings)) ;; alternative for `describe-bindings'
 
-  :init
+    :init
 
-  ;; Optionally replace the key help with a completing-read interface
-  (setq prefix-help-command #'embark-prefix-help-command)
+    ;; Optionally replace the key help with a completing-read interface
+    (setq prefix-help-command #'embark-prefix-help-command)
 
-  :config
+    :config
 
-  ;; Hide the mode line of the Embark live/completions buffers
-  (add-to-list 'display-buffer-alist
-               '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
-                 nil
-                 (window-parameters (mode-line-format . none)))))
+    ;; Hide the mode line of the Embark live/completions buffers
+    (add-to-list 'display-buffer-alist
+                 '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
+                   nil
+                   (window-parameters (mode-line-format . none)))))
 
-;; Consult users will also want the embark-consult package.
-(use-package embark-consult
-  :if (eq my/completion-ui 'vertico)
-  :after (embark consult)
-  :demand t ; only necessary if you have the hook below
-  ;; if you want to have consult previews as you move around an
-  ;; auto-updating embark collect buffer
-  :hook
-  (embark-collect-mode . consult-preview-at-point-mode))
+  ;; Consult users will also want the embark-consult package.
+  (use-package embark-consult
+    :after (embark consult)
+    :demand t ; only necessary if you have the hook below
+    ;; if you want to have consult previews as you move around an
+    ;; auto-updating embark collect buffer
+    :hook
+    (embark-collect-mode . consult-preview-at-point-mode))
+  )
 #+end_src
 
 
 ** Helm
 
 #+begin_src emacs-lisp
-(use-package helm
-  :if (eq my/completion-ui 'helm)
-  :diminish helm-mode
-  :init
-  (require 'helm-config)
-  (helm-mode 1)
-  (global-set-key "\C-ch" 'helm-command-prefix)
-  :bind (("C-c h m" . helm-mini)
-         ("C-c h o" . helm-occur)
-         ("C-c h r" . helm-recentf)
-         ("C-c h %" . helm-regexp)
-         ("C-c g" . helm-do-grep-ag)
-         ("M-y" . helm-show-kill-ring)
-         ("M-x" . helm-M-x)
-         :map my/info-map
-         ("m" . helm-semantic-or-imenu))
-  :custom
-  (helm-completion-mode-string "")
-  :config
-  (define-key global-map [remap find-file] 'helm-find-files)
-  (define-key global-map [remap occur] 'helm-occur)
-  (define-key global-map [remap list-buffers] 'helm-buffers-list)
-  (define-key global-map [remap dabbrev-expand] 'helm-dabbrev)
-  (unless (boundp 'completion-in-region-function)
-    (define-key lisp-interaction-mode-map [remap completion-at-point] 'helm-lisp-completion-at-point)
-    (define-key emacs-lisp-mode-map       [remap completion-at-point] 'helm-lisp-completion-at-point))
+(when (eq my/completion-ui 'helm)
+  (use-package helm
+    :diminish helm-mode
+    :init
+    (require 'helm-config)
+    (helm-mode 1)
+    (global-set-key "\C-ch" 'helm-command-prefix)
+    :bind (("C-c h m" . helm-mini)
+           ("C-c h o" . helm-occur)
+           ("C-c h r" . helm-recentf)
+           ("C-c h %" . helm-regexp)
+           ("C-c g" . helm-do-grep-ag)
+           ("M-y" . helm-show-kill-ring)
+           ("M-x" . helm-M-x)
+           :map my/info-map
+           ("m" . helm-semantic-or-imenu))
+    :custom
+    (helm-completion-mode-string "")
+    :config
+    (define-key global-map [remap find-file] 'helm-find-files)
+    (define-key global-map [remap occur] 'helm-occur)
+    (define-key global-map [remap list-buffers] 'helm-buffers-list)
+    (define-key global-map [remap dabbrev-expand] 'helm-dabbrev)
+    (unless (boundp 'completion-in-region-function)
+      (define-key lisp-interaction-mode-map [remap completion-at-point] 'helm-lisp-completion-at-point)
+      (define-key emacs-lisp-mode-map       [remap completion-at-point] 'helm-lisp-completion-at-point))
 
-  (defun my/helm-buffers-list (sources)
-    "Dispatch helm with specified sources"
-    (helm :sources sources
-          :buffer "*helm buffers*"
-          :keymap helm-buffer-map
-          :truncate-lines helm-buffers-truncate-lines))
+    (defun my/helm-buffers-list (sources)
+      "Dispatch helm with specified sources"
+      (helm :sources sources
+            :buffer "*helm buffers*"
+            :keymap helm-buffer-map
+            :truncate-lines helm-buffers-truncate-lines))
+    )
+
+  (use-package helm-descbinds
+    :custom
+    (helm-descbinds-window-style 'split-window)
+    :config
+    (helm-descbinds-mode))
+
+  (use-package helm-describe-modes
+    :config (global-set-key [remap describe-mode] #'helm-describe-modes))
+
+  (use-package helm-swoop
+    :bind (("C-c O" . helm-swoop)))
+
+  (use-package helm-xref
+    :custom
+    ;; This is required to make xref-find-references work in helm-mode.  In
+    ;; helm-mode, it gives a prompt and asks the identifier (which has no text
+    ;; property) and then passes it to lsp-mode, which requires the text property
+    ;; at point to locate the references.
+    (xref-prompt-for-identifier '(not xref-find-definitions
+                                      xref-find-definitions-other-window
+                                      xref-find-definitions-other-frame
+                                      xref-find-references)))
   )
-
-(use-package helm-descbinds
-  :if (eq my/completion-ui 'helm)
-  :custom
-  (helm-descbinds-window-style 'split-window)
-  :config
-  (helm-descbinds-mode))
-
-(use-package helm-describe-modes
-  :if (eq my/completion-ui 'helm)
-  :config (global-set-key [remap describe-mode] #'helm-describe-modes))
-
-(use-package helm-swoop
-  :if (eq my/completion-ui 'helm)
-  :bind (("C-c O" . helm-swoop)))
-
-(use-package helm-xref
-  :if (eq my/completion-ui 'helm)
-  :custom
-  ;; This is required to make xref-find-references work in helm-mode.  In
-  ;; helm-mode, it gives a prompt and asks the identifier (which has no text
-  ;; property) and then passes it to lsp-mode, which requires the text property
-  ;; at point to locate the references.
-  (xref-prompt-for-identifier '(not xref-find-definitions
-                                    xref-find-definitions-other-window
-                                    xref-find-definitions-other-frame
-                                    xref-find-references)))
 #+end_src
 
 ** Ivy
 
 #+begin_src emacs-lisp
-(use-package ivy
-  :if (eq my/completion-ui 'ivy)
-  :diminish
-  :defer nil
-  :bind (("C-x C-b" . ibuffer))
-  :custom
-  (ivy-use-virtual-buffers t)
-  (enable-recursive-minibuffers t)
-  :config
-  (define-prefix-command 'my-ivy-map)
-  (global-set-key (kbd "C-c h") 'my-ivy-map)
+(when (eq my/completion-ui 'ivy)
+  (use-package ivy
+    :diminish
+    :defer nil
+    :bind (("C-x C-b" . ibuffer))
+    :custom
+    (ivy-use-virtual-buffers t)
+    (enable-recursive-minibuffers t)
+    :config
+    (define-prefix-command 'my-ivy-map)
+    (global-set-key (kbd "C-c h") 'my-ivy-map)
 
-  (minibuffer-depth-indicate-mode 1)
-  (ivy-mode))
+    (minibuffer-depth-indicate-mode 1)
+    (ivy-mode))
 
-(use-package ivy-hydra
-  :if (eq my/completion-ui 'ivy))
+  (use-package ivy-hydra)
 
-(use-package ivy-rich
-  :if (eq my/completion-ui 'ivy)
-  :diminish
-  :config
-  (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line)
-  ;; (setq ivy-rich-path-style 'abbrev)
-  (ivy-rich-mode 1))
+  (use-package ivy-rich
+    :diminish
+    :config
+    (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line)
+    ;; (setq ivy-rich-path-style 'abbrev)
+    (ivy-rich-mode 1))
 
-(use-package counsel
-  :if (eq my/completion-ui 'ivy)
-  :diminish
-  :bind (("C-c h r" . counsel-recentf)
-         ("C-c h g" . counsel-ag))
-  :custom
-  (counsel-find-file-ignore-regexp (regexp-opt '("./" "../")))
-  :config
-  ;; (define-key my-ivy-map (kbd "r") #'counsel-recentf)
-  ;; (define-key my-ivy-map (kbd "g") #'counsel-grep)
+  (use-package counsel
+    :diminish
+    :bind (("C-c h r" . counsel-recentf)
+           ("C-c h g" . counsel-ag))
+    :custom
+    (counsel-find-file-ignore-regexp (regexp-opt '("./" "../")))
+    :config
+    ;; (define-key my-ivy-map (kbd "r") #'counsel-recentf)
+    ;; (define-key my-ivy-map (kbd "g") #'counsel-grep)
 
-  (define-key counsel-find-file-map (kbd "C-l") 'counsel-up-directory)
-  (counsel-mode))
+    (define-key counsel-find-file-map (kbd "C-l") 'counsel-up-directory)
+    (counsel-mode))
 
-(use-package swiper
-  :if (eq my/completion-ui 'ivy)
-  :bind (("C-s" . swiper)
-         ("C-r" . swiper)))
+  (use-package swiper
+    :bind (("C-s" . swiper)
+           ("C-r" . swiper)))
 
-(use-package smex
-  :if (eq my/completion-ui 'ivy)
-  :config
-  (smex-initialize))
+  (use-package smex
+    :config
+    (smex-initialize))
 
-(use-package counsel-projectile
-  :if (eq my/completion-ui 'ivy)
-  :after (counsel projectile)
-  :config
-  (counsel-projectile-mode))
+  (use-package counsel-projectile
+    :after (counsel projectile)
+    :config
+    (counsel-projectile-mode))
+  )
 #+end_src
 
 ** Company
@@ -1294,46 +1287,47 @@ switch to Ivy.
 
 ** Fussy
 #+begin_src emacs-lisp
-(use-package fussy
-  :if (>= (string-to-number emacs-version) 27.2)
-  :config
-  (push 'fussy completion-styles)
-  (setq
-   ;; For example, project-find-file uses 'project-files which uses
-   ;; substring completion by default. Set to nil to make sure it's using
-   ;; flx.
-   completion-category-defaults nil
-   completion-category-overrides nil
-   fussy-score-fn 'fussy-fzf-native-score
-   fussy-filter-fn #'fussy-filter-default)
+(when (>= (string-to-number emacs-version) 27.2)
+  (use-package fussy
+    :config
+    (push 'fussy completion-styles)
+    (setq
+     ;; For example, project-find-file uses 'project-files which uses
+     ;; substring completion by default. Set to nil to make sure it's using
+     ;; flx.
+     completion-category-defaults nil
+     completion-category-overrides nil
+     fussy-score-fn 'fussy-fzf-native-score
+     fussy-filter-fn #'fussy-filter-default)
 
-  (with-eval-after-load 'company
-    (defun j-company-capf (f &rest args)
-      "Manage `completion-styles'."
-      (let ((fussy-max-candidate-limit 5000)
-            (fussy-default-regex-fn 'fussy-pattern-first-letter)
-            (fussy-prefer-prefix nil))
-        (apply f args)))
+    (with-eval-after-load 'company
+      (defun j-company-capf (f &rest args)
+        "Manage `completion-styles'."
+        (let ((fussy-max-candidate-limit 5000)
+              (fussy-default-regex-fn 'fussy-pattern-first-letter)
+              (fussy-prefer-prefix nil))
+          (apply f args)))
 
-    (defun j-company-transformers (f &rest args)
-      "Manage `company-transformers'."
-      (let ((company-transformers '(fussy-company-sort-by-completion-score)))
-        (apply f args)))
+      (defun j-company-transformers (f &rest args)
+        "Manage `company-transformers'."
+        (let ((company-transformers '(fussy-company-sort-by-completion-score)))
+          (apply f args)))
 
-    (advice-add 'company--transform-candidates :around 'j-company-transformers)
-    (advice-add 'company-capf :around 'j-company-capf))
+      (advice-add 'company--transform-candidates :around 'j-company-transformers)
+      (advice-add 'company-capf :around 'j-company-capf))
+    )
+
+  (use-package fzf-native
+    :requires fussy
+    :straight
+    (fzf-native
+     :repo "dangduc/fzf-native"
+     :host github
+     :files (:defaults "bin"))
+    :config
+    (setq fussy-score-fn 'fussy-fzf-native-score)
+    (fzf-native-load-dyn))
   )
-
-(use-package fzf-native
-  :requires fussy
-  :straight
-  (fzf-native
-   :repo "dangduc/fzf-native"
-   :host github
-   :files (:defaults "bin"))
-  :config
-  (setq fussy-score-fn 'fussy-fzf-native-score)
-  (fzf-native-load-dyn))
 #+end_src
 
 * Edit modes
@@ -1412,9 +1406,10 @@ switch to Ivy.
 #+begin_src emacs-lisp
 (use-package wgrep :diminish)
 (use-package wgrep-ag :diminish)
-(use-package wgrep-helm
-  :if (eq my/completion-ui 'helm)
-  :diminish)
+(when (eq my/completion-ui 'helm)
+  (use-package wgrep-helm
+    :diminish)
+  )
 #+end_src
 
 ** Undo tree
@@ -1474,7 +1469,9 @@ switch to Ivy.
 (use-package yasnippet-snippets)
 (use-package go-snippets)
 (use-package java-snippets)
-(use-package helm-c-yasnippet :if (eq my/completion-ui 'helm))
+(when (eq my/completion-ui 'helm)
+  (use-package helm-c-yasnippet))
+
 #+end_src
 
 ** Projectile
@@ -1488,15 +1485,6 @@ switch to Ivy.
          (comint-mode . (lambda () (projectile-mode 0))))
   :custom
   (projectile-mode-line '(:eval (format " [%s]" (projectile-project-name)))))
-
-(use-package helm-projectile
-  :disabled
-  :if (eq my/completion-ui 'helm)
-  :config (helm-projectile-on))
-
-(use-package projectile-speedbar
-  :disabled
-  :bind ("C-c I p" . projectile-speedbar-open-current-buffer-in-tree))
 #+end_src
 
 ** audo-sudoedit
@@ -2513,22 +2501,22 @@ fi
 *** Helm extensions
 
 #+begin_src emacs-lisp
-(use-package helm-ls-git
-  :if (eq my/completion-ui 'helm)
-  :commands (helm-ls-git-ls helm-browse-project)
-  :init
-  (eval-after-load 'helm
-    '(define-key helm-map (kbd "C-x C-d") 'helm-ls-git-ls)))
+(when (eq my/completion-ui 'helm)
+  (use-package helm-ls-git
+    :commands (helm-ls-git-ls helm-browse-project)
+    :init
+    (eval-after-load 'helm
+      '(define-key helm-map (kbd "C-x C-d") 'helm-ls-git-ls)))
 
-(use-package helm-git-grep
-  :if (eq my/completion-ui 'helm)
-  :commands (helm-git-grep helm-git-grep-from-helm)
-  :bind (("C-c h g" . helm-git-grep))
-  :init
-  (define-key isearch-mode-map (kbd "C-c h g")
-    'helm-git-grep-from-isearch)
-  (eval-after-load 'helm
-    '(define-key helm-map (kbd "C-c h g") 'helm-git-grep-from-helm)))
+  (use-package helm-git-grep
+    :commands (helm-git-grep helm-git-grep-from-helm)
+    :bind (("C-c h g" . helm-git-grep))
+    :init
+    (define-key isearch-mode-map (kbd "C-c h g")
+      'helm-git-grep-from-isearch)
+    (eval-after-load 'helm
+      '(define-key helm-map (kbd "C-c h g") 'helm-git-grep-from-helm)))
+  )
 #+end_src
 
 ** Debugging
@@ -2538,8 +2526,8 @@ fi
 (use-package restclient
   :mode ("\\.http\\'" . restclient-mode))
 
-(use-package restclient-helm
-  :if (eq my/completion-ui 'helm))
+(when (eq my/completion-ui 'helm)
+  (use-package restclient-helm))
 
 (use-package company-restclient
   :hook (restclient-mode . (lambda ()
@@ -2710,12 +2698,13 @@ fi
 (use-package golint
   :commands golint)
 
-(use-package helm-go-package
-  :if (eq my/completion-ui 'helm)
-  :after go-mode
-  :init
-  (eval-after-load 'go-mode
-    '(substitute-key-definition 'go-import-add 'helm-go-package go-mode-map)))
+(when (eq my/completion-ui 'helm)
+  (use-package helm-go-package
+    :after go-mode
+    :init
+    (eval-after-load 'go-mode
+      '(substitute-key-definition 'go-import-add 'helm-go-package go-mode-map)))
+  )
 #+end_src
 
 ** Web-mode
@@ -2913,7 +2902,8 @@ fi
 (use-package ob-ipython :disabled)
 (use-package ob-go)
 
-(use-package helm-org-rifle :if (eq my/completion-ui 'helm))
+(when (eq my/completion-ui 'helm)
+  (use-package helm-org-rifle))
 
 (use-package ob-async)
 
@@ -3104,295 +3094,296 @@ same directory as the org-buffer and insert a link to this file."
 * EXWM
 
 #+begin_src emacs-lisp
-(use-package exwm
-  :if (and (eq window-system 'x)
+(when (and (eq window-system 'x)
            (member (getenv "use_exwm") '("1" "yes")))
-  :config
-  (require 'exwm-config)
+  (use-package exwm
+    :config
+    (require 'exwm-config)
 
-  ;; Allow non-floating resizing with mouse.
-  (setq window-divider-default-bottom-width 2
-        window-divider-default-right-width 2)
-  (window-divider-mode)
+    ;; Allow non-floating resizing with mouse.
+    (setq window-divider-default-bottom-width 2
+          window-divider-default-right-width 2)
+    (window-divider-mode)
 
-  (setq exwm-workspace-number 1)
+    (setq exwm-workspace-number 1)
 
-  ;; Try to isolate EXWM buffers per frame.
-  (setq exwm-workspace-show-all-buffers nil)
-  (setq exwm-layout-show-all-buffers nil)
+    ;; Try to isolate EXWM buffers per frame.
+    (setq exwm-workspace-show-all-buffers nil)
+    (setq exwm-layout-show-all-buffers nil)
 
-  ;; Enable char-mode by default.
-  (setq exwm-manage-configurations '((t char-mode t)))
+    ;; Enable char-mode by default.
+    (setq exwm-manage-configurations '((t char-mode t)))
 
-  ;; Rename buffer to window title.
-  (add-hook 'exwm-update-title-hook
-            #'(lambda () (exwm-workspace-rename-buffer exwm-title)))
-  ;; (add-hook 'exwm-update-class-hook
-  ;;           #'(lambda () (exwm-workspace-rename-buffer exwm-class-name)))
+    ;; Rename buffer to window title.
+    (add-hook 'exwm-update-title-hook
+              #'(lambda () (exwm-workspace-rename-buffer exwm-title)))
+    ;; (add-hook 'exwm-update-class-hook
+    ;;           #'(lambda () (exwm-workspace-rename-buffer exwm-class-name)))
 
-  ;; Do not show mode-line for floating windows.
-  (add-hook 'exwm-floating-setup-hook #'exwm-layout-hide-mode-line)
-  (add-hook 'exwm-floating-exit-hook #'exwm-layout-show-mode-line)
+    ;; Do not show mode-line for floating windows.
+    (add-hook 'exwm-floating-setup-hook #'exwm-layout-hide-mode-line)
+    (add-hook 'exwm-floating-exit-hook #'exwm-layout-show-mode-line)
 
-  ;; Make sure that modeline is updated for the active window.
-  (add-hook 'exwm-workspace-switch-hook
-            #'(lambda ()
-                (run-with-idle-timer 0.1 nil
-                                     #'my/exwm-set-input-focus)))
-  
-  (defun my/exwm-layout-toggle-fullscreen-or-single-window ()
-    (interactive)
-    (if (derived-mode-p 'exwm-mode)
-        (call-interactively 'exwm-layout-toggle-fullscreen)
-      (require 'functions)
-      (my/toggle-single-window)))
+    ;; Make sure that modeline is updated for the active window.
+    (add-hook 'exwm-workspace-switch-hook
+              #'(lambda ()
+                  (run-with-idle-timer 0.1 nil
+                                       #'my/exwm-set-input-focus)))
+    
+    (defun my/exwm-layout-toggle-fullscreen-or-single-window ()
+      (interactive)
+      (if (derived-mode-p 'exwm-mode)
+          (call-interactively 'exwm-layout-toggle-fullscreen)
+        (require 'functions)
+        (my/toggle-single-window)))
 
-  (defun my/exwm-set-input-focus ()
-    "Workaround for losing input focus after switch-to-next/prev-buffer"
-    (interactive)
-    (unless (active-minibuffer-window)
-      (let ((window (selected-window)))
-        (select-window window)
-        (x-focus-frame (window-frame window)))))
-  ;; (exwm-input--set-focus
-  ;;  (exwm--buffer->id (window-buffer window))))))
+    (defun my/exwm-set-input-focus ()
+      "Workaround for losing input focus after switch-to-next/prev-buffer"
+      (interactive)
+      (unless (active-minibuffer-window)
+        (let ((window (selected-window)))
+          (select-window window)
+          (x-focus-frame (window-frame window)))))
+    ;; (exwm-input--set-focus
+    ;;  (exwm--buffer->id (window-buffer window))))))
 
 
-  (defvar my/single-window--last-configuration nil
-    "Last window configuration before calling `delete-other-windows'.")
-  (defun my/toggle-single-window ()
-    "Un-maximize current window.
+    (defvar my/single-window--last-configuration nil
+      "Last window configuration before calling `delete-other-windows'.")
+    (defun my/toggle-single-window ()
+      "Un-maximize current window.
     If multiple windows are active, save window configuration and
     delete other windows.  If only one window is active and a window
     configuration was previously save, restore that configuration."
-    (interactive)
-    (if (= (count-windows) 1)
-        (when my/single-window--last-configuration
-          (set-window-configuration my/single-window--last-configuration))
-      (setq my/single-window--last-configuration (current-window-configuration))
-      (delete-other-windows)))
-
-  (defun my/switch-to-last-buffer ()
-    "Switch to last open buffer in current window."
-    (interactive)
-    (let* ((b (other-buffer (current-buffer) 1))
-           (w (get-buffer-window b)))
-      (if w (select-window w)
-        (progn
-          (switch-to-buffer b)
-          (my/exwm-set-input-focus)))))
-
-  ;; Add a new EXWM window to the current perspective.
-  (when (and (featurep 'persp-mode) persp-mode)
-    (add-hook 'exwm-manage-finish-hook
-              #'(lambda () (persp-add-buffer
-                            (current-buffer) (get-current-persp)))))
-
-  ;; === Key bindings working in line-mode. ===
-
-  ;; Clear key bindings for line-mode to unmap C-c.
-  (setq exwm-mode-map (make-sparse-keymap))
-
-  ;; Make C-c a prefix key.
-  (push ?\C-c exwm-input-prefix-keys)
-  ;; Send C-c by typing C-c C-c.
-  (define-key exwm-mode-map (kbd "C-c C-c") #'(lambda () (interactive)
-                                                (exwm-input--fake-key 3)))
-
-  ;; Send C-x (cut) by typing C-x C-x.
-  (define-key exwm-mode-map (kbd "C-x C-x") #'(lambda () (interactive)
-                                                (exwm-input--fake-key 24)))
-  ;; Make C-z a prefix key.
-  (push ?\C-z exwm-input-prefix-keys)
-  ;; Send C-z (undo) by typing C-z C-z.
-  (defun my/send-ctrl-z () (interactive) (exwm-input--fake-key 26))
-  (define-key exwm-mode-map (kbd "C-z C-z") #'my/send-ctrl-z)
-  (when (eq (lookup-key (current-global-map) (kbd "C-z")) 'suspend-frame)
-    (global-set-key (kbd "C-z") #'my/send-ctrl-z))
-
-  ;; Make C-q a quoted insert.
-  (push ?\C-q exwm-input-prefix-keys)
-  (define-key exwm-mode-map [?\C-q] #'exwm-input-send-next-key)
-
-  ;; === Key bindings working in both char-mode and line-mode. ===
-
-  (exwm-input-set-key (kbd "s-'") #'exwm-input-toggle-keyboard)
-
-  (exwm-input-set-key (kbd "s-h") #'windmove-left)
-  (exwm-input-set-key (kbd "s-j") #'windmove-down)
-  (exwm-input-set-key (kbd "s-k") #'windmove-up)
-  (exwm-input-set-key (kbd "s-l") #'windmove-right)
-
-  (exwm-input-set-key (kbd "s-`") #'my/switch-to-last-buffer)
-  (exwm-input-set-key (kbd "s-<return>")
-                      #'(lambda ()
-                          (interactive)
-                          (start-process "" nil "lxterminal")))
-  (exwm-input-set-key (kbd "s-b")
-                      #'(lambda ()
-                          (interactive)
-                          (start-process "" nil "google-chrome")))
-  (exwm-input-set-key (kbd "s-B")
-                      #'(lambda ()
-                          (interactive)
-                          (split-window-right)
-                          (redisplay)
-                          (windmove-right)
-                          (start-process "" nil "google-chrome")))
-  (exwm-input-set-key (kbd "s-L")
-                      #'(lambda ()
-                          (interactive)
-                          (start-process "" nil
-                                         "xscreensaver-command" "-lock")))
-  (exwm-input-set-key (kbd "s-S")
-                      #'(lambda ()
-                          (interactive)
-                          (start-process "" nil
-                                         "gnome-screenshot" "-i")))
-  ;; 's-r': Reset
-  (exwm-input-set-key (kbd "s-r") #'exwm-reset)
-  ;; 's-w': Move window to other workspace
-  (exwm-input-set-key (kbd "s-w") #'exwm-workspace-move-window)
-  ;; 's-<tab>': Switch to next workspace
-  (defun my/exwm-cycle-workspace ()
-    "Cycle workspace to the next one."
-    (interactive)
-    (let ((next-idx (1+ exwm-workspace-current-index)))
-      (if (>= next-idx (length exwm-workspace--list))
-          (setq next-idx 0))
-      (exwm-workspace-switch next-idx)))
-  (exwm-input-set-key (kbd "s-<tab>") #'my/exwm-cycle-workspace)
-
-  ;; 's-N': Switch to Nth workspace
-  (dotimes (i 10)
-    (exwm-input-set-key (kbd (format "s-%d" i))
-                        `(lambda ()
-                           (interactive)
-                           (exwm-workspace-switch-create ,i)
-                           (my/exwm-set-input-focus))))
-
-  ;; 's-!': Launch application
-  (exwm-input-set-key (kbd "s-!")
-                      #'(lambda (command)
-                          (interactive (list (read-shell-command "$ ")))
-                          (start-process-shell-command command nil command)))
-
-  (exwm-input-set-key (kbd "s-n") #'(lambda ()
-                                      (interactive)
-                                      (switch-to-next-buffer)
-                                      (my/exwm-set-input-focus)))
-  (exwm-input-set-key (kbd "s-p")  #'(lambda ()
-                                       (interactive)
-                                       (switch-to-prev-buffer)
-                                       (my/exwm-set-input-focus)))
-  (exwm-input-set-key (kbd "s-C") #'kill-buffer-and-window)
-  (exwm-input-set-key (kbd "s-F") #'exwm-floating-toggle-floating)
-  (exwm-input-set-key (kbd "s-f")
-                      #'my/exwm-layout-toggle-fullscreen-or-single-window)
-
-  (exwm-input-set-key (kbd "s-m")
-                      (cond
-                       ((eq my/completion-ui 'helm) #'helm-mini)
-                       ((eq my/completion-ui 'vertico) #'consult-buffer)
-                       (t #'ibuffer)))
-
-  (exwm-input-set-key (kbd "s-o") #'find-file-other-window)
-
-  (defvar my/exwm-workspace-previous-index 0
-    "The previous active workspace index.")
-  (defun my/exwm-workspace--current-to-previous-index
-      (frame-or-index &optional force)
-    "Save the current active workspace index."
-    (if (numberp frame-or-index)
-        (setq my/exwm-workspace-previous-index exwm-workspace-current-index)))
-  (add-hook 'exwm-init-hook
-            #'(lambda ()
-                (advice-add 'exwm-workspace-switch :before
-                            #'my/exwm-workspace--current-to-previous-index)))
-  (defun my/exwm-workspace-switch-to-previous ()
-    (interactive)
-    "Switch to the previous active workspace."
-    (let ((index my/exwm-workspace-previous-index))
-      (exwm-workspace-switch index)))
-
-  (exwm-input-set-key (kbd "s-;") #'my/exwm-workspace-switch-to-previous)
-  (exwm-input-set-key (kbd "s-N") #'(lambda () (interactive)
-                                      (switch-to-buffer-other-frame
-                                       (get-buffer-create "*scratch*"))))
-  (exwm-input-set-key (kbd "s-s") #'my/get-vterm)
-  (exwm-input-set-key (kbd "s-e") #'my/get-eshell)
-  ;; Note that s-t does not work in exwm mode for some unknown reason.
-  (exwm-input-set-key (kbd "s-t") #'my/get-term)
-
-  ;; Other configurations
-  (exwm-config-misc)
-
-  ;; systemtray
-  (when (member (getenv "use_exwm_systray") '("1" "yes"))
-    (require 'exwm-systemtray)
-    (exwm-systemtray-enable))
-
-  ;; xrandr
-  (when (getenv "CHROME_REMOTE_DESKTOP_SESSION")
-    (require 'exwm-randr)
-    (setq exwm-randr-workspace-output-plist '(0 "Screen"))
-    (exwm-randr-enable))
-
-  ;; Enable EXWM at the end of the initialization.
-  (with-eval-after-load "emacs-init"
-    (exwm-enable))
-
-  (defun my/get-inactive-exwm-buffers ()
-    "Return a list of inactive EXWM buffers or nil if none."
-    (mapcar
-     #'buffer-name
-     (cl-remove-if-not #'(lambda (buf)
-                           (let ((window (get-buffer-window buf t)))
-                             (and
-                              (null window)
-                              (not (string-prefix-p " " (buffer-name buf)))
-                              (with-current-buffer buf
-                                (derived-mode-p 'exwm-mode)))))
-                       (buffer-list))))
-
-  ;; Select inactive EXWM buffers with Vertico/Consult.
-  (when (eq my/completion-ui 'vertico)
-    (defvar my/consult-source-inactive-exwm-buffer
-      `(:name "EXWM"
-              :hidden t
-              :narrow ?x
-              :category buffer
-              :state ,#'consult--buffer-state
-              :items ,#'my/get-inactive-exwm-buffers))
-
-    (setq my/consult-exwm-buffer-source
-          (list
-           `(:hidden nil :narrow ?x ,@my/consult-source-inactive-exwm-buffer)))
-
-    (defun my/consult-inactive-exwm-buffers ()
       (interactive)
-      (if (my/get-inactive-exwm-buffers)
-          (consult-buffer my/consult-exwm-buffer-source)
-        (message "No inactive EXWM buffers found")))
+      (if (= (count-windows) 1)
+          (when my/single-window--last-configuration
+            (set-window-configuration my/single-window--last-configuration))
+        (setq my/single-window--last-configuration (current-window-configuration))
+        (delete-other-windows)))
 
-    ;; Override s-i.
-    (exwm-input-set-key (kbd "s-i") #'my/consult-inactive-exwm-buffers)
+    (defun my/switch-to-last-buffer ()
+      "Switch to last open buffer in current window."
+      (interactive)
+      (let* ((b (other-buffer (current-buffer) 1))
+             (w (get-buffer-window b)))
+        (if w (select-window w)
+          (progn
+            (switch-to-buffer b)
+            (my/exwm-set-input-focus)))))
+
+    ;; Add a new EXWM window to the current perspective.
+    (when (and (featurep 'persp-mode) persp-mode)
+      (add-hook 'exwm-manage-finish-hook
+                #'(lambda () (persp-add-buffer
+                              (current-buffer) (get-current-persp)))))
+
+    ;; === Key bindings working in line-mode. ===
+
+    ;; Clear key bindings for line-mode to unmap C-c.
+    (setq exwm-mode-map (make-sparse-keymap))
+
+    ;; Make C-c a prefix key.
+    (push ?\C-c exwm-input-prefix-keys)
+    ;; Send C-c by typing C-c C-c.
+    (define-key exwm-mode-map (kbd "C-c C-c") #'(lambda () (interactive)
+                                                  (exwm-input--fake-key 3)))
+
+    ;; Send C-x (cut) by typing C-x C-x.
+    (define-key exwm-mode-map (kbd "C-x C-x") #'(lambda () (interactive)
+                                                  (exwm-input--fake-key 24)))
+    ;; Make C-z a prefix key.
+    (push ?\C-z exwm-input-prefix-keys)
+    ;; Send C-z (undo) by typing C-z C-z.
+    (defun my/send-ctrl-z () (interactive) (exwm-input--fake-key 26))
+    (define-key exwm-mode-map (kbd "C-z C-z") #'my/send-ctrl-z)
+    (when (eq (lookup-key (current-global-map) (kbd "C-z")) 'suspend-frame)
+      (global-set-key (kbd "C-z") #'my/send-ctrl-z))
+
+    ;; Make C-q a quoted insert.
+    (push ?\C-q exwm-input-prefix-keys)
+    (define-key exwm-mode-map [?\C-q] #'exwm-input-send-next-key)
+
+    ;; === Key bindings working in both char-mode and line-mode. ===
+
+    (exwm-input-set-key (kbd "s-'") #'exwm-input-toggle-keyboard)
+
+    (exwm-input-set-key (kbd "s-h") #'windmove-left)
+    (exwm-input-set-key (kbd "s-j") #'windmove-down)
+    (exwm-input-set-key (kbd "s-k") #'windmove-up)
+    (exwm-input-set-key (kbd "s-l") #'windmove-right)
+
+    (exwm-input-set-key (kbd "s-`") #'my/switch-to-last-buffer)
+    (exwm-input-set-key (kbd "s-<return>")
+                        #'(lambda ()
+                            (interactive)
+                            (start-process "" nil "lxterminal")))
+    (exwm-input-set-key (kbd "s-b")
+                        #'(lambda ()
+                            (interactive)
+                            (start-process "" nil "google-chrome")))
+    (exwm-input-set-key (kbd "s-B")
+                        #'(lambda ()
+                            (interactive)
+                            (split-window-right)
+                            (redisplay)
+                            (windmove-right)
+                            (start-process "" nil "google-chrome")))
+    (exwm-input-set-key (kbd "s-L")
+                        #'(lambda ()
+                            (interactive)
+                            (start-process "" nil
+                                           "xscreensaver-command" "-lock")))
+    (exwm-input-set-key (kbd "s-S")
+                        #'(lambda ()
+                            (interactive)
+                            (start-process "" nil
+                                           "gnome-screenshot" "-i")))
+    ;; 's-r': Reset
+    (exwm-input-set-key (kbd "s-r") #'exwm-reset)
+    ;; 's-w': Move window to other workspace
+    (exwm-input-set-key (kbd "s-w") #'exwm-workspace-move-window)
+    ;; 's-<tab>': Switch to next workspace
+    (defun my/exwm-cycle-workspace ()
+      "Cycle workspace to the next one."
+      (interactive)
+      (let ((next-idx (1+ exwm-workspace-current-index)))
+        (if (>= next-idx (length exwm-workspace--list))
+            (setq next-idx 0))
+        (exwm-workspace-switch next-idx)))
+    (exwm-input-set-key (kbd "s-<tab>") #'my/exwm-cycle-workspace)
+
+    ;; 's-N': Switch to Nth workspace
+    (dotimes (i 10)
+      (exwm-input-set-key (kbd (format "s-%d" i))
+                          `(lambda ()
+                             (interactive)
+                             (exwm-workspace-switch-create ,i)
+                             (my/exwm-set-input-focus))))
+
+    ;; 's-!': Launch application
+    (exwm-input-set-key (kbd "s-!")
+                        #'(lambda (command)
+                            (interactive (list (read-shell-command "$ ")))
+                            (start-process-shell-command command nil command)))
+
+    (exwm-input-set-key (kbd "s-n") #'(lambda ()
+                                        (interactive)
+                                        (switch-to-next-buffer)
+                                        (my/exwm-set-input-focus)))
+    (exwm-input-set-key (kbd "s-p")  #'(lambda ()
+                                         (interactive)
+                                         (switch-to-prev-buffer)
+                                         (my/exwm-set-input-focus)))
+    (exwm-input-set-key (kbd "s-C") #'kill-buffer-and-window)
+    (exwm-input-set-key (kbd "s-F") #'exwm-floating-toggle-floating)
+    (exwm-input-set-key (kbd "s-f")
+                        #'my/exwm-layout-toggle-fullscreen-or-single-window)
+
+    (exwm-input-set-key (kbd "s-m")
+                        (cond
+                         ((eq my/completion-ui 'helm) #'helm-mini)
+                         ((eq my/completion-ui 'vertico) #'consult-buffer)
+                         (t #'ibuffer)))
+
+    (exwm-input-set-key (kbd "s-o") #'find-file-other-window)
+
+    (defvar my/exwm-workspace-previous-index 0
+      "The previous active workspace index.")
+    (defun my/exwm-workspace--current-to-previous-index
+        (frame-or-index &optional force)
+      "Save the current active workspace index."
+      (if (numberp frame-or-index)
+          (setq my/exwm-workspace-previous-index exwm-workspace-current-index)))
+    (add-hook 'exwm-init-hook
+              #'(lambda ()
+                  (advice-add 'exwm-workspace-switch :before
+                              #'my/exwm-workspace--current-to-previous-index)))
+    (defun my/exwm-workspace-switch-to-previous ()
+      (interactive)
+      "Switch to the previous active workspace."
+      (let ((index my/exwm-workspace-previous-index))
+        (exwm-workspace-switch index)))
+
+    (exwm-input-set-key (kbd "s-;") #'my/exwm-workspace-switch-to-previous)
+    (exwm-input-set-key (kbd "s-N") #'(lambda () (interactive)
+                                        (switch-to-buffer-other-frame
+                                         (get-buffer-create "*scratch*"))))
+    (exwm-input-set-key (kbd "s-s") #'my/get-vterm)
+    (exwm-input-set-key (kbd "s-e") #'my/get-eshell)
+    ;; Note that s-t does not work in exwm mode for some unknown reason.
+    (exwm-input-set-key (kbd "s-t") #'my/get-term)
+
+    ;; Other configurations
+    (exwm-config-misc)
+
+    ;; systemtray
+    (when (member (getenv "use_exwm_systray") '("1" "yes"))
+      (require 'exwm-systemtray)
+      (exwm-systemtray-enable))
+
+    ;; xrandr
+    (when (getenv "CHROME_REMOTE_DESKTOP_SESSION")
+      (require 'exwm-randr)
+      (setq exwm-randr-workspace-output-plist '(0 "Screen"))
+      (exwm-randr-enable))
+
+    ;; Enable EXWM at the end of the initialization.
+    (with-eval-after-load "emacs-init"
+      (exwm-enable))
+
+    (defun my/get-inactive-exwm-buffers ()
+      "Return a list of inactive EXWM buffers or nil if none."
+      (mapcar
+       #'buffer-name
+       (cl-remove-if-not #'(lambda (buf)
+                             (let ((window (get-buffer-window buf t)))
+                               (and
+                                (null window)
+                                (not (string-prefix-p " " (buffer-name buf)))
+                                (with-current-buffer buf
+                                  (derived-mode-p 'exwm-mode)))))
+                         (buffer-list))))
+
+    ;; Select inactive EXWM buffers with Vertico/Consult.
+    (when (eq my/completion-ui 'vertico)
+      (defvar my/consult-source-inactive-exwm-buffer
+        `(:name "EXWM"
+                :hidden t
+                :narrow ?x
+                :category buffer
+                :state ,#'consult--buffer-state
+                :items ,#'my/get-inactive-exwm-buffers))
+
+      (setq my/consult-exwm-buffer-source
+            (list
+             `(:hidden nil :narrow ?x ,@my/consult-source-inactive-exwm-buffer)))
+
+      (defun my/consult-inactive-exwm-buffers ()
+        (interactive)
+        (if (my/get-inactive-exwm-buffers)
+            (consult-buffer my/consult-exwm-buffer-source)
+          (message "No inactive EXWM buffers found")))
+
+      ;; Override s-i.
+      (exwm-input-set-key (kbd "s-i") #'my/consult-inactive-exwm-buffers)
+      )
+
+    ;; Select inactive EXWM buffers with Helm.
+    (when (eq my/completion-ui 'helm)
+      (defun my/helm-exwm ()
+        "Dispatch Helm with inactive EXWM buffers."
+        (interactive)
+        (if (my/get-inactive-exwm-buffers)
+            (my/helm-buffers-list
+             (helm-make-source "Inactive EXWM buffers" 'helm-source-buffers
+               :buffer-list
+               #'my/get-inactive-exwm-buffers))
+          (message "No inactive EXWM buffers found")))
+
+      ;; Override s-i.
+      (exwm-input-set-key (kbd "s-i") #'my/helm-exwm))
     )
-
-  ;; Select inactive EXWM buffers with Helm.
-  (when (eq my/completion-ui 'helm)
-    (defun my/helm-exwm ()
-      "Dispatch Helm with inactive EXWM buffers."
-      (interactive)
-      (if (my/get-inactive-exwm-buffers)
-          (my/helm-buffers-list
-           (helm-make-source "Inactive EXWM buffers" 'helm-source-buffers
-                             :buffer-list
-                             #'my/get-inactive-exwm-buffers))
-        (message "No inactive EXWM buffers found")))
-
-    ;; Override s-i.
-    (exwm-input-set-key (kbd "s-i") #'my/helm-exwm))
   )
 #+end_src
 
@@ -3403,18 +3394,19 @@ same directory as the org-buffer and insert a link to this file."
 Disabled atm as new distro is adopting pipewire.
 
 #+begin_src emacs-lisp
-(use-package pulseaudio-control
-  :disabled
-  :if (eq window-system 'x)
-  :requires exwm
-  :config
-  (push 'XF86AudioMute exwm-input-prefix-keys)
-  (push 'XF86AudioLowerVolume exwm-input-prefix-keys)
-  (push 'XF86AudioRaiseVolume exwm-input-prefix-keys)
+(when (eq window-system 'x)
+  (use-package pulseaudio-control
+    :disabled
+    :requires exwm
+    :config
+    (push 'XF86AudioMute exwm-input-prefix-keys)
+    (push 'XF86AudioLowerVolume exwm-input-prefix-keys)
+    (push 'XF86AudioRaiseVolume exwm-input-prefix-keys)
 
-  (exwm-input-set-key (kbd "<XF86AudioRaiseVolume>") #'pulseaudio-control-increase-volume)
-  (exwm-input-set-key (kbd "<XF86AudioLowerVolume>") #'pulseaudio-control-decrease-volume)
-  (exwm-input-set-key (kbd "<XF86AudioMute>") #'pulseaudio-control-toggle-current-sink-mute)
+    (exwm-input-set-key (kbd "<XF86AudioRaiseVolume>") #'pulseaudio-control-increase-volume)
+    (exwm-input-set-key (kbd "<XF86AudioLowerVolume>") #'pulseaudio-control-decrease-volume)
+    (exwm-input-set-key (kbd "<XF86AudioMute>") #'pulseaudio-control-toggle-current-sink-mute)
+    )
   )
 #+end_src
 
