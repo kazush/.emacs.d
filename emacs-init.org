@@ -292,7 +292,7 @@ called in hooks.
                       :background 'unspecified
                       :weight 'bold
                       :inherit 'default)
-  (set-face-background 'whitespace-tab "gray15")
+  ;; (set-face-background 'whitespace-tab "gray15")
   (set-face-background 'whitespace-trailing "gray25")
   (set-face-foreground 'font-lock-variable-name-face "khaki")
   (unless (daemonp)
