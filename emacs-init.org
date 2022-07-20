@@ -1981,17 +1981,46 @@ Disabled at the moment while trying out persp-mode.
           (buffer-name buf))
          (seq-contains '(shell-mode eshell-mode term-mode vterm-mode) mode))))
 
+(defun my/get-shellish-buffers ()
+  "Return a lit of shellish buffers or nil if none."
+  (mapcar
+   #'buffer-name
+   (cl-remove-if-not 'my/shellish-buffer-p (buffer-list))))
+
+(defvar my/display-shellish-buffer-list #'ignore
+  "Custom function used to display shellish buffer list.")
+
 (when (eq my/completion-ui 'helm)
   (defvar my/helm-source-shellish-buffers-list
-    (helm-make-source "Shell/Eshell/Term/VTerm Buffers" 'helm-source-buffers
-      :buffer-list
-      (lambda ()
-        (let ((buflist (mapcar
-                        #'buffer-name
-                        (cl-remove-if-not 'my/shellish-buffer-p (buffer-list)))))
-          ;; (message "cdr buflist:%s car buflist:%s" (cdr buflist) (car buflist))
-          (append (cdr buflist) (list (car buflist))))))))
+    (helm-make-source "Shellish" 'helm-source-buffers
+                      :buffer-list
+                      (lambda ()
+                        (let ((buflist (my/get-shellish-buffers)))
+                          ;; (message "cdr buflist:%s car buflist:%s" (cdr buflist) (car buflist))
+                          (append (cdr buflist) (list (car buflist)))))))
+  (defun my/helm-shellish-buffers-list ()
+    "Launch Helm buffers list with shell-ish buffers."
+    (interactive)
+    (my/helm-buffers-list my/helm-source-shellish-buffers-list))
 
+  (setq my/display-shellish-buffer-list #'my/helm-shellish-buffers-list)
+  )
+
+(when (eq my/completion-ui 'vertico)
+  (defvar my/consult-source-shellish-buffer
+    `(:name "Shellish"
+            :hidden t
+            :narrow ?s
+            :category buffer
+            :state ,#'consult--buffer-state
+            :items ,#'my/get-shellish-buffers))
+
+  (defun my/consult-shellish-buffers ()
+    (interactive)
+    (consult-buffer (list
+                     `(:hidden nil :narrow ?s ,@my/consult-source-shellish-buffer))))
+
+  (setq my/display-shellish-buffer-list #'my/consult-shellish-buffers))
 
 (defun my/find-last-shellish-buffer (buflist shell-str)
   "Return most recently used shell-ish buffer containing SHELL-STR in BUFLIST."
@@ -2011,11 +2040,6 @@ Disabled at the moment while trying out persp-mode.
     (comint-send-input)
     (set-marker pmark (point))))
 
-(defun my/helm-shellish-buffers-list ()
-  "Launch Helm buffers list with shell-ish buffers."
-  (interactive)
-  (my/helm-buffers-list my/helm-source-shellish-buffers-list))
-
 (defvar my/last-non-shellish-buffer nil)
 
 (defun my/remember-last-non-shellish-buffer ()
@@ -2034,13 +2058,13 @@ Disabled at the moment while trying out persp-mode.
   (interactive "p")
   (let ((b (my/find-last-shellish-buffer (buffer-list (selected-frame))
                                          shell-str)))
-    (cond ((or (not b) (= arg 64))
+    (cond ((or (not b) (= arg 16))
            (my/remember-last-non-shellish-buffer)
            (call-interactively shellfunc))
-          ((and (= arg 4) b)
-           (select-window (display-buffer my/last-non-shellish-buffer)))
-          ((= arg 16)
-           (my/helm-shellish-buffers-list))
+          ;; ((and (= arg 64) b)
+          ;;  (select-window (display-buffer my/last-non-shellish-buffer)))
+          ((= arg 4)
+           (call-interactively my/display-shellish-buffer-list))
           ((my/shellish-buffer-p (current-buffer) shell-str)
            (delete-window (get-buffer-window (current-buffer))))
           (b
