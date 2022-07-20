@@ -802,9 +802,9 @@ switch to Ivy.
 (setq my/completion-ui
       (let ((ui-pkg (getenv "emacs_completion_ui")))
         (cond
-         ((string= ui-pkg "vertico") 'vertico)
+         ((string= ui-pkg "helm") 'helm)
          ((string= ui-pkg "ivy") 'ivy)
-         (t 'helm))))
+         (t 'vertico))))
 #+end_src
 
 ** Vertico
