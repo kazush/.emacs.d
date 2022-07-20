@@ -1279,6 +1279,50 @@ switch to Ivy.
   (company-quickhelp-mode))
 #+end_src
 
+** Fussy
+#+begin_src emacs-lisp
+(use-package fussy
+  :if (>= (string-to-number emacs-version) 27.2)
+  :config
+  (push 'fussy completion-styles)
+  (setq
+   ;; For example, project-find-file uses 'project-files which uses
+   ;; substring completion by default. Set to nil to make sure it's using
+   ;; flx.
+   completion-category-defaults nil
+   completion-category-overrides nil
+   fussy-score-fn 'fussy-fzf-native-score
+   fussy-filter-fn #'fussy-filter-default)
+
+  (with-eval-after-load 'company
+    (defun j-company-capf (f &rest args)
+      "Manage `completion-styles'."
+      (let ((fussy-max-candidate-limit 5000)
+            (fussy-default-regex-fn 'fussy-pattern-first-letter)
+            (fussy-prefer-prefix nil))
+        (apply f args)))
+
+    (defun j-company-transformers (f &rest args)
+      "Manage `company-transformers'."
+      (let ((company-transformers '(fussy-company-sort-by-completion-score)))
+        (apply f args)))
+
+    (advice-add 'company--transform-candidates :around 'j-company-transformers)
+    (advice-add 'company-capf :around 'j-company-capf))
+  )
+
+(use-package fzf-native
+  :requires fussy
+  :straight
+  (fzf-native
+   :repo "dangduc/fzf-native"
+   :host github
+   :files (:defaults "bin"))
+  :config
+  (setq fussy-score-fn 'fussy-fzf-native-score)
+  (fzf-native-load-dyn))
+#+end_src
+
 * Edit modes
 
 ** YAML
