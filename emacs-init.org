@@ -2,20 +2,32 @@
 #+startup: content indent
 #+property: header-args :tangle yes
 
+* Use-package integration with straight.el
+
+Load ~use-package~ using straight.el
+
+#+begin_src emacs-lisp
+(straight-use-package 'use-package)
+(setq straight-use-package-by-default t)
+#+end_src
+
 * Use-package
+
+The original code on use-package is now commented out in favor of straight.el.
+
 Install ~use-package~ first as the entire configuration makes use of the package
 for package management. Basically I want to make sure evey package in the
 configuration is installed at the first time the configuration is loaded, so I
 set ~use-package-always-ensure~ here.
 
 #+begin_src emacs-lisp
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package))
-(eval-when-compile
-  (require 'use-package)
-  (require 'use-package-ensure)
-  (setq use-package-always-ensure t))
+;; (unless (package-installed-p 'use-package)
+;;   (package-refresh-contents)
+;;   (package-install 'use-package))
+;; (eval-when-compile
+;;   (require 'use-package)
+;;   (require 'use-package-ensure)
+;;   (setq use-package-always-ensure t))
 #+end_src
 
 * Pre Init Config
@@ -197,6 +209,7 @@ historical reasons.
 #+begin_src emacs-lisp
 ;; tramp to access remote files transparently
 (use-package tramp
+  :straight (:type built-in)
   :defer t
   :custom
   (tramp-default-method "ssh"))

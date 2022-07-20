@@ -2,7 +2,6 @@
 !/.gitignore
 !/*.org
 !/init.el
+!/early-init.el
 !/README.md
 !/LICENSE
-
-
