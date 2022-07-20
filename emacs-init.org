@@ -1297,6 +1297,15 @@ switch to Ivy.
 ** Fussy
 #+begin_src emacs-lisp
 (when (>= (string-to-number emacs-version) 27.2)
+  (use-package fuz-bin
+    :straight
+    (fuz-bin
+     :repo "jcs-elpa/fuz-bin"
+     :fetcher github
+     :files (:defaults "bin"))
+    :config
+    (fuz-bin-load-dyn))
+
   (use-package fussy
     :config
     (push 'fussy completion-styles)
@@ -1306,7 +1315,7 @@ switch to Ivy.
      ;; flx.
      completion-category-defaults nil
      completion-category-overrides nil
-     fussy-score-fn 'fussy-fzf-native-score
+     fussy-score-fn 'fussy-fuz-bin-score
      fussy-filter-fn #'fussy-filter-default)
 
     (with-eval-after-load 'company
@@ -1325,17 +1334,6 @@ switch to Ivy.
       (advice-add 'company--transform-candidates :around 'j-company-transformers)
       (advice-add 'company-capf :around 'j-company-capf))
     )
-
-  (use-package fzf-native
-    :requires fussy
-    :straight
-    (fzf-native
-     :repo "dangduc/fzf-native"
-     :host github
-     :files (:defaults "bin"))
-    :config
-    (setq fussy-score-fn 'fussy-fzf-native-score)
-    (fzf-native-load-dyn))
   )
 #+end_src
 
