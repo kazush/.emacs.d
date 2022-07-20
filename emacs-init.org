@@ -853,6 +853,14 @@ switch to Ivy.
     ;; Enable recursive minibuffers
     (setq enable-recursive-minibuffers t))
 
+  (use-package extensions/vertico-directory
+    :straight (:type built-in)
+    :after vertico
+    :ensure nil
+    :bind (:map vertico-map
+                ("C-l" . vertico-directory-up)
+                ("\d" . vertico-directory-delete-char)))
+
   (use-package savehist
     :diminish savehist-mode
     :init
@@ -876,6 +884,7 @@ switch to Ivy.
   (use-package consult
     ;; Replace bindings. Lazily loaded due by `use-package'.
     :bind (;; C-c bindings (mode-specific-map)
+           ("C-c r" . consult-recent-file)
            ("C-c h" . consult-history)
            ("C-c m" . consult-mode-command)
            ("C-c k" . consult-kmacro)
