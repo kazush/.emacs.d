@@ -873,7 +873,8 @@ switch to Ivy.
     ;;       orderless-component-separator #'orderless-escapable-split-on-space)
     (setq completion-styles '(orderless basic)
           completion-category-defaults nil
-          completion-category-overrides '((file (styles partial-completion)))))
+          completion-category-overrides '((file (styles partial-completion))))
+    :commands (orderless-filter))
   )
 #+end_src
 
@@ -1308,15 +1309,18 @@ switch to Ivy.
 
   (use-package fussy
     :config
+    (setq
+     fussy-score-fn 'fussy-fuz-bin-score
+     fussy-filter-fn 'fussy-filter-orderless-flex)
+
     (push 'fussy completion-styles)
+
     (setq
      ;; For example, project-find-file uses 'project-files which uses
      ;; substring completion by default. Set to nil to make sure it's using
      ;; flx.
      completion-category-defaults nil
-     completion-category-overrides nil
-     fussy-score-fn 'fussy-fuz-bin-score
-     fussy-filter-fn #'fussy-filter-default)
+     completion-category-overrides nil)
 
     (with-eval-after-load 'company
       (defun j-company-capf (f &rest args)
