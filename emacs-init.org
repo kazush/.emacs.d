@@ -3391,9 +3391,11 @@ same directory as the org-buffer and insert a link to this file."
 
       (defun my/consult-inactive-exwm-buffers ()
         (interactive)
-        (if (my/get-inactive-exwm-buffers)
-            (consult-buffer my/consult-exwm-buffer-source)
-          (message "No inactive EXWM buffers found")))
+        (let ((buflist (my/get-inactive-exwm-buffers)))
+          (case (length buflist)
+            (0 (message "No inactive EXWM buffers found"))
+            (1 (switch-to-buffer (car buflist)))
+            (t (consult-buffer my/consult-exwm-buffer-source)))))
 
       ;; Override s-i.
       (exwm-input-set-key (kbd "s-i") #'my/consult-inactive-exwm-buffers)
