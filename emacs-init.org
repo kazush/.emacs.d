@@ -3344,18 +3344,25 @@ same directory as the org-buffer and insert a link to this file."
     (with-eval-after-load "emacs-init"
       (exwm-enable))
 
+    (defun my/inactive-exwm-buffer-p (buf)
+      "Return t if BUF is an inactive exwm buffer."
+      (let ((window (get-buffer-window buf t)))
+        (and
+         (null window)
+         (not (string-prefix-p " " (buffer-name buf)))
+         (with-current-buffer buf
+           (derived-mode-p 'exwm-mode)))))
+
     (defun my/get-inactive-exwm-buffers ()
+      "Return a list of inactive EXWM buffers or nil if none."
+      (cl-remove-if-not #'my/inactive-exwm-buffer-p
+                        (buffer-list)))
+
+    (defun my/get-inactive-exwm-buffer-names ()
       "Return a list of inactive EXWM buffers or nil if none."
       (mapcar
        #'buffer-name
-       (cl-remove-if-not #'(lambda (buf)
-                             (let ((window (get-buffer-window buf t)))
-                               (and
-                                (null window)
-                                (not (string-prefix-p " " (buffer-name buf)))
-                                (with-current-buffer buf
-                                  (derived-mode-p 'exwm-mode)))))
-                         (buffer-list))))
+       (my/get-inactive-exwm-buffers)))
 
     ;; Select inactive EXWM buffers with Vertico/Consult.
     (when (eq my/completion-ui 'vertico)
@@ -3364,8 +3371,15 @@ same directory as the org-buffer and insert a link to this file."
                 :hidden t
                 :narrow ?x
                 :category buffer
+                :face consult-buffer
+                :history  buffer-name-history
                 :state ,#'consult--buffer-state
-                :items ,#'my/get-inactive-exwm-buffers))
+                :items
+                ,(lambda () (consult--buffer-query :sort 'visibility
+                                                   :as #'buffer-name
+                                                   :predicate
+                                                   #'my/inactive-exwm-buffer-p
+                                                   ))))
 
       (setq my/consult-exwm-buffer-source
             (list
@@ -3389,8 +3403,8 @@ same directory as the org-buffer and insert a link to this file."
         (if (my/get-inactive-exwm-buffers)
             (my/helm-buffers-list
              (helm-make-source "Inactive EXWM buffers" 'helm-source-buffers
-               :buffer-list
-               #'my/get-inactive-exwm-buffers))
+                               :buffer-list
+                               #'my/get-inactive-exwm-buffer-names))
           (message "No inactive EXWM buffers found")))
 
       ;; Override s-i.
