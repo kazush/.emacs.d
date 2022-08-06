@@ -3155,14 +3155,14 @@ same directory as the org-buffer and insert a link to this file."
     (defun my/exwm-set-input-focus ()
       "Workaround for losing input focus after switch-to-next/prev-buffer"
       (interactive)
-      (unless (active-minibuffer-window)
-        (let ((window (selected-window)))
-          (redisplay)
-          (select-window window)
-          (x-focus-frame (window-frame window))
-          (exwm-input--set-focus
-           (exwm--buffer->id (window-buffer window))))))
-
+      (if (and (eq window-system 'x)
+               (not (active-minibuffer-window)))
+          (let ((window (selected-window)))
+            (redisplay)
+            (select-window window)
+            (x-focus-frame (window-frame window))
+            (exwm-input--set-focus
+             (exwm--buffer->id (window-buffer window))))))
 
     (defvar my/single-window--last-configuration nil
       "Last window configuration before calling `delete-other-windows'.")
