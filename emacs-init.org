@@ -544,21 +544,19 @@ Otherwise the same UI setup functions are called via ~emacs-startup-hook~.
 (defun my/setup-ui-theme ()
   "Sets up UI theme."
   (interactive)
-  (when (daemonp)
-    (load-theme 'zerodark t))
+  (load-theme 'zerodark t)
   (my/setup-spaceline)
   (my/setup-frame)
   (my/set-default-faces))
 
-(if (daemonp)
-    (add-hook 'server-after-make-frame-hook
-              #'(lambda ()
-                  (my/setup-fonts)
-                  (my/setup-ui-theme)))
-  (add-hook 'emacs-startup-hook
-            #'(lambda ()
-                (my/setup-fonts)
-                (my/setup-ui-theme))))
+(add-hook 'server-after-make-frame-hook
+          #'(lambda ()
+              (my/setup-fonts)
+              (my/setup-ui-theme)))
+(add-hook 'emacs-startup-hook
+          #'(lambda ()
+              (my/setup-fonts)
+              (my/setup-ui-theme)))
 #+end_src
 
 ** Key binding guidance
