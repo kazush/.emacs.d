@@ -2346,6 +2346,10 @@ fi
 (use-package smartparens
   :diminish smartparens-mode
   :bind (("C-M-f" . sp-forward-sexp)
+         ("M-f" . sp-forward-symbol)
+         ("M-F" . forward-word)
+         ("M-b" . sp-backward-symbol)
+         ("M-B" . backward-word)
          ("C-c >" . sp-slurp-hybrid-sexp)
          ("C-c }" . sp-rewrap-sexp)
          ("C-c ]" . sp-unwrap-sexp))
