@@ -3390,7 +3390,7 @@ same directory as the org-buffer and insert a link to this file."
       (defun my/consult-inactive-exwm-buffers ()
         (interactive)
         (let ((buflist (my/get-inactive-exwm-buffers)))
-          (case (length buflist)
+          (cl-case (length buflist)
             (0 (message "No inactive EXWM buffers found"))
             (1 (switch-to-buffer (car buflist)))
             (t (consult-buffer my/consult-exwm-buffer-source)))))
