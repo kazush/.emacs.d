@@ -942,6 +942,9 @@ switch to Ivy.
     ;; The :init configuration is always executed (Not lazy)
     :init
 
+    ;; Disable live preview by default as it does not work well with EXWM.
+    (setq consult-preview-key (kbd "M-."))
+
     ;; Optionally configure the register formatting. This improves the register
     ;; preview for `consult-register', `consult-register-load',
     ;; `consult-register-store' and the Emacs built-ins.
@@ -3165,14 +3168,13 @@ same directory as the org-buffer and insert a link to this file."
     (defun my/exwm-set-input-focus ()
       "Workaround for losing input focus after switch-to-next/prev-buffer"
       (interactive)
-      (if (and (eq window-system 'x)
-               (not (active-minibuffer-window)))
-          (let ((window (selected-window)))
-            (redisplay)
-            (select-window window)
-            (x-focus-frame (window-frame window))
-            (exwm-input--set-focus
-             (exwm--buffer->id (window-buffer window))))))
+      (when (and (eq window-system 'x)
+                 (not (active-minibuffer-window)))
+        (let ((window (selected-window)))
+          (select-window window)
+          (x-focus-frame (window-frame window))
+          (exwm-input--set-focus
+           (exwm--buffer->id (window-buffer window))))))
 
     (defvar my/single-window--last-configuration nil
       "Last window configuration before calling `delete-other-windows'.")
@@ -3404,7 +3406,8 @@ same directory as the org-buffer and insert a link to this file."
         (let ((buflist (my/get-inactive-exwm-buffers)))
           (cl-case (length buflist)
             (0 (message "No inactive EXWM buffers found"))
-            (1 (switch-to-buffer (car buflist)))
+            (1 (switch-to-buffer (car buflist))
+               (my/exwm-set-input-focus))
             (t (consult-buffer my/consult-exwm-buffer-source)))))
 
       ;; Override s-i.
