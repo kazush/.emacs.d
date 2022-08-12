@@ -2069,8 +2069,15 @@ Disabled at the moment while trying out persp-mode.
             :hidden t
             :narrow ?s
             :category buffer
+            :face consult-buffer
+            :history  buffer-name-history
             :state ,#'consult--buffer-state
-            :items ,#'my/get-shellish-buffers))
+            :items
+            ,(lambda () (consult--buffer-query :sort 'visibility
+                                               :as #'buffer-name
+                                               :predicate
+                                               #'my/shellish-buffer-p
+                                               ))))
 
   (defun my/consult-shellish-buffers ()
     (interactive)
