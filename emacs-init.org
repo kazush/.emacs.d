@@ -1397,7 +1397,23 @@ switch to Ivy.
 #+end_src
 
 * Misc editing enhancements
+** Tramp
+*** docker-tramp
 
+#+begin_src emacs-lisp
+(use-package docker-tramp)
+#+end_src
+*** consult-tramp
+
+#+begin_src emacs-lisp
+(when (eq my/completion-ui 'vertico)
+  (straight-use-package
+   '(consult-tramp :type git :host github :repo "Ladicle/consult-tramp"))
+  (global-set-key (kbd "C-q t") 'consult-tramp)
+  )
+#+end_src
+
+*
 ** Multiple-Cursors
    Activate multiple-cursor vai Hydra.
 
@@ -1521,6 +1537,7 @@ Do not forget to install aspell.
   (setq ispell-local-dictionary "en_US")
   (add-to-list 'ispell-skip-region-alist '("[^\000-\377]+")))
 #+end_src
+
 
 * Window and workspace management
 
@@ -2225,7 +2242,7 @@ Disabled at the moment while trying out persp-mode.
 Do not forget to add the following code to .bashrc
 #+begin_src shell
 if [[ "$INSIDE_EMACS" = 'vterm' ]]; then
-  . ~/.emacs.d/27.1/elpa/vterm-20*/etc/emacs-vterm-bash.sh
+  . ~/.emacs.d/28.1/straight/build/vterm/etc/emacs-vterm-bash.sh
 fi
 #+end_src
 
