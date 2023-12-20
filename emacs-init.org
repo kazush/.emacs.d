@@ -295,6 +295,7 @@ called in hooks.
   ;; (set-face-background 'whitespace-tab "gray15")
   (set-face-background 'whitespace-trailing "gray25")
   (set-face-foreground 'font-lock-variable-name-face "khaki")
+  (set-face-background 'term 'unspecified)
   (unless (daemonp)
     (require 'color)
     (set-face-attribute 'mode-line-inactive nil
@@ -943,7 +944,7 @@ switch to Ivy.
     :init
 
     ;; Disable live preview by default as it does not work well with EXWM.
-    (setq consult-preview-key (kbd "M-."))
+    (setq consult-preview-key "M-.")
 
     ;; Optionally configure the register formatting. This improves the register
     ;; preview for `consult-register', `consult-register-load',
@@ -977,7 +978,7 @@ switch to Ivy.
      consult-bookmark consult-recent-file consult-xref
      consult--source-bookmark consult--source-recent-file
      consult--source-project-recent-file
-     :preview-key (kbd "M-."))
+     :preview-key "M-.")
 
     ;; Optionally configure the narrowing key.
     ;; Both < and C-+ work reasonably well.
@@ -1401,7 +1402,8 @@ switch to Ivy.
 *** docker-tramp
 
 #+begin_src emacs-lisp
-(use-package docker-tramp)
+(when (< (string-to-number emacs-version) 29)
+  (use-package docker-tramp))
 #+end_src
 *** consult-tramp
 
