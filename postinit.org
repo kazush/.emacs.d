@@ -22,7 +22,7 @@ Configure font.
   (set-fontset-font t 'katakana-jisx0201 fontspec)
   (set-fontset-font t 'jisx0201 fontspec)
   ;; Scale the font to nicely align with Inconsolata/Ricty.
-  (add-to-list 'face-font-rescale-alist `(,fontspec . 1.1))
+  (add-to-list 'face-font-rescale-alist '("Noto Sans Mono.*" . 1.1))
   )
 
 (add-to-list 'face-font-rescale-alist '("Noto Color Emoji.*" . 0.9))
