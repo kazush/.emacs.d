@@ -123,6 +123,10 @@ Customization for miscellaneous built-in features.
 ;; Enable winner-mode which does undo/redo of window configuration with C-c
 ;; left/right.
 (winner-mode 1)
+
+;; Automatically focus help and man windows when displayed.
+(setq help-window-select t)
+(setq Man-notify-method 'aggressive)
 #+end_src
 
 Change the format of buffer name to /<unique dir suffix>/<filename>/.
@@ -1301,6 +1305,7 @@ switch to Ivy.
 #+begin_src emacs-lisp
 (when (>= (string-to-number emacs-version) 27.2)
   (use-package fuz-bin
+    :disabled
     :straight
     (fuz-bin
      :repo "jcs-elpa/fuz-bin"
@@ -1310,6 +1315,7 @@ switch to Ivy.
     (fuz-bin-load-dyn))
 
   (use-package fussy
+    :disabled
     :config
     (setq
      fussy-score-fn 'fussy-fuz-bin-score
@@ -1327,16 +1333,24 @@ switch to Ivy.
     (with-eval-after-load 'company
       (defun j-company-capf (f &rest args)
         "Manage `completion-styles'."
-        (let ((fussy-max-candidate-limit 5000)
-              (fussy-default-regex-fn 'fussy-pattern-first-letter)
-              (fussy-prefer-prefix nil))
-          (apply f args)))
+        (if (length= company-prefix 0)
+            ;; Don't use `company' for 0 length prefixes.
+            (let ((completion-styles (remq 'fussy completion-styles)))
+              (apply f args))
+          (let ((fussy-max-candidate-limit 5000)
+                (fussy-default-regex-fn 'fussy-pattern-first-letter)
+                (fussy-prefer-prefix nil))
+            (apply f args))))
 
       (defun j-company-transformers (f &rest args)
         "Manage `company-transformers'."
-        (let ((company-transformers '(fussy-company-sort-by-completion-score)))
-          (apply f args)))
+        (if (length= company-prefix 0)
+            ;; Don't use `company' for 0 length prefixes.
+            (apply f args)
+          (let ((company-transformers '(fussy-company-sort-by-completion-score)))
+            (apply f args))))
 
+      (advice-add 'company-auto-begin :before 'fussy-wipe-cache)
       (advice-add 'company--transform-candidates :around 'j-company-transformers)
       (advice-add 'company-capf :around 'j-company-capf))
     )
