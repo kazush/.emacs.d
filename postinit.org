@@ -8,22 +8,22 @@
 
 * UI
 
-Configure font.
+Configure font. Comment out settings on Noto Sans Mono CJK JP as I'm using HackGen for Monospace.
 
 #+begin_src emacs-lisp
-;; Use Noto Sans Mono CJK JP for Japanese character set.
-(let ((fontspec (font-spec :family "Noto Sans Mono CJK JP")))
-  (set-fontset-font t 'japanese-jisx0208 fontspec)
-  (set-fontset-font t 'japanese-jisx0208-1978 fontspec)
-  (set-fontset-font t 'japanese-jisx0212 fontspec)
-  (set-fontset-font t 'japanese-jisx0213-1 fontspec)
-  (set-fontset-font t 'japanese-jisx0213-2 fontspec)
-  (set-fontset-font t 'japanese-jisx0213.2004-1 fontspec)
-  (set-fontset-font t 'katakana-jisx0201 fontspec)
-  (set-fontset-font t 'jisx0201 fontspec)
-  ;; Scale the font to nicely align with Inconsolata/Ricty.
-  (add-to-list 'face-font-rescale-alist '("Noto Sans Mono.*" . 1.1))
-  )
+;; ;; Use Noto Sans Mono CJK JP for Japanese character set.
+;; (let ((fontspec (font-spec :family "Noto Sans Mono CJK JP")))
+;;   (set-fontset-font t 'japanese-jisx0208 fontspec)
+;;   (set-fontset-font t 'japanese-jisx0208-1978 fontspec)
+;;   (set-fontset-font t 'japanese-jisx0212 fontspec)
+;;   (set-fontset-font t 'japanese-jisx0213-1 fontspec)
+;;   (set-fontset-font t 'japanese-jisx0213-2 fontspec)
+;;   (set-fontset-font t 'japanese-jisx0213.2004-1 fontspec)
+;;   (set-fontset-font t 'katakana-jisx0201 fontspec)
+;;   (set-fontset-font t 'jisx0201 fontspec)
+;;   ;; Scale the font to nicely align with Inconsolata/Ricty.
+;;   (add-to-list 'face-font-rescale-alist '("Noto Sans Mono.*" . 1.1))
+;;   )
 
 (add-to-list 'face-font-rescale-alist '("Noto Color Emoji.*" . 0.9))
 #+end_src
