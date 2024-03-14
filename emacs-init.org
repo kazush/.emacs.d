@@ -1532,7 +1532,7 @@ switch to Ivy.
 #+begin_src emacs-lisp
 (use-package ws-butler
   :diminish ws-butler-mode
-  :hook (prog-mode-hook . ws-butler-mode))
+  :hook (prog-mode . ws-butler-mode))
 #+end_src
 
 ** recentf enhancement
@@ -2351,6 +2351,31 @@ fi
               (setq-local indent-tabs-mode nil)))
 #+end_src
 
+** Tree Sitter
+
+#+begin_src emacs-lisp
+(if (< (string-to-number emacs-version) 29)
+    (progn
+      (use-package tree-sitter
+        :config
+        (require 'tree-sitter-hl)
+        (set-face-attribute 'tree-sitter-hl-face:property nil
+                            :slant 'unspecified
+                            :inherit 'font-lock-property-use-face)
+        (global-tree-sitter-mode)
+        (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode))
+      (use-package tree-sitter-langs)
+      )
+  (use-package treesit-auto
+    :custom
+    (treesit-auto-install t)
+    (treesit-font-lock-level 4)
+    :config
+    (treesit-auto-add-to-auto-mode-alist 'all)
+    (global-treesit-auto-mode))
+  )
+#+end_src
+
 ** LSP
 
 *** lsp-mode
@@ -2366,7 +2391,26 @@ fi
   (setq lsp-keymap-prefix (kbd "C-c l")))
 
 (use-package lsp-ui
-  :after lsp-mode)
+  :after lsp-mode
+  :custom
+  (lsp-ui-doc-show-with-cursor t)
+  (lsp-ui-doc-delay 0.5)
+  :config
+  (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
+  (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references)
+  (set-face-attribute 'lsp-ui-peek-selection nil
+                      :foreground 'unspecified
+                      :background 'unspecified
+                      :inherit 'company-tooltip-selection)
+  (set-face-attribute 'lsp-ui-peek-header nil
+                      :foreground 'unspecified
+                      :background "dark slate blue")
+  (set-face-attribute 'lsp-ui-peek-highlight nil
+                      :foreground 'unspecified
+                      :background "royal blue"
+                      :distant-foreground 'unspecified
+                      :box '(:line-width -1 :color "white"))
+  )
 
 (use-package lsp-pyright
   :after lsp-mode)
@@ -2374,7 +2418,10 @@ fi
 (use-package lsp-treemacs
   :after lsp-mode)
 
-(defvar my/lsp-enabled-mode-hook-list '(python-mode-hook yaml-mode-hook))
+(defvar my/lsp-enabled-mode-hook-list
+  (if (< (string-to-number emacs-version) 29)
+      '(python-mode-hook yaml-mode-hook)
+    '(python-base-mode-hook yaml-mode-hook)))
 (defun my/setup-lsp ()
   "Set up hooks to enable lsp-mode."
   (interactive)
@@ -2487,7 +2534,13 @@ fi
 #+begin_src emacs-lisp
 (use-package dumb-jump
   :diminish
-  :hook (prog-mode . dumb-jump-mode))
+  :hook (prog-mode . dumb-jump-mode)
+  :custom
+  (dumb-jump-disable-obsolete-warnings t)
+  (dumb-jumb-default-project "")
+  :config
+  (add-hook 'xref-backend-functions #'dumb-jump-xref-activate))
+
 #+end_src
 
 ** Aggressive indent
@@ -2499,6 +2552,14 @@ fi
 #+end_src
 
 ** Highlighting
+*** Rainbow Mode
+
+#+begin_src emacs-lisp
+(use-package rainbow-mode
+  :diminish
+  )
+#+end_src
+
 *** Rainbow Delimiters
 
 #+begin_src emacs-lisp
@@ -2726,6 +2787,7 @@ fi
    (c-mode-common . google-make-newline-indent)))
 
 (use-package modern-cpp-font-lock
+  :diminish modern-c++-font-lock-mode
   :hook
   (c++-mode . modern-c++-font-lock-mode))
 
@@ -2754,10 +2816,11 @@ fi
 
 #+begin_src emacs-lisp
 (use-package yapfify
-  :hook
-  (python-mode . (lambda ()
-                   (local-set-key (kbd "C-c i b") 'yapfify-buffer)
-                   (local-set-key (kbd "C-c i r") 'yapfify-region))))
+  :hook  ((python-mode python-base-mode) . my/setup-yapfify)
+  :config
+  (defun my/setup-yapfify ()
+    (local-set-key (kbd "C-c i b") 'yapfify-buffer)
+    (local-set-key (kbd "C-c i r") 'yapfify-region)))
 
 (use-package anaconda-mode
   :disabled
@@ -2802,7 +2865,7 @@ fi
                (setq-local fill-column 100)
                (setq-local c-basic-offset 4)
                (setq-local tab-width 4)
-               (setq-local indent-tabs-mode 1)
+               (setq-local indent-tabs-mode t)
                (go-guru-hl-identifier-mode)
                (add-hook 'before-save-hook 'gofmt-before-save nil 'local)
                (local-set-key (kbd "M-.") 'godef-jump)
@@ -2927,10 +2990,14 @@ fi
    lsp-mode. The formatter is available [[https://github.com/google/google-java-format][here]].
 
 #+begin_src emacs-lisp
-(add-hook 'java-mode-hook
-          #'(lambda ()
-              (local-set-key (kbd "C-c i b") 'google-java-format-buffer)
-              (local-set-key (kbd "C-c i r") 'google-java-format-region)))
+(defun my/setup-java-mode ()
+  "Used for java-mode hook"
+  (interactive)
+  (local-set-key (kbd "C-c i b") 'google-java-format-buffer)
+  (local-set-key (kbd "C-c i r") 'google-java-format-region))
+
+(add-hook 'java-mode-hook #'my/setup-java-mode)
+(add-hook 'java-ts-mode-hook #'my/setup-java-mode)
 #+end_src
 
 ** Protobuf
@@ -2944,11 +3011,13 @@ fi
 ** Shell scripts
 
 #+begin_src emacs-lisp
-(add-hook 'sh-mode-hook
-          #'(lambda ()
-              (setq-local sh-basic-offset 2)
-              (setq-local tab-width 2)
-              (setq-local indent-tabs-mode 0)))
+(defun my/setup-sh-mode ()
+  (setq-local sh-basic-offset 2)
+  (setq-local tab-width 2)
+  (setq-local indent-tabs-mode nil))
+
+(add-hook 'sh-mode-hook #'my/setup-sh-mode)
+(add-hook 'sh-base-mode-hook #'my/setup-sh-mode)
 #+end_src
 
 * Org mode
@@ -3001,12 +3070,16 @@ fi
   (org-stuck-projects
    '("+PROJECT/-DONE-SOMEDAY" ("TODO" "WAIT")))
   :config
+  ;; Enable template expansion with '<' prefix.
+  (require 'org-tempo)
+
   ;; (font-lock-add-keywords 'org-mode
   ;;                         '(("^ *\\([-]\\) "
   ;;                            (0 (prog1 ()
   ;;                                 (compose-region (match-beginning 1)
   ;;                                                 (match-end 1) "•"))))))
-  ;; enable babel for languages
+
+  ;; Enable babel for languages.
   (require 'ob-shell)
   (require 'ob-java)
   (require 'ob-python)
