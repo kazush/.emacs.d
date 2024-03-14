@@ -284,6 +284,7 @@ called in hooks.
   (set-face-attribute 'region nil
                       :foreground 'unspecified
                       :background "RoyalBlue4")
+  (set-face-foreground 'show-paren-match "orange")
   (set-face-attribute 'font-lock-comment-face nil
                       :foreground "azure4"
                       :background 'unspecified
@@ -291,14 +292,21 @@ called in hooks.
   (set-face-attribute 'font-lock-comment-delimiter-face nil
                       ;; :weight 'bold
                       :inherit 'font-lock-comment-face)
+  (set-face-attribute 'font-lock-constant-face nil
+                      :weight 'unspecified)
   (set-face-attribute 'highlight nil
                       :foreground "orange"
                       :background 'unspecified
                       :weight 'bold
                       :inherit 'default)
+  (set-face-attribute 'hl-line nil
+                      :foreground 'unspecified
+                      :background 'unspecified
+                      :underline "gray30")
   ;; (set-face-background 'whitespace-tab "gray15")
   (set-face-background 'whitespace-trailing "gray25")
   (set-face-foreground 'font-lock-variable-name-face "khaki")
+  (set-face-foreground 'font-lock-function-name-face "dodger blue")
   (set-face-background 'term 'unspecified)
   (unless (daemonp)
     (require 'color)
@@ -307,18 +315,13 @@ called in hooks.
                         :background (color-darken-name
                                      (face-background 'mode-line) 10)
                         :inherit 'mode-line)
-    (set-face-foreground 'font-lock-function-name-face
-                         (color-darken-name
-                          (face-foreground 'font-lock-type-face) 10))
-    (set-face-foreground 'font-lock-preprocessor-face
-                         (color-lighten-name
-                          (face-foreground 'font-lock-keyword-face) 10)))
+    )
   )
 
 ;; Configure default font and other faces such as emojis.
 
 (defvar my/default-font-family "Monospace")
-(defvar my/default-font-size 11)
+(defvar my/default-font-size 10)
 
 (defun my/setfont (size)
   (interactive "nFont size: ")
