@@ -871,16 +871,6 @@ switch to Ivy.
     :diminish savehist-mode
     :init
     (savehist-mode))
-
-  (use-package orderless
-    :init
-    ;; Configure a custom style dispatcher (see the Consult wiki)
-    ;; (setq orderless-style-dispatchers '(+orderless-dispatch)
-    ;;       orderless-component-separator #'orderless-escapable-split-on-space)
-    (setq completion-styles '(orderless basic)
-          completion-category-defaults nil
-          completion-category-overrides '((file (styles partial-completion))))
-    :commands (orderless-filter))
   )
 #+end_src
 
@@ -1202,6 +1192,7 @@ switch to Ivy.
   :diminish
   :hook ((prog-mode shell-mode eshell-mode org-mode) . company-mode)
   :bind (:map company-active-map
+              ("<tab>" . company-complete-common-or-cycle)
               ("C-n" . company-select-next)
               ("C-p" . company-select-previous))
   :custom
@@ -1211,13 +1202,14 @@ switch to Ivy.
   (company-echo-delay 0)
   (company-dabbrev-downcase nil)
   (company-tooltip-align-annotations t)
-  (company-backends '((company-capf
-                       company-keywords
-                       :with
-                       company-dabbrev-code
-                       company-semantic)
-                      (company-abbrev
-                       company-dabbrev)))
+  ;; (company-backends '((company-capf
+  ;;                      company-keywords
+  ;;                      :with
+  ;;                      company-dabbrev-code
+  ;;                      company-semantic)
+  ;;                     (company-abbrev
+  ;;                      company-dabbrev)))
+  (company-transformers '(delete-consecutive-dups))
   :config
   (add-hook 'shell-mode-hook #'(lambda () (setq-local company-idle-delay 0.5)))
   (add-hook 'eshell-mode-hook #'(lambda () (setq-local company-idle-delay 0.5)))
@@ -1236,7 +1228,7 @@ switch to Ivy.
                           :foreground 'unspecified
                           :background (color-lighten-name
                                        (face-background 'company-tooltip)
-                                       10)
+                                       30)
                           :inherit 'company-tooltip)
       (set-face-attribute 'company-tooltip-common nil
                           :background 'unspecified
@@ -1293,6 +1285,17 @@ switch to Ivy.
                       company-candidates)
           (self-insert-command 1)
         (company-complete-number (string-to-number k)))))
+
+  (defun my/company-capf (f command &rest args)
+    "Do not use company if prefix is empty."
+    (let ((res (apply f command args)))
+      (if (and (eq command 'prefix)
+               (or (equal res "")
+                   (equal res '("" . t))))
+          nil
+        res)))
+
+  (advice-add 'company-capf :around 'my/company-capf)
   )
 
 (use-package company-quickhelp
@@ -1302,6 +1305,38 @@ switch to Ivy.
   :config
   (define-key company-active-map (kbd "M-h") #'company-quickhelp-manual-begin)
   (company-quickhelp-mode))
+#+end_src
+
+** Orderless
+
+#+begin_src emacs-lisp
+(use-package orderless
+  :config
+  ;; https://github.com/oantolin/orderless?tab=readme-ov-file#defining-custom-orderless-styles
+  (orderless-define-completion-style orderless+initialism
+    (orderless-matching-styles '(orderless-initialism
+                                 orderless-prefixes
+                                 orderless-literal
+                                 orderless-regexp)))
+  (with-eval-after-load 'company
+    ;; Enable highlighting of candidates.
+    ;; https://github.com/oantolin/orderless?tab=readme-ov-file#company
+    (defun just-one-face (fn &rest args)
+      (let ((orderless-match-faces [completions-common-part]))
+        (apply fn args)))
+    (advice-add 'company-capf--candidates :around #'just-one-face)
+    ;; ;; Use literal matching for in-buffer completion with Company.
+    ;; (defun company-completion-styles (capf-fn &rest args)
+    ;;   (let ((completion-styles '(basic partial-completion)))
+    ;;     (apply capf-fn args)))
+    ;; (advice-add 'company-capf :around #'company-completion-styles)
+    )
+  :custom
+  (orderless-matching-styles '(orderless-literal orderless-prefixes orderless-regexp))
+  (completion-styles '(orderless basic))
+  (completion-category-overrides
+   '((file (styles basic partial-completion))
+     (command (styles orderless+initialism)))))
 #+end_src
 
 ** Fussy
@@ -1319,19 +1354,18 @@ switch to Ivy.
 
   (use-package fussy
     :disabled
+    :custom
+    (fussy-score-fn 'fussy-fuz-bin-score)
+    (fussy-filter-fn 'fussy-filter-orderless-flex)
     :config
-    (setq
-     fussy-score-fn 'fussy-fuz-bin-score
-     fussy-filter-fn 'fussy-filter-orderless-flex)
-
     (push 'fussy completion-styles)
 
-    (setq
-     ;; For example, project-find-file uses 'project-files which uses
-     ;; substring completion by default. Set to nil to make sure it's using
-     ;; flx.
-     completion-category-defaults nil
-     completion-category-overrides nil)
+    ;; (setq
+    ;;  ;; For example, project-find-file uses 'project-files which uses
+    ;;  ;; substring completion by default. Set to nil to make sure it's using
+    ;;  ;; flx.
+    ;;  completion-category-defaults nil
+    ;;  completion-category-overrides nil)
 
     (with-eval-after-load 'company
       (defun j-company-capf (f &rest args)
@@ -1358,6 +1392,21 @@ switch to Ivy.
       (advice-add 'company-capf :around 'j-company-capf))
     )
   )
+#+end_src
+
+** Prescient
+
+#+begin_src emacs-lisp
+(use-package prescient
+  :config
+  (prescient-persist-mode))
+(use-package company-prescient
+  :after company
+  :hook (company-mode . company-prescient-mode))
+(use-package vertico-prescient
+  :after vertico
+  :config
+  (vertico-prescient-mode))
 #+end_src
 
 * Edit modes
