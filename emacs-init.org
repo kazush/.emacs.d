@@ -1435,7 +1435,9 @@ switch to Ivy.
          ("\\.md\\'" . markdown-mode)
          ("\\.markdown\\'" . markdown-mode))
   :init
-  (setq markdown-command "gfm-preview"))
+  (let ((cmd (expand-file-name "~/bin/gfm-preview")))
+    (when (file-exists-p cmd) (setq markdown-command cmd)))
+  )
 #+end_src
 
 ** UML
