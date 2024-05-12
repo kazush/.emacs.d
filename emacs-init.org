@@ -303,8 +303,7 @@ called in hooks.
                       :inherit 'default)
   (set-face-attribute 'hl-line nil
                       :foreground 'unspecified
-                      :background 'unspecified
-                      :underline "gray30")
+                      :background "gray15")
   ;; (set-face-background 'whitespace-tab "gray15")
   (set-face-background 'whitespace-trailing "gray25")
   (set-face-foreground 'font-lock-variable-name-face "khaki")
