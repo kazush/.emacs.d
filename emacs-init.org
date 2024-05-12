@@ -66,12 +66,14 @@ instance. ~restart-server~ is a helper function to restart the server process.
 Customize dired. Load wdired feature to make [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Wdired.html][edit functions]] available.
 
 #+begin_src emacs-lisp
-(add-hook 'dired-mode-hook
-          #'(lambda ()
-              (define-key dired-mode-map "k" 'dired-kill-subdir)))
-(require 'wdired)
-(setq wdired-allow-to-change-permissions t)
-(define-key dired-mode-map "e" 'wdired-change-to-wdired-mode)
+  ;; make file size format human-friendly
+  (setq dired-listing-switches "-alh")
+  (add-hook 'dired-mode-hook
+            #'(lambda ()
+                (define-key dired-mode-map "k" 'dired-kill-subdir)))
+  (require 'wdired)
+  (setq wdired-allow-to-change-permissions t)
+  (define-key dired-mode-map "e" 'wdired-change-to-wdired-mode)
 #+end_src
 
 ** General editor preferences
@@ -1607,6 +1609,39 @@ Do not forget to install aspell.
 #+end_src
 
 
+* Misc utilities and enhancements
+** Dired
+Mostly borrowed from https://taipapamotohus.com/post/dired/.
+
+*** Dired subtree
+#+begin_src emacs-lisp
+(use-package dired-subtree
+  :config
+  (bind-keys :map dired-mode-map
+             ("i" . dired-subtree-insert)
+             (";" . dired-subtree-remove)))
+#+end_src
+
+*** Dired+
+#+begin_src emacs-lisp
+(use-package dired+
+  :straight
+  (dired+ :fetcher github :repo "emacsmirror/dired-plus")
+  :defer 1
+  :init
+  (setq diredp-hide-details-initially-flag nil)
+  (setq diredp-hide-details-propagate-flag nil)
+  :config
+  (diredp-toggle-find-file-reuse-dir 1)
+  )
+#+end_src
+
+*** Dired quick sort
+#+begin_src emacs-lisp
+(use-package dired-quick-sort
+  :config
+  (dired-quick-sort-setup))
+#+end_src
 * Window and workspace management
 
 ** Persp-mode
