@@ -2840,7 +2840,7 @@ fi
 
 (use-package clang-format
   :custom
-  (clang-format-style-option "google")
+  (clang-format-style "google")
   :hook
   ((c-mode-common c++-ts-mode) . (lambda ()
                      (local-set-key (kbd "C-c i b") 'clang-format-buffer)
