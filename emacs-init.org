@@ -942,7 +942,6 @@ switch to Ivy.
            ("C-M-#" . consult-register)
            ;; Other custom bindings
            ("M-y" . consult-yank-pop)                ;; orig. yank-pop
-           ("<help> a" . consult-apropos)            ;; orig. apropos-command
            ;; M-g bindings (goto-map)
            ("M-g e" . consult-compile-error)
            ("M-g f" . consult-flymake)               ;; Alternative: consult-flycheck
@@ -961,7 +960,6 @@ switch to Ivy.
            ("M-s r" . consult-ripgrep)
            ("M-s l" . consult-line)
            ("M-s L" . consult-line-multi)
-           ("M-s m" . consult-multi-occur)
            ("M-s k" . consult-keep-lines)
            ("M-s u" . consult-focus-lines)
            ;; Isearch integration
@@ -1076,6 +1074,8 @@ switch to Ivy.
  
 *** Embark
 
+Disabling embark-prefix-help-command for now as I prefer which-key's compact layout.
+
 #+begin_src emacs-lisp
 (when (eq my/completion-ui 'vertico)
   (use-package embark
@@ -1087,7 +1087,7 @@ switch to Ivy.
     :init
 
     ;; Optionally replace the key help with a completing-read interface
-    (setq prefix-help-command #'embark-prefix-help-command)
+    ;; (setq prefix-help-command #'embark-prefix-help-command)
 
     :config
 
@@ -1095,7 +1095,18 @@ switch to Ivy.
     (add-to-list 'display-buffer-alist
                  '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
                    nil
-                   (window-parameters (mode-line-format . none)))))
+                   (window-parameters (mode-line-format . none))))
+
+    ;; TODO: uncomment if I get used to use this package.
+    ;; (setq embark-indicators
+    ;;       '(embark-minimal-indicator  ; default is embark-mixed-indicator
+    ;;         embark-highlight-indicator
+    ;;         embark-isearch-highlight-indicator))
+
+    ;; TODO: uncomment in case I want to replace which-key with this package.
+    ;; (vertico-multiform-mode)
+    ;; (add-to-list 'vertico-multiform-categories '(embark-keybinding grid))
+    )
 
   ;; Consult users will also want the embark-consult package.
   (use-package embark-consult
