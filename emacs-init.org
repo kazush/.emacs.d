@@ -1695,89 +1695,89 @@ with EXWM. For example, this package manipulates frame params on dialog windows
 (e.g. open file dialog on Chrome).
 
 #+begin_src emacs-lisp
-(use-package persp-mode
-  :disabled
-  :bind (("C-x b" . my/persp-switch-to-buffer)
-         ("C-x C-b" . my/persp-list-buffers)
-         ("C-x k" . persp-kill-buffer)
-         (:map persp-key-map
-               ("o" . my/persp-switch-to-last-persp)))
-  :custom
-  (persp-keymap-prefix (kbd "C-z"))
-  (persp-set-ido-hooks t)
-  (persp-auto-save-opt 0)
-  (persp-auto-save-opt 0)
-  (persp-auto-resume-time -1)
-  (persp-autokill-buffer-on-remove t)
-  (persp-buffer-list-restricted-filter-functions
-   persp-common-buffer-filter-functions)
-  :init
-  (persp-mode)
-  :config
-  ;; Quoted from https://gist.github.com/Bad-ptr/1aca1ec54c3bdb2ee80996eb2b68ad2d#file-persp-mru-el
+(use-package-if-not-exwm
+ persp-mode
+ :disabled
+ :bind (("C-x b" . my/persp-switch-to-buffer)
+        ("C-x C-b" . my/persp-list-buffers)
+        ("C-x k" . persp-kill-buffer)
+        (:map persp-key-map
+              ("o" . my/persp-switch-to-last-persp)))
+ :custom
+ (persp-keymap-prefix (kbd "C-z"))
+ (persp-set-ido-hooks t)
+ (persp-auto-save-opt 0)
+ (persp-auto-save-opt 0)
+ (persp-auto-resume-time -1)
+ (persp-autokill-buffer-on-remove t)
+ (persp-buffer-list-restricted-filter-functions
+  persp-common-buffer-filter-functions)
+ :init
+ (persp-mode)
+ :config
+ ;; Quoted from https://gist.github.com/Bad-ptr/1aca1ec54c3bdb2ee80996eb2b68ad2d#file-persp-mru-el
 
-  (add-hook 'persp-before-switch-functions
-            #'(lambda (new-persp-name w-or-f)
-                (let ((cur-persp-name (safe-persp-name (get-current-persp))))
-                  (when (member cur-persp-name persp-names-cache)
-                    (setq persp-names-cache
-                          (cons cur-persp-name
-                                (delete cur-persp-name persp-names-cache)))))))
+ (add-hook 'persp-before-switch-functions
+           #'(lambda (new-persp-name w-or-f)
+               (let ((cur-persp-name (safe-persp-name (get-current-persp))))
+                 (when (member cur-persp-name persp-names-cache)
+                   (setq persp-names-cache
+                         (cons cur-persp-name
+                               (delete cur-persp-name persp-names-cache)))))))
 
-  (add-hook 'persp-renamed-functions
-            #'(lambda (persp old-name new-name)
-                (setq persp-names-cache
-                      (cons new-name (delete old-name persp-names-cache)))))
+ (add-hook 'persp-renamed-functions
+           #'(lambda (persp old-name new-name)
+               (setq persp-names-cache
+                     (cons new-name (delete old-name persp-names-cache)))))
 
-  (add-hook 'persp-before-kill-functions
-            #'(lambda (persp)
-                (setq persp-names-cache
-                      (delete (safe-persp-name persp) persp-names-cache))))
+ (add-hook 'persp-before-kill-functions
+           #'(lambda (persp)
+               (setq persp-names-cache
+                     (delete (safe-persp-name persp) persp-names-cache))))
 
-  (add-hook 'persp-created-functions
-            #'(lambda (persp phash)
-                (when (and (eq phash *persp-hash*)
-                           (not (member (safe-persp-name persp)
-                                        persp-names-cache)))
-                  (setq persp-names-cache
-                        (cons (safe-persp-name persp) persp-names-cache)))))
+ (add-hook 'persp-created-functions
+           #'(lambda (persp phash)
+               (when (and (eq phash *persp-hash*)
+                          (not (member (safe-persp-name persp)
+                                       persp-names-cache)))
+                 (setq persp-names-cache
+                       (cons (safe-persp-name persp) persp-names-cache)))))
 
-  ;; Switch to last perspective.
-  (defun my/persp-switch-to-last-persp ()
-    (interactive)
-    (persp-frame-switch (car persp-names-cache)))
+ ;; Switch to last perspective.
+ (defun my/persp-switch-to-last-persp ()
+   (interactive)
+   (persp-frame-switch (car persp-names-cache)))
 
-  (when (eq my/completion-ui 'helm)
-    (defvar my/helm-source-persp-buffers-list
-      (helm-make-source "Persp Buffers" 'helm-source-buffers
-        :buffer-list
-        (lambda ()
-          (mapcar #'buffer-name (persp-buffer-list-restricted))))))
+ (when (eq my/completion-ui 'helm)
+   (defvar my/helm-source-persp-buffers-list
+     (helm-make-source "Persp Buffers" 'helm-source-buffers
+                       :buffer-list
+                       (lambda ()
+                         (mapcar #'buffer-name (persp-buffer-list-restricted))))))
 
-  (defun my/helm-maybe-persp-buffers-list (arg)
-    (interactive)
-    (if (= arg 4)
-        (helm-buffers-list)
-      (my/helm-buffers-list my/helm-source-persp-buffers-list)))
+ (defun my/helm-maybe-persp-buffers-list (arg)
+   (interactive)
+   (if (= arg 4)
+       (helm-buffers-list)
+     (my/helm-buffers-list my/helm-source-persp-buffers-list)))
 
-  (defun my/persp-switch-to-buffer (arg)
-    (interactive "p")
-    (if (eq my/completion-ui 'helm)
-        (my/helm-maybe-persp-buffers-list arg)
-      (call-interactively
-       (if (= arg 4)
-           'switch-to-buffer
-         'persp-switch-to-buffer))))
+ (defun my/persp-switch-to-buffer (arg)
+   (interactive "p")
+   (if (eq my/completion-ui 'helm)
+       (my/helm-maybe-persp-buffers-list arg)
+     (call-interactively
+      (if (= arg 4)
+          'switch-to-buffer
+        'persp-switch-to-buffer))))
 
-  (defun my/persp-list-buffers (arg)
-    (interactive "p")
-    (if (eq my/completion-ui 'helm)
-        (my/helm-maybe-persp-buffers-list arg)
-      (if (=arg 4)
-          (list-buffers)
-        (with-persp-buffer-list () (list-buffers)))))
-
-  )
+ (defun my/persp-list-buffers (arg)
+   (interactive "p")
+   (if (eq my/completion-ui 'helm)
+       (my/helm-maybe-persp-buffers-list arg)
+     (if (=arg 4)
+         (list-buffers)
+       (with-persp-buffer-list () (list-buffers)))))
+ )
 #+end_src
 
 ** Perspeen
