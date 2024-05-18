@@ -23,8 +23,9 @@ Configure font. Comment out settings on Noto Sans Mono CJK JP as I'm using HackG
 ;;   (set-fontset-font t 'jisx0201 fontspec)
 ;;   ;; Scale the font to nicely align with Inconsolata/Ricty.
 ;;   (add-to-list 'face-font-rescale-alist '("Noto Sans Mono.*" . 1.1))
-;;   )
+;; )
 
+(set-fontset-font t 'emoji (font-spec :family "Noto Color Emoji"))
 (add-to-list 'face-font-rescale-alist '("Noto Color Emoji.*" . 0.9))
 #+end_src
 
