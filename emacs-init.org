@@ -2620,20 +2620,23 @@ fi
                  (define-key lsp-mode-map (kbd "C-c l") lsp-command-map))))
   :commands (lsp lsp-register-client)
   :init
-  (setq lsp-keymap-prefix (kbd "C-c l")))
+  (setq lsp-keymap-prefix (kbd "C-c l"))
+  ;; (setq lsp-signature-auto-activate nil)
+  (setq lsp-signature-render-documentation nil)
+  )
 
 (use-package lsp-ui
   :after lsp-mode
   :custom
-  (lsp-ui-doc-show-with-cursor t)
-  (lsp-ui-doc-delay 0.5)
+  (lsp-ui-doc-show-with-cursor nil)
+  (lsp-ui-doc-delay 0.2)
   :config
-  (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
-  (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references)
+  ;; (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
+  ;; (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references)
   (set-face-attribute 'lsp-ui-peek-selection nil
                       :foreground 'unspecified
                       :background 'unspecified
-                      :inherit 'company-tooltip-selection)
+                      :inherit 'region)
   (set-face-attribute 'lsp-ui-peek-header nil
                       :foreground 'unspecified
                       :background "dark slate blue")
