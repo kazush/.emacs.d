@@ -434,7 +434,7 @@ Different tweaks on appearance.
 *NOTE:* Do not forget to run ~all-the-icons-install-fonts~ to install icon fonts.
 
 #+begin_src emacs-lisp
-(use-package all-the-icons
+(use-package-if-gui all-the-icons
   :custom
   (inhibit-compacting-font-caches t))
 #+end_src
@@ -444,7 +444,7 @@ I used to use this with elisp IRC clients. You need to call ~emojify-mode~ to
 activate emojify.
 
 #+begin_src emacs-lisp
-(use-package emojify)
+;; (use-package-if-gui emojify)
 #+end_src
 
 ** Keymaps
@@ -594,7 +594,7 @@ Otherwise the same UI setup functions are called via ~emacs-startup-hook~.
 (defun my/setup-ui-theme ()
   "Sets up UI theme."
   (interactive)
-  (load-theme 'zerodark t)
+  ;; (load-theme 'zerodark t)
   (my/setup-spaceline)
   (my/setup-frame)
   (my/set-default-faces))
@@ -1106,7 +1106,6 @@ switch to Ivy.
   )
 #+end_src
 
-
 ** Helm
 
 #+begin_src emacs-lisp
@@ -1225,130 +1224,6 @@ switch to Ivy.
   )
 #+end_src
 
-** Company
-   Key bindings and faces for company UI are customized for my
-   preference. Unnecessary backends are excluded.
-
-#+begin_src emacs-lisp
-(use-package company
-  :diminish
-  :hook ((prog-mode shell-mode eshell-mode org-mode) . company-mode)
-  :bind (:map company-active-map
-              ("<tab>" . company-complete-common-or-cycle)
-              ("C-n" . company-select-next)
-              ("C-p" . company-select-previous))
-  :custom
-  (company-minimum-prefix-length 1)
-  (company-show-numbers t)
-  (company-idle-delay 0.2)
-  (company-echo-delay 0)
-  (company-dabbrev-downcase nil)
-  (company-tooltip-align-annotations t)
-  ;; (company-backends '((company-capf
-  ;;                      company-keywords
-  ;;                      :with
-  ;;                      company-dabbrev-code
-  ;;                      company-semantic)
-  ;;                     (company-abbrev
-  ;;                      company-dabbrev)))
-  (company-transformers '(delete-consecutive-dups))
-  :config
-  (add-hook 'shell-mode-hook #'(lambda () (setq-local company-idle-delay 0.5)))
-  (add-hook 'eshell-mode-hook #'(lambda () (setq-local company-idle-delay 0.5)))
-
-  (require 'company-template)
-  (defun my/set-company-tooltip-faces ()
-    "Set faces for company tooltip."
-    (interactive)
-    (let ((bg (face-attribute 'default :background)))
-      (set-face-attribute 'company-tooltip nil
-                          :background (color-lighten-name
-                                       (face-background 'default)
-                                       10)
-                          :inherit 'default)
-      (set-face-attribute 'company-tooltip-selection nil
-                          :foreground 'unspecified
-                          :background (color-lighten-name
-                                       (face-background 'company-tooltip)
-                                       30)
-                          :inherit 'company-tooltip)
-      (set-face-attribute 'company-tooltip-common nil
-                          :background 'unspecified
-                          :inherit 'company-tooltip)
-      (set-face-attribute 'company-tooltip-common-selection nil
-                          :foreground 'unspecified
-                          :background (face-background
-                                       'company-tooltip-selection)
-                          :inherit 'company-tooltip-common)
-      (set-face-attribute 'company-tooltip-annotation nil
-                          :foreground "LightSlateBlue"
-                          :background 'unspecified
-                          :inherit 'company-tooltip)
-      (set-face-attribute 'company-tooltip-annotation-selection nil
-                          :foreground 'unspecified
-                          :background (face-background
-                                       'company-tooltip-selection)
-                          :inherit 'company-tooltip-annotation)
-      (set-face-attribute 'company-scrollbar-bg nil
-                          :background (color-lighten-name bg 10))
-      (set-face-attribute 'company-scrollbar-fg nil
-                          :background (color-lighten-name bg 40))
-      (set-face-attribute 'company-template-field nil
-                          :foreground (face-foreground
-                                       'company-tooltip-annotation)
-                          :background 'unspecified
-                          :slant 'unspecified
-                          :inherit 'default)
-      ))
-  (if (daemonp)
-      (add-hook 'server-after-make-frame-hook 'my/set-company-tooltip-faces)
-    (add-hook 'emacs-startup-hook 'my/set-company-tooltip-faces))
-
-  ;; quoted from https://oremacs.com/2017/12/27/company-numbers/
-  (let ((map company-active-map))
-    (mapc
-     (lambda (x)
-       (define-key map (format "%d" x) 'ora-company-number))
-     (number-sequence 0 9))
-    (define-key map " " (lambda ()
-                          (interactive)
-                          (company-abort)
-                          (self-insert-command 1)))
-    (define-key map (kbd "<return>") nil))
-  (defun ora-company-number ()
-    "Forward to `company-complete-number'.
-
-  Unless the number is potentially part of the candidate.
-  In that case, insert the number."
-    (interactive)
-    (let* ((k (this-command-keys))
-           (re (concat "^" company-prefix k)))
-      (if (cl-find-if (lambda (s) (string-match re s))
-                      company-candidates)
-          (self-insert-command 1)
-        (company-complete-number (string-to-number k)))))
-
-  (defun my/company-capf (f command &rest args)
-    "Do not use company if prefix is empty."
-    (let ((res (apply f command args)))
-      (if (and (eq command 'prefix)
-               (or (equal res "")
-                   (equal res '("" . t))))
-          nil
-        res)))
-
-  (advice-add 'company-capf :around 'my/company-capf)
-  )
-
-(use-package company-quickhelp
-  :after company
-  :custom
-  (company-quickhelp-delay nil)
-  :config
-  (define-key company-active-map (kbd "M-h") #'company-quickhelp-manual-begin)
-  (company-quickhelp-mode))
-#+end_src
-
 ** Orderless
 
 #+begin_src emacs-lisp
@@ -1358,8 +1233,10 @@ switch to Ivy.
   (orderless-define-completion-style orderless+initialism
     (orderless-matching-styles '(orderless-initialism
                                  orderless-prefixes
-                                 orderless-literal
-                                 orderless-regexp)))
+                                 ;; orderless-literal
+                                 ;; orderless-regexp
+                                 )))
+
   (with-eval-after-load 'company
     ;; Enable highlighting of candidates.
     ;; https://github.com/oantolin/orderless?tab=readme-ov-file#company
@@ -1367,89 +1244,352 @@ switch to Ivy.
       (let ((orderless-match-faces [completions-common-part]))
         (apply fn args)))
     (advice-add 'company-capf--candidates :around #'just-one-face)
-    ;; ;; Use literal matching for in-buffer completion with Company.
-    ;; (defun company-completion-styles (capf-fn &rest args)
-    ;;   (let ((completion-styles '(basic partial-completion)))
-    ;;     (apply capf-fn args)))
-    ;; (advice-add 'company-capf :around #'company-completion-styles)
+    ;; Use literal matching for in-buffer completion with Company.
+    (defun company-completion-styles (capf-fn &rest args)
+      (let ((completion-styles '(basic partial-completion)))
+        (apply capf-fn args)))
+    (advice-add 'company-capf :around #'company-completion-styles)
     )
+
   :custom
-  (orderless-matching-styles '(orderless-literal orderless-prefixes orderless-regexp))
+  (orderless-matching-styles '(orderless-prefixes orderless-flex))
   (completion-styles '(orderless basic))
   (completion-category-overrides
    '((file (styles basic partial-completion))
      (command (styles orderless+initialism)))))
 #+end_src
 
+** Prescient
+
+Disabled for now as I don't see clear benefits from using this along with Orderless.
+
+#+begin_src emacs-lisp
+(use-package-if
+ nil
+ prescient
+ :config
+ (prescient-persist-mode))
+
+(use-package-if
+ nil
+ company-prescient
+ :after company
+ :hook (company-mode . company-prescient-mode))
+
+(use-package-if
+ nil
+ vertico-prescient
+ :after vertico
+ :config
+ (vertico-prescient-mode))
+#+end_src
+
+** Cape
+#+begin_src emacs-lisp
+(use-package cape
+  :custom
+  (dabbrev-case-fold-search t)
+  (dabbrev-case-replace nil)
+
+  ;; Bind dedicated completion commands
+  ;; Alternative prefix keys: C-c p, M-p, M-+, ...
+  :bind (("C-c p p" . completion-at-point) ;; capf
+         ("C-c p t" . complete-tag)        ;; etags
+         ("C-c p d" . cape-dabbrev)        ;; or dabbrev-completion
+         ("C-c p h" . cape-history)
+         ("C-c p f" . cape-file)
+         ("C-c p k" . cape-keyword)
+         ("C-c p s" . cape-elisp-symbol)
+         ("C-c p e" . cape-elisp-block)
+         ("C-c p a" . cape-abbrev)
+         ("C-c p l" . cape-line)
+         ("C-c p w" . cape-dict)
+         ("C-c p :" . cape-emoji)
+         ("C-c p \\" . cape-tex)
+         ("C-c p _" . cape-tex)
+         ("C-c p ^" . cape-tex)
+         ("C-c p &" . cape-sgml)
+         ("C-c p r" . cape-rfc1345))
+  :init
+  ;; Add to the global default value of `completion-at-point-functions' which is
+  ;; used by `completion-at-point'.  The order of the functions matters, the
+  ;; first function returning a result wins.  Note that the list of buffer-local
+  ;; completion functions takes precedence over the global list.
+  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+  (add-to-list 'completion-at-point-functions #'cape-emoji)
+  ;; (add-to-list 'completion-at-point-functions #'cape-file)
+  (add-to-list 'completion-at-point-functions #'cape-elisp-block)
+  ;;(add-to-list 'completion-at-point-functions #'cape-history)
+  ;;(add-to-list 'completion-at-point-functions #'cape-keyword)
+  ;;(add-to-list 'completion-at-point-functions #'cape-tex)
+  ;;(add-to-list 'completion-at-point-functions #'cape-sgml)
+  ;;(add-to-list 'completion-at-point-functions #'cape-rfc1345)
+  ;;(add-to-list 'completion-at-point-functions #'cape-abbrev)
+  ;;(add-to-list 'completion-at-point-functions #'cape-dict)
+  ;;(add-to-list 'completion-at-point-functions #'cape-elisp-symbol)
+  ;;(add-to-list 'completion-at-point-functions #'cape-line)
+  )
+#+end_src
+** Corfu
+
+Trying Corfu as Company is getting slow on my Emacs 29.
+
+#+begin_src emacs-lisp
+(setq my/in-buffer-completion-ui
+      (let ((ib-ui (getenv "emacs_in_buffer_completion_ui")))
+        (cond
+         ((string= ib-ui "company") 'company)
+         (t 'corfu))))
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package-if-corfu corfu
+ :custom
+ (corfu-cycle t)
+ (completion-cycle-threshold 3)
+ (tab-always-indent 'complete)
+ :init
+ (global-corfu-mode)
+
+ :config
+ ;; Emacs 28 and newer: Hide commands in M-x which do not apply to the current
+ ;; mode.  Corfu commands are hidden, since they are not used via M-x. This
+ ;; setting is useful beyond Corfu.
+ (setq read-extended-command-predicate #'command-completion-default-include-p)
+
+ (defun corfu-enable-in-minibuffer ()
+   "Enable Corfu in the minibuffer."
+   (when (local-variable-p 'completion-at-point-functions)
+     ;; (setq-local corfu-auto nil) ;; Enable/disable auto completion
+     (setq-local corfu-echo-delay nil ;; Disable automatic echo and popup
+                 corfu-popupinfo-delay nil)
+     (corfu-mode 1)))
+ ;; (add-hook 'minibuffer-setup-hook #'corfu-enable-in-minibuffer)
+ )
+#+end_src
+
+For terminal.
+
+#+begin_src emacs-lisp
+(use-package-if-corfu
+ corfu-terminal
+ :straight
+ (corfu-terminal
+  :type git
+  :repo "https://codeberg.org/akib/emacs-corfu-terminal.git")
+ :config
+ (unless (display-graphic-p)
+   (corfu-terminal-mode +1)))
+#+end_src
+
+Dabbrev settings copied from the GitHub Corfu page.
+
+#+begin_src emacs-lisp
+;; Use Dabbrev with Corfu
+(use-package dabbrev
+  ;; ;; Swap M-/ and C-M-/
+  ;; :bind (("M-/" . dabbrev-completion)
+  ;;        ("C-M-/" . dabbrev-expand))
+  :config
+  (add-to-list 'dabbrev-ignored-buffer-regexps "\\` ")
+  ;; Since 29.1, use `dabbrev-ignored-buffer-regexps' on older.
+  (add-to-list 'dabbrev-ignored-buffer-modes 'doc-view-mode)
+  (add-to-list 'dabbrev-ignored-buffer-modes 'pdf-view-mode)
+  (add-to-list 'dabbrev-ignored-buffer-modes 'tags-table-mode))
+#+end_src
+
+** Company
+
+Key bindings and faces for company UI are customized for my
+preference. Unnecessary backends are excluded.
+
+#+begin_src emacs-lisp
+(use-package-if-company company
+ :diminish
+ :hook ((prog-mode shell-mode eshell-mode org-mode) . company-mode)
+ :bind (:map company-active-map
+             ("<tab>" . company-complete-common-or-cycle)
+             ("C-n" . company-select-next)
+             ("C-p" . company-select-previous))
+ :custom
+ (company-minimum-prefix-length 1)
+ (company-show-numbers t)
+ (company-idle-delay 0.2)
+ (company-echo-delay 0)
+ (company-dabbrev-downcase nil)
+ (company-tooltip-align-annotations t)
+ ;; (company-backends '((company-capf
+ ;;                      company-keywords
+ ;;                      :with
+ ;;                      company-dabbrev-code
+ ;;                      company-semantic)
+ ;;                     (company-abbrev
+ ;;                      company-dabbrev)))
+ (company-transformers '(delete-consecutive-dups))
+ :config
+ (add-hook 'shell-mode-hook #'(lambda () (setq-local company-idle-delay 0.5)))
+ (add-hook 'eshell-mode-hook #'(lambda () (setq-local company-idle-delay 0.5)))
+
+ (require 'company-template)
+ (defun my/set-company-tooltip-faces ()
+   "Set faces for company tooltip."
+   (interactive)
+   (let ((bg (face-attribute 'default :background)))
+     (set-face-attribute 'company-tooltip nil
+                         :background (color-lighten-name
+                                      (face-background 'default)
+                                      10)
+                         :inherit 'default)
+     (set-face-attribute 'company-tooltip-selection nil
+                         :foreground 'unspecified
+                         :background (color-lighten-name
+                                      (face-background 'company-tooltip)
+                                      30)
+                         :inherit 'company-tooltip)
+     (set-face-attribute 'company-tooltip-common nil
+                         :background 'unspecified
+                         :inherit 'company-tooltip)
+     (set-face-attribute 'company-tooltip-common-selection nil
+                         :foreground 'unspecified
+                         :background (face-background
+                                      'company-tooltip-selection)
+                         :inherit 'company-tooltip-common)
+     (set-face-attribute 'company-tooltip-annotation nil
+                         :foreground "LightSlateBlue"
+                         :background 'unspecified
+                         :inherit 'company-tooltip)
+     (set-face-attribute 'company-tooltip-annotation-selection nil
+                         :foreground 'unspecified
+                         :background (face-background
+                                      'company-tooltip-selection)
+                         :inherit 'company-tooltip-annotation)
+     (set-face-attribute 'company-scrollbar-bg nil
+                         :background (color-lighten-name bg 10))
+     (set-face-attribute 'company-scrollbar-fg nil
+                         :background (color-lighten-name bg 40))
+     (set-face-attribute 'company-template-field nil
+                         :foreground (face-foreground
+                                      'company-tooltip-annotation)
+                         :background 'unspecified
+                         :slant 'unspecified
+                         :inherit 'default)
+     ))
+ (if (daemonp)
+     (add-hook 'server-after-make-frame-hook 'my/set-company-tooltip-faces)
+   (add-hook 'emacs-startup-hook 'my/set-company-tooltip-faces))
+
+ ;; quoted from https://oremacs.com/2017/12/27/company-numbers/
+ (let ((map company-active-map))
+   (mapc
+    (lambda (x)
+      (define-key map (format "%d" x) 'ora-company-number))
+    (number-sequence 0 9))
+   (define-key map " " (lambda ()
+                         (interactive)
+                         (company-abort)
+                         (self-insert-command 1)))
+   (define-key map (kbd "<return>") nil))
+ (defun ora-company-number ()
+   "Forward to `company-complete-number'.
+
+  Unless the number is potentially part of the candidate.
+  In that case, insert the number."
+   (interactive)
+   (let* ((k (this-command-keys))
+          (re (concat "^" company-prefix k)))
+     (if (cl-find-if (lambda (s) (string-match re s))
+                     company-candidates)
+         (self-insert-command 1)
+       (company-complete-number (string-to-number k)))))
+
+ (defun my/company-capf (f command &rest args)
+   "Do not use company if prefix is empty."
+   (let ((res (apply f command args)))
+     (if (and (eq command 'prefix)
+              (or (equal res "")
+                  (equal res '("" . t))))
+         nil
+       res)))
+
+ (advice-add 'company-capf :around 'my/company-capf)
+
+ (add-to-list 'eshell-mode-hook
+              #'(lambda ()
+                  (company-mode 1)
+                  (setq-local company-tooltip-limit 5)
+                  (setq-local company-idle-delay 1.0)
+                  (setq-local company-backends '(company-capf))))
+ )
+
+(use-package-if
+ nil
+ ;; (eq my/in-buffer-completion-ui 'company)
+ company-quickhelp
+ :after company
+ :custom
+ (company-quickhelp-delay nil)
+ :config
+ (define-key company-active-map (kbd "M-h") #'company-quickhelp-manual-begin)
+ (company-quickhelp-mode))
+#+end_src
+
 ** Fussy
 #+begin_src emacs-lisp
 (when (>= (string-to-number emacs-version) 27.2)
-  (use-package fuz-bin
-    :disabled
-    :straight
-    (fuz-bin
-     :repo "jcs-elpa/fuz-bin"
-     :fetcher github
-     :files (:defaults "bin"))
-    :config
-    (fuz-bin-load-dyn))
+  (use-package-if
+   nil
+   fuz-bin
+   :straight
+   (fuz-bin
+    :repo "jcs-elpa/fuz-bin"
+    :fetcher github
+    :files (:defaults "bin"))
+   :config
+   (fuz-bin-load-dyn))
 
-  (use-package fussy
-    :disabled
-    :custom
-    (fussy-score-fn 'fussy-fuz-bin-score)
-    (fussy-filter-fn 'fussy-filter-orderless-flex)
-    :config
-    (push 'fussy completion-styles)
+  (use-package-if
+   nil
+   fussy
+   :custom
+   (fussy-score-fn 'fussy-fuz-bin-score)
+   (fussy-filter-fn 'fussy-filter-orderless-flex)
+   :config
+   (push 'fussy completion-styles)
 
-    ;; (setq
-    ;;  ;; For example, project-find-file uses 'project-files which uses
-    ;;  ;; substring completion by default. Set to nil to make sure it's using
-    ;;  ;; flx.
-    ;;  completion-category-defaults nil
-    ;;  completion-category-overrides nil)
+   ;; (setq
+   ;;  ;; For example, project-find-file uses 'project-files which uses
+   ;;  ;; substring completion by default. Set to nil to make sure it's using
+   ;;  ;; flx.
+   ;;  completion-category-defaults nil
+   ;;  completion-category-overrides nil)
 
-    (with-eval-after-load 'company
-      (defun j-company-capf (f &rest args)
-        "Manage `completion-styles'."
-        (if (length= company-prefix 0)
-            ;; Don't use `company' for 0 length prefixes.
-            (let ((completion-styles (remq 'fussy completion-styles)))
-              (apply f args))
-          (let ((fussy-max-candidate-limit 5000)
-                (fussy-default-regex-fn 'fussy-pattern-first-letter)
-                (fussy-prefer-prefix nil))
-            (apply f args))))
+   (with-eval-after-load 'company
+     (defun j-company-capf (f &rest args)
+       "Manage `completion-styles'."
+       (if (length= company-prefix 0)
+           ;; Don't use `company' for 0 length prefixes.
+           (let ((completion-styles (remq 'fussy completion-styles)))
+             (apply f args))
+         (let ((fussy-max-candidate-limit 5000)
+               (fussy-default-regex-fn 'fussy-pattern-first-letter)
+               (fussy-prefer-prefix nil))
+           (apply f args))))
 
-      (defun j-company-transformers (f &rest args)
-        "Manage `company-transformers'."
-        (if (length= company-prefix 0)
-            ;; Don't use `company' for 0 length prefixes.
-            (apply f args)
-          (let ((company-transformers '(fussy-company-sort-by-completion-score)))
-            (apply f args))))
+     (defun j-company-transformers (f &rest args)
+       "Manage `company-transformers'."
+       (if (length= company-prefix 0)
+           ;; Don't use `company' for 0 length prefixes.
+           (apply f args)
+         (let ((company-transformers '(fussy-company-sort-by-completion-score)))
+           (apply f args))))
 
-      (advice-add 'company-auto-begin :before 'fussy-wipe-cache)
-      (advice-add 'company--transform-candidates :around 'j-company-transformers)
-      (advice-add 'company-capf :around 'j-company-capf))
-    )
+     (advice-add 'company-auto-begin :before 'fussy-wipe-cache)
+     (advice-add 'company--transform-candidates :around 'j-company-transformers)
+     (advice-add 'company-capf :around 'j-company-capf))
+   )
   )
 #+end_src
 
-** Prescient
-
-#+begin_src emacs-lisp
-(use-package prescient
-  :config
-  (prescient-persist-mode))
-(use-package company-prescient
-  :after company
-  :hook (company-mode . company-prescient-mode))
-(use-package vertico-prescient
-  :after vertico
-  :config
-  (vertico-prescient-mode))
-#+end_src
 
 * Edit modes
 
@@ -1620,7 +1760,7 @@ switch to Ivy.
 (use-package projectile
   :diminish
   :bind-keymap
-  ("C-c p" . projectile-command-map)
+  ("C-c P" . projectile-command-map)
   :hook ((prog-mode . projectile-mode)
          (comint-mode . (lambda () (projectile-mode 0))))
   :custom
@@ -2360,12 +2500,7 @@ Disabled at the moment while trying out persp-mode.
               ;; visual commands
               (add-to-list 'eshell-visual-commands "ssh")
               (add-to-list 'eshell-visual-commands "tail")
-              (add-to-list 'eshell-visual-commands "top")
-              (with-eval-after-load 'company
-                (company-mode 1)
-                (setq-local company-tooltip-limit 5)
-                (setq-local company-idle-delay 1.0)
-                (setq-local company-backends '(company-capf)))))
+              (add-to-list 'eshell-visual-commands "top")))
 
 (defun my/neweshell ()
   (interactive)
@@ -2787,10 +2922,10 @@ fi
 (when (eq my/completion-ui 'helm)
   (use-package restclient-helm))
 
-(use-package company-restclient
-  :hook (restclient-mode . (lambda ()
-                             (add-to-list (make-local-variable 'company-backends)
-                                          'company-restclient))))
+(use-package-if-company company-restclient
+ :hook (restclient-mode . (lambda ()
+                            (add-to-list (make-local-variable 'company-backends)
+                                         'company-restclient))))
 
 (use-package ob-restclient
   :after (restclient org)
@@ -3364,314 +3499,313 @@ same directory as the org-buffer and insert a link to this file."
 * EXWM
 
 #+begin_src emacs-lisp
-(when (and (eq window-system 'x)
-           (member (getenv "use_exwm") '("1" "yes")))
-  (use-package exwm
-    :config
-    (require 'exwm-config)
+(use-package-if-exwm
+ exwm
+ :config
+ (require 'exwm-config)
 
-    ;; Allow non-floating resizing with mouse.
-    (setq window-divider-default-bottom-width 2
-          window-divider-default-right-width 2)
-    (window-divider-mode)
+ ;; Allow non-floating resizing with mouse.
+ (setq window-divider-default-bottom-width 2
+       window-divider-default-right-width 2)
+ (window-divider-mode)
 
-    (setq exwm-workspace-number 1)
+ (setq exwm-workspace-number 1)
 
-    ;; Try to isolate EXWM buffers per frame.
-    (setq exwm-workspace-show-all-buffers nil)
-    (setq exwm-layout-show-all-buffers nil)
+ ;; Try to isolate EXWM buffers per frame.
+ (setq exwm-workspace-show-all-buffers nil)
+ (setq exwm-layout-show-all-buffers nil)
 
-    ;; Enable char-mode by default.
-    (setq exwm-manage-configurations '((t char-mode t)))
+ ;; Enable char-mode by default.
+ (setq exwm-manage-configurations '((t char-mode t)))
 
-    ;; Rename buffer to window title.
-    (add-hook 'exwm-update-title-hook
-              #'(lambda () (exwm-workspace-rename-buffer exwm-title)))
-    ;; (add-hook 'exwm-update-class-hook
-    ;;           #'(lambda () (exwm-workspace-rename-buffer exwm-class-name)))
+ ;; Rename buffer to window title.
+ (add-hook 'exwm-update-title-hook
+           #'(lambda () (exwm-workspace-rename-buffer exwm-title)))
+ ;; (add-hook 'exwm-update-class-hook
+ ;;           #'(lambda () (exwm-workspace-rename-buffer exwm-class-name)))
 
-    ;; Do not show mode-line for floating windows.
-    (add-hook 'exwm-floating-setup-hook #'exwm-layout-hide-mode-line)
-    (add-hook 'exwm-floating-exit-hook #'exwm-layout-show-mode-line)
+ ;; Do not show mode-line for floating windows.
+ (add-hook 'exwm-floating-setup-hook #'exwm-layout-hide-mode-line)
+ (add-hook 'exwm-floating-exit-hook #'exwm-layout-show-mode-line)
 
-    ;; Make sure that modeline is updated for the active window.
-    (add-hook 'exwm-workspace-switch-hook
-              #'(lambda ()
-                  (run-with-idle-timer 0.1 nil
-                                       #'my/exwm-set-input-focus)))
-    
-    (defun my/exwm-layout-toggle-fullscreen-or-single-window ()
-      (interactive)
-      (if (derived-mode-p 'exwm-mode)
-          (call-interactively 'exwm-layout-toggle-fullscreen)
-        (require 'functions)
-        (my/toggle-single-window)))
+ ;; Make sure that modeline is updated for the active window.
+ (add-hook 'exwm-workspace-switch-hook
+           #'(lambda ()
+               (run-with-idle-timer 0.1 nil
+                                    #'my/exwm-set-input-focus)))
 
-    (defun my/exwm-set-input-focus ()
-      "Workaround for losing input focus after switch-to-next/prev-buffer"
-      (interactive)
-      (when (and (eq window-system 'x)
-                 (not (active-minibuffer-window)))
-        (let ((window (selected-window)))
-          (select-window window)
-          (x-focus-frame (window-frame window))
-          (exwm-input--set-focus
-           (exwm--buffer->id (window-buffer window))))))
+ (defun my/exwm-layout-toggle-fullscreen-or-single-window ()
+   (interactive)
+   (if (derived-mode-p 'exwm-mode)
+       (call-interactively 'exwm-layout-toggle-fullscreen)
+     (require 'functions)
+     (my/toggle-single-window)))
 
-    (defvar my/single-window--last-configuration nil
-      "Last window configuration before calling `delete-other-windows'.")
-    (defun my/toggle-single-window ()
-      "Un-maximize current window.
+ (defun my/exwm-set-input-focus ()
+   "Workaround for losing input focus after switch-to-next/prev-buffer"
+   (interactive)
+   (when (and (eq window-system 'x)
+              (not (active-minibuffer-window)))
+     (let ((window (selected-window)))
+       (select-window window)
+       (x-focus-frame (window-frame window))
+       (exwm-input--set-focus
+        (exwm--buffer->id (window-buffer window))))))
+
+ (defvar my/single-window--last-configuration nil
+   "Last window configuration before calling `delete-other-windows'.")
+ (defun my/toggle-single-window ()
+   "Un-maximize current window.
     If multiple windows are active, save window configuration and
     delete other windows.  If only one window is active and a window
     configuration was previously save, restore that configuration."
-      (interactive)
-      (if (= (count-windows) 1)
-          (when my/single-window--last-configuration
-            (set-window-configuration my/single-window--last-configuration))
-        (setq my/single-window--last-configuration (current-window-configuration))
-        (delete-other-windows)))
+   (interactive)
+   (if (= (count-windows) 1)
+       (when my/single-window--last-configuration
+         (set-window-configuration my/single-window--last-configuration))
+     (setq my/single-window--last-configuration (current-window-configuration))
+     (delete-other-windows)))
 
-    (defun my/switch-to-last-buffer ()
-      "Switch to last open buffer in current window."
-      (interactive)
-      (let* ((b (other-buffer (current-buffer) 1))
-             (w (get-buffer-window b)))
-        (if w (select-window w)
-          (progn
-            (switch-to-buffer b)
-            (my/exwm-set-input-focus)))))
+ (defun my/switch-to-last-buffer ()
+   "Switch to last open buffer in current window."
+   (interactive)
+   (let* ((b (other-buffer (current-buffer) 1))
+          (w (get-buffer-window b)))
+     (if w (select-window w)
+       (progn
+         (switch-to-buffer b)
+         (my/exwm-set-input-focus)))))
 
-    ;; Add a new EXWM window to the current perspective.
-    (when (and (featurep 'persp-mode) persp-mode)
-      (add-hook 'exwm-manage-finish-hook
-                #'(lambda () (persp-add-buffer
-                              (current-buffer) (get-current-persp)))))
+ ;; Add a new EXWM window to the current perspective.
+ (when (and (featurep 'persp-mode) persp-mode)
+   (add-hook 'exwm-manage-finish-hook
+             #'(lambda () (persp-add-buffer
+                           (current-buffer) (get-current-persp)))))
 
-    ;; === Key bindings working in line-mode. ===
+ ;; === Key bindings working in line-mode. ===
 
-    ;; Clear key bindings for line-mode to unmap C-c.
-    (setq exwm-mode-map (make-sparse-keymap))
+ ;; Clear key bindings for line-mode to unmap C-c.
+ (setq exwm-mode-map (make-sparse-keymap))
 
-    ;; Make C-c a prefix key.
-    (push ?\C-c exwm-input-prefix-keys)
-    ;; Send C-c by typing C-c C-c.
-    (define-key exwm-mode-map (kbd "C-c C-c") #'(lambda () (interactive)
-                                                  (exwm-input--fake-key 3)))
+ ;; Make C-c a prefix key.
+ (push ?\C-c exwm-input-prefix-keys)
+ ;; Send C-c by typing C-c C-c.
+ (define-key exwm-mode-map (kbd "C-c C-c") #'(lambda () (interactive)
+                                               (exwm-input--fake-key 3)))
 
-    ;; Send C-x (cut) by typing C-x C-x.
-    (define-key exwm-mode-map (kbd "C-x C-x") #'(lambda () (interactive)
-                                                  (exwm-input--fake-key 24)))
-    ;; Make C-z a prefix key.
-    (push ?\C-z exwm-input-prefix-keys)
-    ;; Send C-z (undo) by typing C-z C-z.
-    (defun my/send-ctrl-z () (interactive) (exwm-input--fake-key 26))
-    (define-key exwm-mode-map (kbd "C-z C-z") #'my/send-ctrl-z)
-    (when (eq (lookup-key (current-global-map) (kbd "C-z")) 'suspend-frame)
-      (global-set-key (kbd "C-z") #'my/send-ctrl-z))
+ ;; Send C-x (cut) by typing C-x C-x.
+ (define-key exwm-mode-map (kbd "C-x C-x") #'(lambda () (interactive)
+                                               (exwm-input--fake-key 24)))
+ ;; Make C-z a prefix key.
+ (push ?\C-z exwm-input-prefix-keys)
+ ;; Send C-z (undo) by typing C-z C-z.
+ (defun my/send-ctrl-z () (interactive) (exwm-input--fake-key 26))
+ (define-key exwm-mode-map (kbd "C-z C-z") #'my/send-ctrl-z)
+ (when (eq (lookup-key (current-global-map) (kbd "C-z")) 'suspend-frame)
+   (global-set-key (kbd "C-z") #'my/send-ctrl-z))
 
-    ;; Make C-q a quoted insert.
-    (push ?\C-q exwm-input-prefix-keys)
-    (define-key exwm-mode-map [?\C-q] #'exwm-input-send-next-key)
+ ;; Make C-q a quoted insert.
+ (push ?\C-q exwm-input-prefix-keys)
+ (define-key exwm-mode-map [?\C-q] #'exwm-input-send-next-key)
 
-    ;; === Key bindings working in both char-mode and line-mode. ===
+ ;; === Key bindings working in both char-mode and line-mode. ===
 
-    (exwm-input-set-key (kbd "s-'") #'exwm-input-toggle-keyboard)
+ (exwm-input-set-key (kbd "s-'") #'exwm-input-toggle-keyboard)
 
-    (exwm-input-set-key (kbd "s-h") #'windmove-left)
-    (exwm-input-set-key (kbd "s-j") #'windmove-down)
-    (exwm-input-set-key (kbd "s-k") #'windmove-up)
-    (exwm-input-set-key (kbd "s-l") #'windmove-right)
+ (exwm-input-set-key (kbd "s-h") #'windmove-left)
+ (exwm-input-set-key (kbd "s-j") #'windmove-down)
+ (exwm-input-set-key (kbd "s-k") #'windmove-up)
+ (exwm-input-set-key (kbd "s-l") #'windmove-right)
 
-    (exwm-input-set-key (kbd "s-`") #'my/switch-to-last-buffer)
-    (exwm-input-set-key (kbd "s-<return>")
-                        #'(lambda ()
-                            (interactive)
-                            (start-process "" nil "lxterminal")))
-    (exwm-input-set-key (kbd "s-b")
-                        #'(lambda ()
-                            (interactive)
-                            (start-process "" nil "google-chrome")))
-    (exwm-input-set-key (kbd "s-B")
-                        #'(lambda ()
-                            (interactive)
-                            (split-window-right)
-                            (redisplay)
-                            (windmove-right)
-                            (start-process "" nil "google-chrome")))
-    (exwm-input-set-key (kbd "s-L")
-                        #'(lambda ()
-                            (interactive)
-                            (start-process "" nil
-                                           "xscreensaver-command" "-lock")))
-    (exwm-input-set-key (kbd "s-S")
-                        #'(lambda ()
-                            (interactive)
-                            (start-process "" nil
-                                           "gnome-screenshot" "-i")))
-    ;; 's-r': Reset
-    (exwm-input-set-key (kbd "s-r") #'exwm-reset)
-    ;; 's-w': Move window to other workspace
-    (exwm-input-set-key (kbd "s-w") #'exwm-workspace-move-window)
-    ;; 's-<tab>': Switch to next workspace
-    (defun my/exwm-cycle-workspace ()
-      "Cycle workspace to the next one."
-      (interactive)
-      (let ((next-idx (1+ exwm-workspace-current-index)))
-        (if (>= next-idx (length exwm-workspace--list))
-            (setq next-idx 0))
-        (exwm-workspace-switch next-idx)))
-    (exwm-input-set-key (kbd "s-<tab>") #'my/exwm-cycle-workspace)
+ (exwm-input-set-key (kbd "s-`") #'my/switch-to-last-buffer)
+ (exwm-input-set-key (kbd "s-<return>")
+                     #'(lambda ()
+                         (interactive)
+                         (start-process "" nil "lxterminal")))
+ (exwm-input-set-key (kbd "s-b")
+                     #'(lambda ()
+                         (interactive)
+                         (start-process "" nil "google-chrome")))
+ (exwm-input-set-key (kbd "s-B")
+                     #'(lambda ()
+                         (interactive)
+                         (split-window-right)
+                         (redisplay)
+                         (windmove-right)
+                         (start-process "" nil "google-chrome")))
+ (exwm-input-set-key (kbd "s-L")
+                     #'(lambda ()
+                         (interactive)
+                         (start-process "" nil
+                                        "xscreensaver-command" "-lock")))
+ (exwm-input-set-key (kbd "s-S")
+                     #'(lambda ()
+                         (interactive)
+                         (start-process "" nil
+                                        "gnome-screenshot" "-i")))
+ ;; 's-r': Reset
+ (exwm-input-set-key (kbd "s-r") #'exwm-reset)
+ ;; 's-w': Move window to other workspace
+ (exwm-input-set-key (kbd "s-w") #'exwm-workspace-move-window)
+ ;; 's-<tab>': Switch to next workspace
+ (defun my/exwm-cycle-workspace ()
+   "Cycle workspace to the next one."
+   (interactive)
+   (let ((next-idx (1+ exwm-workspace-current-index)))
+     (if (>= next-idx (length exwm-workspace--list))
+         (setq next-idx 0))
+     (exwm-workspace-switch next-idx)))
+ (exwm-input-set-key (kbd "s-<tab>") #'my/exwm-cycle-workspace)
 
-    ;; 's-N': Switch to Nth workspace
-    (dotimes (i 10)
-      (exwm-input-set-key (kbd (format "s-%d" i))
-                          `(lambda ()
-                             (interactive)
-                             (exwm-workspace-switch-create ,i)
-                             (my/exwm-set-input-focus))))
+ ;; 's-N': Switch to Nth workspace
+ (dotimes (i 10)
+   (exwm-input-set-key (kbd (format "s-%d" i))
+                       `(lambda ()
+                          (interactive)
+                          (exwm-workspace-switch-create ,i)
+                          (my/exwm-set-input-focus))))
 
-    ;; 's-!': Launch application
-    (exwm-input-set-key (kbd "s-!")
-                        #'(lambda (command)
-                            (interactive (list (read-shell-command "$ ")))
-                            (start-process-shell-command command nil command)))
+ ;; 's-!': Launch application
+ (exwm-input-set-key (kbd "s-!")
+                     #'(lambda (command)
+                         (interactive (list (read-shell-command "$ ")))
+                         (start-process-shell-command command nil command)))
 
-    (exwm-input-set-key (kbd "s-n") #'(lambda ()
-                                        (interactive)
-                                        (switch-to-next-buffer)
-                                        (my/exwm-set-input-focus)))
-    (exwm-input-set-key (kbd "s-p")  #'(lambda ()
-                                         (interactive)
-                                         (switch-to-prev-buffer)
-                                         (my/exwm-set-input-focus)))
-    (exwm-input-set-key (kbd "s-C") #'kill-buffer-and-window)
-    (exwm-input-set-key (kbd "s-F") #'exwm-floating-toggle-floating)
-    (exwm-input-set-key (kbd "s-f")
-                        #'my/exwm-layout-toggle-fullscreen-or-single-window)
+ (exwm-input-set-key (kbd "s-n") #'(lambda ()
+                                     (interactive)
+                                     (switch-to-next-buffer)
+                                     (my/exwm-set-input-focus)))
+ (exwm-input-set-key (kbd "s-p")  #'(lambda ()
+                                      (interactive)
+                                      (switch-to-prev-buffer)
+                                      (my/exwm-set-input-focus)))
+ (exwm-input-set-key (kbd "s-C") #'kill-buffer-and-window)
+ (exwm-input-set-key (kbd "s-F") #'exwm-floating-toggle-floating)
+ (exwm-input-set-key (kbd "s-f")
+                     #'my/exwm-layout-toggle-fullscreen-or-single-window)
 
-    (exwm-input-set-key (kbd "s-m")
-                        (cond
-                         ((eq my/completion-ui 'helm) #'helm-mini)
-                         ((eq my/completion-ui 'vertico) #'consult-buffer)
-                         (t #'ibuffer)))
+ (exwm-input-set-key (kbd "s-m")
+                     (cond
+                      ((eq my/completion-ui 'helm) #'helm-mini)
+                      ((eq my/completion-ui 'vertico) #'consult-buffer)
+                      (t #'ibuffer)))
 
-    (exwm-input-set-key (kbd "s-o") #'find-file-other-window)
+ (exwm-input-set-key (kbd "s-o") #'find-file-other-window)
 
-    (defvar my/exwm-workspace-previous-index 0
-      "The previous active workspace index.")
-    (defun my/exwm-workspace--current-to-previous-index
-        (frame-or-index &optional force)
-      "Save the current active workspace index."
-      (if (numberp frame-or-index)
-          (setq my/exwm-workspace-previous-index exwm-workspace-current-index)))
-    (add-hook 'exwm-init-hook
-              #'(lambda ()
-                  (advice-add 'exwm-workspace-switch :before
-                              #'my/exwm-workspace--current-to-previous-index)))
-    (defun my/exwm-workspace-switch-to-previous ()
-      (interactive)
-      "Switch to the previous active workspace."
-      (let ((index my/exwm-workspace-previous-index))
-        (exwm-workspace-switch index)))
+ (defvar my/exwm-workspace-previous-index 0
+   "The previous active workspace index.")
+ (defun my/exwm-workspace--current-to-previous-index
+     (frame-or-index &optional force)
+   "Save the current active workspace index."
+   (if (numberp frame-or-index)
+       (setq my/exwm-workspace-previous-index exwm-workspace-current-index)))
+ (add-hook 'exwm-init-hook
+           #'(lambda ()
+               (advice-add 'exwm-workspace-switch :before
+                           #'my/exwm-workspace--current-to-previous-index)))
+ (defun my/exwm-workspace-switch-to-previous ()
+   (interactive)
+   "Switch to the previous active workspace."
+   (let ((index my/exwm-workspace-previous-index))
+     (exwm-workspace-switch index)))
 
-    (exwm-input-set-key (kbd "s-;") #'my/exwm-workspace-switch-to-previous)
-    (exwm-input-set-key (kbd "s-N") #'(lambda () (interactive)
-                                        (switch-to-buffer-other-frame
-                                         (get-buffer-create "*scratch*"))))
-    (exwm-input-set-key (kbd "s-s") #'my/get-vterm)
-    (exwm-input-set-key (kbd "s-e") #'my/get-eshell)
-    ;; Note that s-t does not work in exwm mode for some unknown reason.
-    (exwm-input-set-key (kbd "s-t") #'my/get-term)
+ (exwm-input-set-key (kbd "s-;") #'my/exwm-workspace-switch-to-previous)
+ (exwm-input-set-key (kbd "s-N") #'(lambda () (interactive)
+                                     (switch-to-buffer-other-frame
+                                      (get-buffer-create "*scratch*"))))
+ (exwm-input-set-key (kbd "s-s") #'my/get-vterm)
+ (exwm-input-set-key (kbd "s-e") #'my/get-eshell)
+ ;; Note that s-t does not work in exwm mode for some unknown reason.
+ (exwm-input-set-key (kbd "s-t") #'my/get-term)
 
-    ;; Other configurations
-    (exwm-config-misc)
+ ;; Other configurations
+ (exwm-config-misc)
 
-    ;; systemtray
-    (when (member (getenv "use_exwm_systray") '("1" "yes"))
-      (require 'exwm-systemtray)
-      (exwm-systemtray-enable))
+ ;; systemtray
+ (when (member (getenv "use_exwm_systray") '("1" "yes"))
+   (require 'exwm-systemtray)
+   (exwm-systemtray-enable))
 
-    ;; xrandr
-    (when (getenv "CHROME_REMOTE_DESKTOP_SESSION")
-      (require 'exwm-randr)
-      (setq exwm-randr-workspace-output-plist '(0 "Screen"))
-      (exwm-randr-enable))
+ ;; xrandr
+ (when (getenv "CHROME_REMOTE_DESKTOP_SESSION")
+   (require 'exwm-randr)
+   (setq exwm-randr-workspace-output-plist '(0 "Screen"))
+   (exwm-randr-enable))
 
-    ;; Enable EXWM at the end of the initialization.
-    (with-eval-after-load "emacs-init"
-      (exwm-enable))
+ ;; Enable EXWM at the end of the initialization.
+ (with-eval-after-load "emacs-init"
+   (exwm-enable))
 
-    (defun my/inactive-exwm-buffer-p (buf)
-      "Return t if BUF is an inactive exwm buffer."
-      (let ((window (get-buffer-window buf t)))
-        (and
-         (null window)
-         (not (string-prefix-p " " (buffer-name buf)))
-         (with-current-buffer buf
-           (derived-mode-p 'exwm-mode)))))
+ (defun my/inactive-exwm-buffer-p (buf)
+   "Return t if BUF is an inactive exwm buffer."
+   (let ((window (get-buffer-window buf t)))
+     (and
+      (null window)
+      (not (string-prefix-p " " (buffer-name buf)))
+      (with-current-buffer buf
+        (derived-mode-p 'exwm-mode)))))
 
-    (defun my/get-inactive-exwm-buffers ()
-      "Return a list of inactive EXWM buffers or nil if none."
-      (cl-remove-if-not #'my/inactive-exwm-buffer-p
-                        (buffer-list)))
+ (defun my/get-inactive-exwm-buffers ()
+   "Return a list of inactive EXWM buffers or nil if none."
+   (cl-remove-if-not #'my/inactive-exwm-buffer-p
+                     (buffer-list)))
 
-    (defun my/get-inactive-exwm-buffer-names ()
-      "Return a list of inactive EXWM buffers or nil if none."
-      (mapcar
-       #'buffer-name
-       (my/get-inactive-exwm-buffers)))
+ (defun my/get-inactive-exwm-buffer-names ()
+   "Return a list of inactive EXWM buffers or nil if none."
+   (mapcar
+    #'buffer-name
+    (my/get-inactive-exwm-buffers)))
 
-    ;; Select inactive EXWM buffers with Vertico/Consult.
-    (when (eq my/completion-ui 'vertico)
-      (defvar my/consult-source-inactive-exwm-buffer
-        `(:name "EXWM"
-                :hidden t
-                :narrow ?x
-                :category buffer
-                :face consult-buffer
-                :history  buffer-name-history
-                :state ,#'consult--buffer-state
-                :items
-                ,(lambda () (consult--buffer-query :sort 'visibility
-                                                   :as #'buffer-name
-                                                   :predicate
-                                                   #'my/inactive-exwm-buffer-p
-                                                   ))))
+ ;; Select inactive EXWM buffers with Vertico/Consult.
+ (when (eq my/completion-ui 'vertico)
+   (defvar my/consult-source-inactive-exwm-buffer
+     `(:name "EXWM"
+             :hidden t
+             :narrow ?x
+             :category buffer
+             :face consult-buffer
+             :history  buffer-name-history
+             :state ,#'consult--buffer-state
+             :items
+             ,(lambda () (consult--buffer-query :sort 'visibility
+                                                :as #'buffer-name
+                                                :predicate
+                                                #'my/inactive-exwm-buffer-p
+                                                ))))
 
-      (setq my/consult-exwm-buffer-source
-            (list
-             `(:hidden nil :narrow ?x ,@my/consult-source-inactive-exwm-buffer)))
+   (setq my/consult-exwm-buffer-source
+         (list
+          `(:hidden nil :narrow ?x ,@my/consult-source-inactive-exwm-buffer)))
 
-      (defun my/consult-inactive-exwm-buffers ()
-        (interactive)
-        (let ((buflist (my/get-inactive-exwm-buffers)))
-          (cl-case (length buflist)
-            (0 (message "No inactive EXWM buffers found"))
-            (1 (switch-to-buffer (car buflist))
-               (my/exwm-set-input-focus))
-            (t (consult-buffer my/consult-exwm-buffer-source)))))
+   (defun my/consult-inactive-exwm-buffers ()
+     (interactive)
+     (let ((buflist (my/get-inactive-exwm-buffers)))
+       (cl-case (length buflist)
+         (0 (message "No inactive EXWM buffers found"))
+         (1 (switch-to-buffer (car buflist))
+            (my/exwm-set-input-focus))
+         (t (consult-buffer my/consult-exwm-buffer-source)))))
 
-      ;; Override s-i.
-      (exwm-input-set-key (kbd "s-i") #'my/consult-inactive-exwm-buffers)
-      )
+   ;; Override s-i.
+   (exwm-input-set-key (kbd "s-i") #'my/consult-inactive-exwm-buffers)
+   )
 
-    ;; Select inactive EXWM buffers with Helm.
-    (when (eq my/completion-ui 'helm)
-      (defun my/helm-exwm ()
-        "Dispatch Helm with inactive EXWM buffers."
-        (interactive)
-        (if (my/get-inactive-exwm-buffers)
-            (my/helm-buffers-list
-             (helm-make-source "Inactive EXWM buffers" 'helm-source-buffers
-                               :buffer-list
-                               #'my/get-inactive-exwm-buffer-names))
-          (message "No inactive EXWM buffers found")))
+ ;; Select inactive EXWM buffers with Helm.
+ (when (eq my/completion-ui 'helm)
+   (defun my/helm-exwm ()
+     "Dispatch Helm with inactive EXWM buffers."
+     (interactive)
+     (if (my/get-inactive-exwm-buffers)
+         (my/helm-buffers-list
+          (helm-make-source "Inactive EXWM buffers" 'helm-source-buffers
+                            :buffer-list
+                            #'my/get-inactive-exwm-buffer-names))
+       (message "No inactive EXWM buffers found")))
 
-      ;; Override s-i.
-      (exwm-input-set-key (kbd "s-i") #'my/helm-exwm))
-    )
-  )
+   ;; Override s-i.
+   (exwm-input-set-key (kbd "s-i") #'my/helm-exwm))
+ )
+
 #+end_src
 
 * Device Control and Management
@@ -3681,40 +3815,37 @@ same directory as the org-buffer and insert a link to this file."
 Disabled atm as new distro is adopting pipewire.
 
 #+begin_src emacs-lisp
-(when (eq window-system 'x)
-  (use-package pulseaudio-control
-    :disabled
-    :requires exwm
-    :config
-    (push 'XF86AudioMute exwm-input-prefix-keys)
-    (push 'XF86AudioLowerVolume exwm-input-prefix-keys)
-    (push 'XF86AudioRaiseVolume exwm-input-prefix-keys)
+(use-package-if-exwm
+ pulseaudio-control
+ :requires exwm
+ :config
+ (push 'XF86AudioMute exwm-input-prefix-keys)
+ (push 'XF86AudioLowerVolume exwm-input-prefix-keys)
+ (push 'XF86AudioRaiseVolume exwm-input-prefix-keys)
 
-    (exwm-input-set-key (kbd "<XF86AudioRaiseVolume>") #'pulseaudio-control-increase-volume)
-    (exwm-input-set-key (kbd "<XF86AudioLowerVolume>") #'pulseaudio-control-decrease-volume)
-    (exwm-input-set-key (kbd "<XF86AudioMute>") #'pulseaudio-control-toggle-current-sink-mute)
-    )
-  )
+ (exwm-input-set-key (kbd "<XF86AudioRaiseVolume>") #'pulseaudio-control-increase-volume)
+ (exwm-input-set-key (kbd "<XF86AudioLowerVolume>") #'pulseaudio-control-decrease-volume)
+ (exwm-input-set-key (kbd "<XF86AudioMute>") #'pulseaudio-control-toggle-current-sink-mute)
+ )
 #+end_src
 
 ** Brightness
 
 #+begin_src emacs-lisp
-(when (and (eq window-system 'x)
-           (member (getenv "use_exwm") '("1" "yes")))
-  (push 'XF86MonBrightnessDown exwm-input-prefix-keys)
-  (push 'XF86MonBrightnessUp exwm-input-prefix-keys)
+(when-use-exwm
+ (push 'XF86MonBrightnessDown exwm-input-prefix-keys)
+ (push 'XF86MonBrightnessUp exwm-input-prefix-keys)
 
-  (exwm-input-set-key (kbd "<XF86MonBrightnessDown>")
-                      #'(lambda ()
-                          (interactive)
-                          (start-process "" nil "light" "-U" "10")))
+ (exwm-input-set-key (kbd "<XF86MonBrightnessDown>")
+                     #'(lambda ()
+                         (interactive)
+                         (start-process "" nil "light" "-U" "10")))
 
-  (exwm-input-set-key (kbd "<XF86MonBrightnessUp>")
-                      #'(lambda ()
-                          (interactive)
-                          (start-process "" nil "light" "-A" "10")))
-)
+ (exwm-input-set-key (kbd "<XF86MonBrightnessUp>")
+                     #'(lambda ()
+                         (interactive)
+                         (start-process "" nil "light" "-A" "10")))
+ )
 #+end_src
 
 * Post Init Config
