@@ -39,6 +39,47 @@ Load preinit.org if exists.
     (org-babel-load-file preinit-file)))
 #+end_src
 
+* Macros
+
+Some tiny macros to incrase code readability and take care of the issue with :if
+keyword not working with straight.el.
+
+#+begin_src emacs-lisp
+(defmacro use-package-if (cond name &rest args)
+  `(when ,cond
+     (use-package ,name ,@args)))
+
+(defmacro use-package-if-company (name &rest args)
+  `(when (eq my/in-buffer-completion-ui 'company)
+     (use-package ,name ,@args)))
+
+(defmacro use-package-if-corfu (name &rest args)
+  `(when (eq my/in-buffer-completion-ui 'corfu)
+     (use-package ,name ,@args)))
+
+(defmacro when-use-exwm (&rest body)
+  `(when (and (eq window-system 'x)
+              (member (getenv "use_exwm") '("1" "yes")))
+     (progn ,@body)))
+
+(defmacro when-not-use-exwm (&rest body)
+  `(unless (and (eq window-system 'x)
+                (member (getenv "use_exwm") '("1" "yes")))
+     (progn ,@body)))
+
+(defmacro use-package-if-exwm (name &rest args)
+  `(when-use-exwm
+    (use-package ,name ,@args)))
+
+(defmacro use-package-if-not-exwm (name &rest args)
+  `(when-not-use-exwm
+    (use-package ,name ,@args)))
+
+(defmacro use-package-if-gui (name &rest args)
+  `(when window-system
+     (use-package ,name ,@args)))
+#+end_src
+
 * General config
 
 Miscellaneous buit-in features are configured and customzied here.
