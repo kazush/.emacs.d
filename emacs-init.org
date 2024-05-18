@@ -1356,11 +1356,20 @@ Trying Corfu as Company is getting slow on my Emacs 29.
 #+end_src
 
 #+begin_src emacs-lisp
-(use-package-if-corfu corfu
+(use-package-if-corfu
+ corfu
+ :straight (corfu :files (:defaults "extensions/*"))
  :custom
  (corfu-cycle t)
  (completion-cycle-threshold 3)
  (tab-always-indent 'complete)
+ (corfu-preselect 'prompt)
+ :bind
+ (:map corfu-map
+       ("TAB" . corfu-next)
+       ([tab] . corfu-next)
+       ("S-TAB" . corfu-previous)
+       ([backtab] . corfu-previous))
  :init
  (global-corfu-mode)
 
@@ -1377,22 +1386,8 @@ Trying Corfu as Company is getting slow on my Emacs 29.
      (setq-local corfu-echo-delay nil ;; Disable automatic echo and popup
                  corfu-popupinfo-delay nil)
      (corfu-mode 1)))
- ;; (add-hook 'minibuffer-setup-hook #'corfu-enable-in-minibuffer)
+ (add-hook 'minibuffer-setup-hook #'corfu-enable-in-minibuffer)
  )
-#+end_src
-
-For terminal.
-
-#+begin_src emacs-lisp
-(use-package-if-corfu
- corfu-terminal
- :straight
- (corfu-terminal
-  :type git
-  :repo "https://codeberg.org/akib/emacs-corfu-terminal.git")
- :config
- (unless (display-graphic-p)
-   (corfu-terminal-mode +1)))
 #+end_src
 
 Dabbrev settings copied from the GitHub Corfu page.
@@ -1409,6 +1404,59 @@ Dabbrev settings copied from the GitHub Corfu page.
   (add-to-list 'dabbrev-ignored-buffer-modes 'doc-view-mode)
   (add-to-list 'dabbrev-ignored-buffer-modes 'pdf-view-mode)
   (add-to-list 'dabbrev-ignored-buffer-modes 'tags-table-mode))
+#+end_src
+
+*** corfu-terminal
+
+#+begin_src emacs-lisp
+(use-package-if-corfu
+ corfu-terminal
+ :straight
+ (corfu-terminal
+  :type git
+  :repo "https://codeberg.org/akib/emacs-corfu-terminal.git")
+ :config
+ (unless (display-graphic-p)
+   (corfu-terminal-mode +1)))
+#+end_src
+
+*** corfu-popupinfo
+
+#+begin_src emacs-lisp
+(use-package-if-corfu
+ corfu-popupinfo
+ :straight nil
+ :after corfu
+ :hook (corfu-mode . corfu-popupinfo-mode))
+#+end_src
+
+*** nerd-icons-corfu
+
+#+begin_src emacs-lisp
+(use-package-if-corfu
+ nerd-icons-corfu
+ :config
+ (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
+#+end_src
+
+*** corfu-candidate-overlay
+
+#+begin_src emacs-lisp
+(use-package corfu-candidate-overlay
+  :straight (:type git
+                   :repo "https://code.bsdgeek.org/adam/corfu-candidate-overlay"
+                   :files (:defaults "*.el"))
+  :after corfu
+  :config
+  ;; enable corfu-candidate-overlay mode globally
+  ;; this relies on having corfu-auto set to nil
+  (corfu-candidate-overlay-mode +1)
+  ;; ;; bind Ctrl + TAB to trigger the completion popup of corfu
+  ;; (global-set-key (kbd "C-<tab>") 'completion-at-point)
+  ;; ;; bind Ctrl + Shift + Tab to trigger completion of the first candidate
+  ;; ;; (keybing <iso-lefttab> may not work for your keyboard model)
+  ;; (global-set-key (kbd "C-<iso-lefttab>") 'corfu-candidate-overlay-complete-at-point)
+  )
 #+end_src
 
 ** Company
