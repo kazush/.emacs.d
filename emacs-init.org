@@ -1365,7 +1365,11 @@ Trying Corfu as Company is getting slow on my Emacs 29.
  (tab-always-indent 'complete)
  (corfu-preselect 'prompt)
  :bind
- (:map corfu-map
+ (("s-TAB" . completion-at-point)
+  ("s-<tab>" . completion-at-point)
+  ("C-q <tab>" . completion-at-point)
+  ("C-q TAB" . completion-at-point)
+  :map corfu-map
        ("TAB" . corfu-next)
        ([tab] . corfu-next)
        ("S-TAB" . corfu-previous)
@@ -1387,6 +1391,11 @@ Trying Corfu as Company is getting slow on my Emacs 29.
                  corfu-popupinfo-delay nil)
      (corfu-mode 1)))
  (add-hook 'minibuffer-setup-hook #'corfu-enable-in-minibuffer)
+
+ (add-to-list 'completion-styles-alist
+              '(tab completion-basic-try-completion ignore
+                    "Completion style which provides TAB completion only."))
+ (setq completion-styles '(tab orderless basic))
  )
 #+end_src
 
@@ -1416,8 +1425,31 @@ Dabbrev settings copied from the GitHub Corfu page.
   :type git
   :repo "https://codeberg.org/akib/emacs-corfu-terminal.git")
  :config
- (unless (display-graphic-p)
-   (corfu-terminal-mode +1)))
+ (defun start-corfu-terminal-mode ()
+   (unless (display-graphic-p)
+     (corfu-terminal-mode +1)))
+
+ (add-hook 'server-after-make-frame-hook #'start-corfu-terminal-mode)
+ (start-corfu-terminal-mode)
+ )
+#+end_src
+
+*** corfu-doc-terminal
+
+#+begin_src emacs-lisp
+(use-package-if-corfu
+ corfu-doc-terminal
+ :straight (corfu-doc-terminal
+            :type git
+            :repo "https://codeberg.org/akib/emacs-corfu-doc-terminal.git")
+ :config
+ (defun start-corfu-doc-terminal-mode ()
+   (unless (display-graphic-p)
+     (corfu-doc-terminal-mode +1)))
+
+ (add-hook 'server-after-make-frame-hook #'start-corfu-doc-terminal-mode)
+ (start-corfu-doc-terminal-mode)
+ )
 #+end_src
 
 *** corfu-popupinfo
