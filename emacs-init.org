@@ -353,11 +353,9 @@ called in hooks.
   (set-face-foreground 'font-lock-function-name-face "dodger blue")
   (set-face-background 'term 'unspecified)
   (unless (daemonp)
-    (require 'color)
     (set-face-attribute 'mode-line-inactive nil
-                        :foreground (face-foreground 'mode-line)
-                        :background (color-darken-name
-                                     (face-background 'mode-line) 10)
+                        :foreground "white"
+                        :background "gray10"
                         :inherit 'mode-line)
     )
   )
@@ -3385,6 +3383,31 @@ fi
   (org-stuck-projects
    '("+PROJECT/-DONE-SOMEDAY" ("TODO" "WAIT")))
   :config
+  ;; Faces
+  (set-face-attribute 'org-level-1 nil
+                      :foreground "gray")
+  (set-face-attribute 'org-level-2 nil
+                      :foreground "steelblue3")
+  (set-face-attribute 'org-level-3 nil
+                      :foreground "honeydew4")
+  (set-face-attribute 'org-level-4 nil
+                      :foreground "tan3")
+  (set-face-attribute 'org-level-5 nil
+                      :foreground "DarkSlateGray4")
+  (set-face-attribute 'org-level-6 nil
+                      :foreground "IndianRed")
+  (set-face-attribute 'org-level-7 nil
+                      :foreground "DarkOrchid3")
+  (set-face-attribute 'org-level-8 nil
+                      :foreground "OliveDrab4")
+  (set-face-attribute 'org-block-begin-line nil
+                      :background "#2e3652")
+  (set-face-attribute 'org-block-end-line nil
+                      :background 'unspecified
+                      :inherit 'org-block-begin-line)
+  (set-face-attribute 'org-block nil
+                      :background "#252938")
+
   ;; Enable template expansion with '<' prefix.
   (require 'org-tempo)
 
