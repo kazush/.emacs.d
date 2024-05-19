@@ -3348,7 +3348,8 @@ fi
                         (interactive) (org-capture nil "m")))
          ("C-c o t" . (lambda ()
                         (interactive) (org-capture nil "t"))))
-  :hook ((org-agenda-mode . (lambda () (hl-line-mode 1)))
+  :hook ((org . org-indent-mode)
+         (org-agenda-mode . (lambda () (hl-line-mode 1)))
          (org-babel-after-execute . org-redisplay-inline-images))
   :custom
   (org-src-preserve-indentation t)
@@ -3437,7 +3438,45 @@ fi
 (use-package ob-async)
 
 (use-package org-bullets
+  :disabled
   :hook (org-mode . (lambda () (org-bullets-mode 1))))
+
+(use-package org-modern
+  :hook (org-mode . org-modern-mode)
+  :config
+  (setq
+   ;; Edit settings
+   org-auto-align-tags nil
+   org-tags-column 0
+   org-fold-catch-invisible-edits 'show-and-error
+   org-special-ctrl-a/e t
+   org-insert-heading-respect-content t
+
+   ;; Org styling, hide markup etc.
+   org-hide-emphasis-markers t
+   org-pretty-entities t
+
+   ;; Agenda styling
+   org-agenda-tags-column 0
+   org-agenda-block-separator ?─
+   org-agenda-time-grid
+   '((daily today require-timed)
+     (800 1000 1200 1400 1600 1800 2000)
+     " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄")
+   org-agenda-current-time-string
+   "⭠ now ─────────────────────────────────────────────────")
+
+  ;; Ellipsis styling
+  org-ellipsis "…"
+  (set-face-attribute 'org-ellipsis nil :inherit 'default :box nil))
+
+(use-package org-modern-indent
+  :straight (org-modern-indent
+             :type git
+             :host github
+             :repo "jdtsmith/org-modern-indent")
+  :config
+  (add-hook 'org-mode-hook #'org-modern-indent-mode 90))
 
 (use-package org-cliplink
   :bind (("C-c o L" . org-cliplink)))
