@@ -564,6 +564,7 @@ prefix. This way which-key will be more useful.
 (use-package spaceline
   :config
   (defun my/setup-spaceline ()
+    (interactive)
     (if (not window-system)
         (setq powerline-default-separator 'utf-8))
     (require 'spaceline-config)
