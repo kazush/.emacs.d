@@ -523,7 +523,6 @@ prefix. This way which-key will be more useful.
   (global-set-key (kbd "s-j") #'windmove-down)
   (global-set-key (kbd "s-k") #'windmove-up)
   (global-set-key (kbd "s-l") #'windmove-right)
-  (global-set-key (kbd "s-<tab>") #'switch-to-last-buffer)
   (global-set-key (kbd "s-n") #'switch-to-next-buffer)
   (global-set-key (kbd "s-p") #'switch-to-prev-buffer)
   (global-set-key (kbd "s-C") #'kill-buffer-and-window)
