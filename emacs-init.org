@@ -1476,9 +1476,34 @@ Dabbrev settings copied from the GitHub Corfu page.
                    :files (:defaults "*.el"))
   :after corfu
   :config
+  (set-face-attribute 'corfu-candidate-overlay-face nil
+                      :foreground "wheat2")
+  ;; Hack to enable corfu-candidate-overlay-mode in certain modes only.
+  (defun my/corfu-candidate-overlay-mode (&optional win-or-frame)
+    (let* ((b (current-buffer))
+           (w (get-buffer-window b))
+           (enabled-mode-list '(prog-mode)))
+      ;; (message "buf:%s, win:%s, livep:%s" b w (window-live-p w))
+      (when (and
+             (window-live-p w)
+             (not (or
+                   (window-minibuffer-p w)
+                   (minibufferp b))))
+        (if (apply #'derived-mode-p enabled-mode-list)
+            (progn
+              ;; (message "enabling corfu...")
+              (unless (member 'corfu-candidate-overlay--post-command post-command-hook)
+                (add-hook 'post-command-hook #'corfu-candidate-overlay--post-command)
+                (add-hook 'pre-command-hook  #'corfu-candidate-overlay--pre-command)))
+          (progn
+            ;; (message "disabling corfu...")
+            (when (member 'corfu-candidate-overlay--post-command post-command-hook)
+              (remove-hook 'post-command-hook #'corfu-candidate-overlay--post-command)
+              (remove-hook 'pre-command-hook  #'corfu-candidate-overlay--pre-command)))
+          ))))
+  (add-to-list 'window-buffer-change-functions 'my/corfu-candidate-overlay-mode)
   ;; enable corfu-candidate-overlay mode globally
   ;; this relies on having corfu-auto set to nil
-  (corfu-candidate-overlay-mode +1)
   ;; ;; bind Ctrl + TAB to trigger the completion popup of corfu
   ;; (global-set-key (kbd "C-<tab>") 'completion-at-point)
   ;; ;; bind Ctrl + Shift + Tab to trigger completion of the first candidate
