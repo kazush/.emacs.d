@@ -1363,9 +1363,7 @@ Trying Corfu as Company is getting slow on my Emacs 29.
  (tab-always-indent 'complete)
  (corfu-preselect 'prompt)
  :bind
- (("s-TAB" . completion-at-point)
-  ("s-<tab>" . completion-at-point)
-  ("C-q <tab>" . completion-at-point)
+ (("C-q <tab>" . completion-at-point)
   ("C-q TAB" . completion-at-point)
   :map corfu-map
        ("TAB" . corfu-next)
