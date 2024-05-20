@@ -1808,22 +1808,16 @@ preference. Unnecessary backends are excluded.
   )
 #+end_src
 
-** Undo tree
-   Undo tree is pretty useful.
+** Vundo
 
 #+begin_src emacs-lisp
-(use-package undo-tree
-  :diminish undo-tree-mode
-  :bind (("C-_" . undo-tree-visualize)
-         :map undo-tree-map
-         ("C-x u" . undo-tree-undo)
+(use-package vundo
+  :bind (("C-_" . vundo)
          :map my/edit-map
-         ("u" . undo-tree-visualize))
-  :custom
-  (undo-tree-visualizer-diff 1)
-  (undo-tree-visualizer-timestamps 1)
+         ("u" . vundo))
   :config
-  (global-undo-tree-mode))
+  (setq vundo-glyph-alist vundo-unicode-symbols)
+  )
 #+end_src
 
 ** ws-butler
