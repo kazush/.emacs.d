@@ -378,19 +378,9 @@ zerodark theme is a theme with classic dark mode colors.
 Different tweaks on appearance.
 
 #+begin_src emacs-lisp
-(menu-bar-mode -1)
-(tool-bar-mode -1)
-(if window-system
-    (progn
-      (scroll-bar-mode -1)
-      (fringe-mode 1)))
 (display-time-mode t)
-
-;; display settings
 (line-number-mode 1)
 (column-number-mode t)
-(when (not (window-system))
-  (display-time))
 (setq visible-bell t)
 
 ;; Selectivly use hl-line-mode.
@@ -400,8 +390,6 @@ Different tweaks on appearance.
                 yaml-mode-hook))
   (add-hook mode #'hl-line-mode))
 
-;; add line number for open files
-;; (add-hook 'find-file-hook (lambda () (linum-mode 1)))
 (setq use-dialog-box nil)
 (setq-default indicate-empty-lines t)
 #+end_src
@@ -582,7 +570,7 @@ Otherwise the same UI setup functions are called via ~emacs-startup-hook~.
   (tool-bar-mode -1)
   (when window-system
     (scroll-bar-mode -1)
-    (fringe-mode 1)))
+    (fringe-mode 5)))
 
 (defun my/setup-ui-theme ()
   "Sets up UI theme."
