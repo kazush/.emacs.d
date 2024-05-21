@@ -1,5 +1,5 @@
 ;; GC setting
-(setq gc-cons-threshold (* 1024 1024 1024))
+(setq gc-cons-threshold (* 128 1024 1024))
 
 ;; For straight.
 (setq package-enable-at-startup nil

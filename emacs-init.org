@@ -4079,7 +4079,7 @@ Just GCMH is used.
 
 #+begin_src emacs-lisp
 (use-package gcmh
-  :defer t
+  :disabled
   :config
   (gcmh-mode 1))
 #+end_src
