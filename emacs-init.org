@@ -1692,7 +1692,7 @@ preference. Unnecessary backends are excluded.
   :after marginalia
   :config
   (nerd-icons-completion-mode)
-  :hook (marginalia-mode . #'nerd-icons-completion-marginalia-setup))
+  (add-hook 'marginalia-mode-hook #'nerd-icons-completion-marginalia-setup))
 #+end_src
 
 * Edit modes
