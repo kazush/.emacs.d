@@ -2949,7 +2949,12 @@ fi
 #+begin_src emacs-lisp
 (use-package diff-hl
   :diminish
-  :config (global-diff-hl-mode))
+  :config
+  (with-eval-after-load 'magit
+    (add-hook 'magit-pre-refresh-hook 'diff-hl-magit-pre-refresh)
+    (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh))
+
+  (global-diff-hl-mode))
 #+end_src
 
 ** Git
