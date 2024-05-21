@@ -1931,11 +1931,20 @@ Mostly borrowed from https://taipapamotohus.com/post/dired/.
 #+end_src
 
 *** Dired quick sort
+
 #+begin_src emacs-lisp
 (use-package dired-quick-sort
   :config
   (dired-quick-sort-setup))
 #+end_src
+
+*** nerd-icons-dired
+
+#+begin_src emacs-lisp
+(use-package nerd-icons-dired
+  :hook (dired-mode . nerd-icons-dired-mode))
+#+end_src
+
 * Window and workspace management
 
 ** Persp-mode
