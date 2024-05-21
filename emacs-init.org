@@ -182,33 +182,6 @@ Change the format of buffer name to /<unique dir suffix>/<filename>/.
 (setq uniquify-ignore-buffers-re "^\\*")
 #+end_src
 
-** GC settings
-Just GCMH is used.
-
-#+begin_src emacs-lisp
-(use-package gcmh
-  :defer t
-  :config
-  (gcmh-mode 1))
-#+end_src
-
-The old setting below was based on the suggestion described in the lsp-mode
-page. The code snippet using minibuffer hooks is known as a technique to attempt
-to minimize typing lag due to GC. I still keep it in case I want to revert the
-setting to it.
-
-#+begin_src emacs-lisp
-;; GC settings recommended by lsp-mode doc.
-;; (setq gc-cons-threshold 100000000)
-;; Old hack with minibuffer hooks.
-;; (defun my-minibuffer-setup-hook ()
-;;   (setq gc-cons-threshold most-positive-fixnum))
-;; (defun my-minibuffer-exit-hook ()
-;;   (setq gc-cons-threshold 800000))
-;; (add-hook 'minibuffer-setup-hook #'my-minibuffer-setup-hook)
-;; (add-hook 'minibuffer-exit-hook #'my-minibuffer-exit-hook)
-#+end_src
-
 ** Completion in minibuffer
 I prefer the old behavior on completion, which is triggered by a space key.
 
@@ -4073,6 +4046,35 @@ Load postinit.org if exists.
   (when (file-exists-p postinit-file)
     (org-babel-load-file postinit-file)))
 #+end_src
+
+* Post post-init config
+** GC settings
+Just GCMH is used.
+
+#+begin_src emacs-lisp
+(use-package gcmh
+  :defer t
+  :config
+  (gcmh-mode 1))
+#+end_src
+
+The old setting below was based on the suggestion described in the lsp-mode
+page. The code snippet using minibuffer hooks is known as a technique to attempt
+to minimize typing lag due to GC. I still keep it in case I want to revert the
+setting to it.
+
+#+begin_src emacs-lisp
+;; GC settings recommended by lsp-mode doc.
+;; (setq gc-cons-threshold 100000000)
+;; Old hack with minibuffer hooks.
+;; (defun my-minibuffer-setup-hook ()
+;;   (setq gc-cons-threshold most-positive-fixnum))
+;; (defun my-minibuffer-exit-hook ()
+;;   (setq gc-cons-threshold 800000))
+;; (add-hook 'minibuffer-setup-hook #'my-minibuffer-setup-hook)
+;; (add-hook 'minibuffer-exit-hook #'my-minibuffer-exit-hook)
+#+end_src
+
 
 * EOF
 
