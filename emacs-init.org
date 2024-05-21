@@ -2582,8 +2582,9 @@ Disabled at the moment while trying out persp-mode.
 #+end_src
 
 ** Eshell
-   I don't use eshell often (I use shell instead) so there is a chance that this
-   config does not perfectly work.
+
+I don't use eshell often (I use shell instead) so there is a chance that this
+config does not perfectly work.
 
 #+begin_src emacs-lisp
 (setq eshell-buffer-shorthand t
@@ -2610,6 +2611,11 @@ Disabled at the moment while trying out persp-mode.
               (add-to-list 'eshell-visual-commands "ssh")
               (add-to-list 'eshell-visual-commands "tail")
               (add-to-list 'eshell-visual-commands "top")))
+
+;; Faces
+(with-eval-after-load 'em-ls
+  (set-face-attribute 'eshell-ls-directory nil
+                      :foreground "DodgerBlue"))
 
 (defun my/neweshell ()
   (interactive)
