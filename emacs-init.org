@@ -2632,13 +2632,6 @@ config does not perfectly work.
   (eshell-git-prompt-use-theme 'powerline))
 #+end_src
 
-*** fish-completion
-
-#+begin_src emacs-lisp
-(use-package fish-completion
-  :config
-  (global-fish-completion-mode))
-#+end_src
 ** VTerm
 
 Do not forget to add the following code to .bashrc
