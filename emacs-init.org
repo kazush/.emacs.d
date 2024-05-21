@@ -3119,7 +3119,7 @@ fi
                :host github
                :repo "shuxiao9058/tabnine")
     :commands (tabnine-start-process)
-    :hook ((prog-mode . tabnine-mode)
+    :hook (;; (prog-mode . tabnine-mode)
            (kill-emacs . tabnine-kill-process))
     :diminish "⌬"
     :custom
