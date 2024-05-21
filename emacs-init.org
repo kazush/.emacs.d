@@ -323,11 +323,15 @@ called in hooks.
   "Set default faces."
   (interactive)
   (set-face-attribute 'default nil
-                      :background "gray10")
+                      :foreground "#abb2bf"
+                      :background "#282c34")
   (set-face-attribute 'region nil
                       :foreground 'unspecified
                       :background "RoyalBlue4")
   (set-face-foreground 'show-paren-match "orange")
+  (set-face-attribute 'font-lock-doc-face nil
+                      :foreground "azure3"
+                      :background 'unspecified)
   (set-face-attribute 'font-lock-comment-face nil
                       :foreground "azure4"
                       :background 'unspecified
