@@ -1338,7 +1338,7 @@ Trying Corfu as Company is getting slow on my Emacs 29.
  (corfu-cycle t)
  (completion-cycle-threshold 3)
  (tab-always-indent 'complete)
- (corfu-preselect 'prompt)
+ (corfu-preselect 'first)
  :bind
  (("C-q <tab>" . completion-at-point)
   ("C-q TAB" . completion-at-point)
@@ -1398,12 +1398,12 @@ Dabbrev settings copied from the GitHub Corfu page.
   :type git
   :repo "https://codeberg.org/akib/emacs-corfu-terminal.git")
  :config
- (defun start-corfu-terminal-mode ()
+ (defun my/start-corfu-terminal-mode ()
    (unless (display-graphic-p)
      (corfu-terminal-mode +1)))
 
- (add-hook 'server-after-make-frame-hook #'start-corfu-terminal-mode)
- (start-corfu-terminal-mode)
+ (add-hook 'server-after-make-frame-hook #'my/start-corfu-terminal-mode)
+ (my/start-corfu-terminal-mode)
  )
 #+end_src
 
