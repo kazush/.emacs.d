@@ -324,8 +324,6 @@ called in hooks.
                       :background "gray15")
   (set-face-attribute 'ansi-color-blue nil
                       :foreground "DodgerBlue")
-  ;; (set-face-background 'whitespace-tab "gray15")
-  (set-face-background 'whitespace-trailing "gray25")
   (set-face-foreground 'font-lock-variable-name-face "khaki")
   (set-face-foreground 'font-lock-function-name-face "dodger blue")
   (set-face-background 'term 'unspecified)
@@ -2919,6 +2917,9 @@ fi
   :hook (prog-mode . (lambda ()
                        (whitespace-mode 1)))
   :custom
+  ;; (set-face-background 'whitespace-tab "gray15")
+  (set-face-background 'whitespace-trailing "gray25")
+
   (whitespace-style '(face trailing tabs tab-mark)))
 #+end_src
 
