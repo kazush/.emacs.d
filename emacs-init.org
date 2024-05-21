@@ -121,6 +121,9 @@ Customize dired. Load wdired feature to make [[https://www.gnu.org/software/emac
 Customization for miscellaneous built-in features.
 
 #+begin_src emacs-lisp
+;; Auto-save visited files
+(setq auto-save-visited-interval 30)
+(auto-save-visited-mode +1)
 ;; Disable startup message.
 (setq inhibit-startup-message t)
 ;; Set additional load-path.
