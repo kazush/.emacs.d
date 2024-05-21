@@ -3585,6 +3585,7 @@ same directory as the org-buffer and insert a link to this file."
 *** Elfeed
 #+begin_src emacs-lisp
 (use-package elfeed
+  :disabled
   :bind (("C-c F" . (lambda ()
                       (interactive)
                       (require 'elfeed-goodies)
