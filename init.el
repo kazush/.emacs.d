@@ -31,3 +31,6 @@
 
 (straight-use-package '(org :type built-in))
 (org-babel-load-file (expand-file-name "~/.emacs.d/emacs-init.org"))
+
+;; (profiler-report)
+;; (profiler-stop)

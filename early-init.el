@@ -1,5 +1,9 @@
-;; GC setting
-(setq gc-cons-threshold (* 128 1024 1024))
+;; (require 'profiler)
+;; (profiler-start 'cpu)
+
+;; GC settings.
+(setq gc-cons-threshold (* 100 1024 1024))
+(setq garbage-collection-messages t)
 
 ;; For straight.
 (setq package-enable-at-startup nil
