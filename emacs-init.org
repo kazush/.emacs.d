@@ -2946,12 +2946,15 @@ fi
 (use-package whitespace
   :diminish whitespace-mode
   :hook (prog-mode . (lambda ()
-                       (whitespace-mode 1)))
+                       (whitespace-mode +1)))
   :custom
-  ;; (set-face-background 'whitespace-tab "gray15")
-  (set-face-background 'whitespace-trailing "gray25")
+  (whitespace-style '(face trailing tabs tab-mark))
+  :config
+  (set-face-background 'whitespace-tab "gray70")
+  ;; (set-face-background 'whitespace-trailing "gray25")
+  )
 
-  (whitespace-style '(face trailing tabs tab-mark)))
+
 #+end_src
 
 *** Symbol overlay
