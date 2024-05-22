@@ -906,10 +906,15 @@ switch to Ivy.
   (use-package extensions/vertico-directory
     :straight (:type built-in)
     :after vertico
-    :ensure nil
     :bind (:map vertico-map
                 ("C-l" . vertico-directory-up)
                 ("\d" . vertico-directory-delete-char)))
+
+  (use-package extensions/vertico-repeat
+    :straight (:type built-in)
+    :after vertico
+    :bind ("C-c -" . vertico-repeat)
+    :hook (minibuffer-setup . vertico-repeat-save))
 
   (use-package savehist
     :diminish savehist-mode
