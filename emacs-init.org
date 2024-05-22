@@ -3485,7 +3485,7 @@ Disabled for now. This entry is for future use.
   :config
   ;; Faces
   (set-face-attribute 'org-level-1 nil
-                      :foreground "gray")
+                      :foreground "darkgray")
   (set-face-attribute 'org-level-2 nil
                       :foreground "steelblue3")
   (set-face-attribute 'org-level-3 nil
