@@ -2998,9 +2998,19 @@ fi
 #+begin_src emacs-lisp
 (use-package magit
   :commands (magit-status)
-  :bind (("C-c m" . magit-status)))
+  :bind (("C-c m" . magit-status))
+  :config
+  (add-hook 'magit-process-find-password-functions 'magit-process-password-auth-source))
 #+end_src
+*** Forge
 
+Disabled for now. This entry is for future use.
+
+#+begin_src emacs-lisp
+(use-package forge
+  :disabled
+  :after magit)
+#+end_src
 *** Git timemachine
 
 #+begin_src emacs-lisp
