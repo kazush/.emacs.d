@@ -126,7 +126,14 @@ A few tweaks to make dired work better for me.
 Customization for miscellaneous built-in features.
 
 #+begin_src emacs-lisp
-;; Auto-save visited files
+;; Increase read buffer.
+(setq read-process-output-max (* 8 1024 1024))
+(setq process-adaptive-read-buffering t)
+;; Use spaces for indentation.
+(setq-default indent-tabs-mode nil)
+;; Disable native-comp warnings.
+(setq native-comp-async-report-warnings-errors 'silent)
+;; Auto-save visited files.
 (setq auto-save-visited-interval 30)
 (auto-save-visited-mode +1)
 ;; Disable startup message.
@@ -141,6 +148,7 @@ Customization for miscellaneous built-in features.
 (global-auto-revert-mode)
 (transient-mark-mode t)
 (show-paren-mode 1)
+(setq show-paren-context-when-offscreen 'overlay)
 (setq mouse-yank-at-point t)
 (setq backup-inhibited t)
 (setq next-line-add-newlines nil)
@@ -398,6 +406,13 @@ Different tweaks on appearance.
 
 (setq use-dialog-box nil)
 (setq-default indicate-empty-lines t)
+(setq bidi-display-reordering 'left-to-right)
+(setq bidi-inhibit-bpa t)
+(setq redisplay-skip-fontification-on-input t)
+
+;; Somehow pixel scrolling does not work well yet.
+;; (setq pixel-scroll-precision-use-momentum t)
+;; (pixel-scroll-precision-mode)
 #+end_src
 
 ** Icons
