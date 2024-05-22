@@ -104,17 +104,22 @@ instance. ~restart-server~ is a helper function to restart the server process.
 #+end_src
 
 ** Dired
-Customize dired. Load wdired feature to make [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Wdired.html][edit functions]] available.
+
+A few tweaks to make dired work better for me.
 
 #+begin_src emacs-lisp
+(use-package dired
+  :straight (:type built-in)
+  :custom
   ;; make file size format human-friendly
-  (setq dired-listing-switches "-alh")
-  (add-hook 'dired-mode-hook
-            #'(lambda ()
-                (define-key dired-mode-map "k" 'dired-kill-subdir)))
-  (require 'wdired)
-  (setq wdired-allow-to-change-permissions t)
-  (define-key dired-mode-map "e" 'wdired-change-to-wdired-mode)
+  (dired-listing-switches "-alh")
+  :bind (:map dired-mode-map
+              ("k" . dired-kill-subdir)))
+
+(use-package wdired
+  :straight (:type built-in)
+  :custom
+  (wdired-allow-to-change-permissions t))
 #+end_src
 
 ** General editor preferences
@@ -1898,19 +1903,20 @@ Mostly borrowed from https://taipapamotohus.com/post/dired/.
 
 *** Dired subtree
 #+begin_src emacs-lisp
-(use-package dired-subtree
-  :config
-  (bind-keys :map dired-mode-map
-             ("i" . dired-subtree-insert)
-             (";" . dired-subtree-remove)))
+  (use-package dired-subtree
+    :disabled
+    :after dired
+    :bind (:map dired-mode-map
+                ("i" . dired-subtree-insert)
+                (";" . dired-subtree-remove)))
 #+end_src
 
 *** Dired+
 #+begin_src emacs-lisp
 (use-package dired+
+  :after dired
   :straight
   (dired+ :fetcher github :repo "emacsmirror/dired-plus")
-  :defer 1
   :init
   (setq diredp-hide-details-initially-flag nil)
   (setq diredp-hide-details-propagate-flag nil)
@@ -1923,6 +1929,7 @@ Mostly borrowed from https://taipapamotohus.com/post/dired/.
 
 #+begin_src emacs-lisp
 (use-package dired-quick-sort
+  :after dired
   :config
   (dired-quick-sort-setup))
 #+end_src
@@ -1931,6 +1938,7 @@ Mostly borrowed from https://taipapamotohus.com/post/dired/.
 
 #+begin_src emacs-lisp
 (use-package nerd-icons-dired
+  :after dired
   :hook (dired-mode . nerd-icons-dired-mode))
 #+end_src
 
