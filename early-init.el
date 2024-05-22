@@ -28,6 +28,11 @@
    (push '(vertical-scroll-bars) frame-alist))
  '(default-frame-alist initial-frame-alist))
 
+(scroll-bar-mode -1)
+(tool-bar-mode -1)
+(menu-bar-mode -1)
+(fringe-mode 5)
+
 (setq mode-line-format nil)
 (set-face-attribute 'default nil :foreground "#282c34" :background "#282c34")
 (set-face-attribute 'mode-line nil :background "#000000" :foreground "#ffffff" :box 'unspecified)
