@@ -1,3 +1,22 @@
+;; Initial GUI configuration
+
+(defvar my/default-font-family "Monospace")
+(defvar my/default-font-size 13)
+
+(set-face-attribute 'default nil
+                    :foreground "#abb2bf"
+                    :background "#282c34"
+                    :family my/default-font-family
+                    :height (* my/default-font-size 10))
+(set-face-attribute 'mode-line nil
+                    :foreground "#d3d3d3"
+                    :background "#000000")
+(scroll-bar-mode -1)
+(tool-bar-mode -1)
+(menu-bar-mode -1)
+(fringe-mode 5)
+(set-frame-size nil 100 35)
+
 ;; For measurement of startup time.
 
 (defconst my/before-load-init-time (current-time))

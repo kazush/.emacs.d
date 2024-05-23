@@ -345,16 +345,13 @@ called in hooks.
   (set-face-background 'term 'unspecified)
   (unless (daemonp)
     (set-face-attribute 'mode-line-inactive nil
-                        :foreground "white"
+                        :foreground "darkgray"
                         :background "gray10"
                         :inherit 'mode-line)
     )
   )
 
 ;; Configure default font and other faces such as emojis.
-
-(defvar my/default-font-family "Monospace")
-(defvar my/default-font-size 10)
 
 (defun my/setfont (size)
   (interactive "nFont size: ")
@@ -383,7 +380,7 @@ zerodark theme is a theme with classic dark mode colors.
 #+begin_src emacs-lisp
 (use-package zerodark-theme
   :config
-  (load-theme 'zerodark t)
+  ;; (load-theme 'zerodark t)
   ;; (zerodark-setup-modeline-format)
   )
 #+end_src
@@ -597,8 +594,8 @@ Otherwise the same UI setup functions are called via ~emacs-startup-hook~.
   "Sets up UI theme."
   (interactive)
   ;; (load-theme 'zerodark t)
-  (my/setup-spaceline)
-  (my/setup-frame)
+  ;; (my/setup-spaceline)
+  ;; (my/setup-frame)
   (my/set-default-faces))
 
 (add-hook 'server-after-make-frame-hook
