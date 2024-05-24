@@ -588,7 +588,7 @@ Otherwise the same UI setup functions are called via ~emacs-startup-hook~.
   (tool-bar-mode -1)
   (when window-system
     (scroll-bar-mode -1)
-    (fringe-mode 5)))
+    (fringe-mode 10)))
 
 (defun my/setup-ui-theme ()
   "Sets up UI theme."
