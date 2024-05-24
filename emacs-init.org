@@ -357,7 +357,8 @@ called in hooks.
   (interactive "nFont size: ")
   (set-face-attribute 'default nil
                       :family my/default-font-family
-                      :height (* size 10)))
+                      :height (* size 10))
+  (setq my/default-font-size size))
 
 (defun my/setup-fonts ()
   "Set up fonts."
