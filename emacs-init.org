@@ -3405,6 +3405,9 @@ Disabled for now. This entry is for future use.
 #+begin_src emacs-lisp
 ;; MQL4
 (add-to-list 'auto-mode-alist '("\\.mq[45h]\\'" . c++-mode))
+
+;; Add format of compilation error message.
+(add-to-list 'compilation-error-regexp-alist '("^\\(.+\\)(\\([0-9]+\\),\\([0-9]+\\)) : \\(error\\|warning\\).*$" 1 2 3))
 #+end_src
 
 ** Java
