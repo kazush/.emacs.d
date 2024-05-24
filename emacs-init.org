@@ -668,6 +668,16 @@ Otherwise the same UI setup functions are called via ~emacs-startup-hook~.
   ("q" nil))
 
 ;; window management
+(defun my/window-split-vertical ()
+   (interactive)
+         (split-window-right)
+         (windmove-right))
+
+(defun my/window-split-horizontal ()
+         (interactive)
+         (split-window-below)
+         (windmove-down))
+
 (defhydra hydra-window (my/wm-map "w"
                                   :color red
                                   :hint nil)
@@ -685,14 +695,8 @@ Otherwise the same UI setup functions are called via ~emacs-startup-hook~.
   ("J" (hydra-move-splitter-down 4))
   ("K" (hydra-move-splitter-up 4))
   ("L" (hydra-move-splitter-right 4))
-  ("|" (lambda ()
-         (interactive)
-         (split-window-right)
-         (windmove-right)))
-  ("_" (lambda ()
-         (interactive)
-         (split-window-below)
-         (windmove-down)))
+  ("|" my/window-split-vertical)
+  ("_" my/window-split-horizontal)
   ("v" split-window-right)
   ("x" split-window-below)
   ;; winner-mode must be enabled
