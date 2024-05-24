@@ -389,9 +389,10 @@ zerodark theme is a theme with classic dark mode colors.
 Different tweaks on appearance.
 
 #+begin_src emacs-lisp
-(display-time-mode t)
-(line-number-mode 1)
-(column-number-mode t)
+(when-use-exwm
+ (display-time-mode +1))
+(line-number-mode +1)
+(column-number-mode +1)
 (setq visible-bell t)
 
 ;; Selectivly use hl-line-mode.
