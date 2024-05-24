@@ -964,7 +964,7 @@ switch to Ivy.
            ("M-s g" . consult-grep)
            ("M-s G" . consult-git-grep)
            ("M-s r" . consult-ripgrep)
-           ("M-s l" . consult-line)
+           ("M-s l" . my/consult-line)
            ("M-s L" . consult-line-multi)
            ("M-s k" . consult-keep-lines)
            ("M-s u" . consult-focus-lines)
@@ -988,8 +988,9 @@ switch to Ivy.
     ;; The :init configuration is always executed (Not lazy)
     :init
 
-    ;; Disable live preview by default as it does not work well with EXWM.
-    (setq consult-preview-key "M-.")
+    ;; Disable live preview when EXWM is enabled as it does not work well.
+    (when-use-exwm
+     (setq consult-preview-key "M-."))
 
     ;; Optionally configure the register formatting. This improves the register
     ;; preview for `consult-register', `consult-register-load',
@@ -1045,6 +1046,14 @@ switch to Ivy.
     ;; (setq consult-project-function (lambda (_) (vc-root-dir)))
   ;;;; 4. locate-dominating-file
     ;; (setq consult-project-function (lambda (_) (locate-dominating-file "." ".git")))
+
+    (defun my/consult-line (&optional prefix)
+      (interactive "P")
+      (if prefix
+          (consult-line)
+        (if (use-region-p)
+            (consult-line (buffer-substring (region-beginning) (region-end)))
+          (consult-line (thing-at-point 'symbol)))))
 
     (defun consult-exwm-preview-fix (buf-or-name &optional norecord force-same-window)
       "Kludge to stop EXWM buffers from stealing focus during Consult previews."
