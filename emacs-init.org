@@ -331,10 +331,10 @@ called in hooks.
   (set-face-attribute 'font-lock-constant-face nil
                       :weight 'unspecified)
   (set-face-attribute 'highlight nil
-                      :foreground "orange"
-                      :background 'unspecified
-                      :weight 'bold
-                      :inherit 'default)
+                      ;; :foreground "orange"
+                      ;; :background 'unspecified
+                      :background "dark slate gray"
+                      :weight 'bold)
   (set-face-attribute 'hl-line nil
                       :foreground 'unspecified
                       :background "gray15")
