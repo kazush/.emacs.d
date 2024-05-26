@@ -1590,9 +1590,9 @@ with EXWM. For example, this package manipulates frame params on dialog windows
  (persp-keymap-prefix (kbd "C-z"))
  (persp-set-ido-hooks t)
  (persp-auto-save-opt 0)
- (persp-auto-save-opt 0)
  (persp-auto-resume-time -1)
- (persp-autokill-buffer-on-remove t)
+ (persp-add-buffer-on-after-change-major-mode t)
+ (persp-autokill-buffer-on-remove 'kill-weak)
  (persp-buffer-list-restricted-filter-functions
   persp-common-buffer-filter-functions)
  :init
