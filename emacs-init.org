@@ -168,9 +168,11 @@ Customization for miscellaneous built-in features.
 (setq truncate-partial-width-windows nil)
 ;; resolve symlinks
 (setq find-file-visit-truename t)
-;; (require 'misc)
-;; (global-set-key (kbd "M-f") 'forward-to-word)
-;; (global-set-key (kbd "M-b") 'backward-word)
+
+;; Key bindings for per-word cursor moving
+(require 'misc)
+(global-set-key (kbd "C-S-f") 'forward-to-word)
+(global-set-key (kbd "C-S-b") 'backward-word)
 
 ;; display function name in mode line
 ;; (which-function-mode 1)
@@ -2882,7 +2884,8 @@ fi
 #+begin_src emacs-lisp
 (use-package smartparens
   :diminish smartparens-mode
-  :bind (("C-M-f" . sp-forward-sexp)
+  :bind (("C-M-f" . sp-forward-slurp-sexp)
+         ("C-M-b" . sp-backward-slurp-sexp)
          ("M-f" . sp-forward-symbol)
          ("M-F" . forward-word)
          ("M-b" . sp-backward-symbol)
