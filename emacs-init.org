@@ -320,7 +320,8 @@ called in hooks.
 (defun my/set-default-font (maybe-family size)
   "Set family and size for default font."
   (interactive "sFamily: \nnFont size: ")
-  (let ((family (or maybe-family my/default-font-family)))
+  (let ((family (or (not (string= maybe-family ""))
+                    my/default-font-family)))
     (set-face-attribute 'default nil
                         :family family
                         :height (* size 10))
