@@ -1378,17 +1378,21 @@ Trying Corfu as Company is getting slow on my Emacs 29.
  :straight (corfu :files (:defaults "extensions/*"))
  :custom
  (corfu-cycle t)
- (completion-cycle-threshold 3)
+ ;; (completion-cycle-threshold 1)
  (tab-always-indent 'complete)
- (corfu-preselect 'first)
+ (corfu-preselect 'prompt)
  :bind
  (("C-q <tab>" . completion-at-point)
   ("C-q TAB" . completion-at-point)
   :map corfu-map
-       ("TAB" . corfu-next)
-       ([tab] . corfu-next)
-       ("S-TAB" . corfu-previous)
-       ([backtab] . corfu-previous))
+  ("C-f" . corfu-expand)
+  ("C-i" . corfu-next)
+  ("C-l" . my/corfu-backward-word)
+  ("<tab>" . my/corfu-next-or-expand)
+  ([tab] . my/corfu-next-or-expand)
+  ("<backtab>" . corfu-previous)
+  ([backtab] . corfu-previous)
+  )
  :init
  (global-corfu-mode)
 
@@ -1407,10 +1411,29 @@ Trying Corfu as Company is getting slow on my Emacs 29.
      (corfu-mode 1)))
  (add-hook 'minibuffer-setup-hook #'corfu-enable-in-minibuffer)
 
- (add-to-list 'completion-styles-alist
-              '(tab completion-basic-try-completion ignore
-                    "Completion style which provides TAB completion only."))
- (setq completion-styles '(tab orderless basic))
+ ;; Comment out as this dose not seem to work as expected.
+ ;; (add-to-list 'completion-styles-alist
+ ;;              '(tab completion-basic-try-completion ignore
+ ;;                    "Completion style which provides TAB completion only."))
+ ;; (setq completion-styles '(tab orderless basic))
+
+
+ (defun my/corfu-next-or-expand (&optional n)
+   "Do corfu-expand when only one candidate exists otherwise move to next candidate."
+   (interactive "p")
+   (if (= corfu--total 1)
+       (corfu-expand)
+     (corfu-next n)))
+ (add-to-list 'corfu-continue-commands 'my/corfu-next-or-expand)
+
+ (defun my/corfu-backward-word (&optional n)
+   "Delete the word prior to the point."
+   (interactive "p")
+   (dotimes (i (or n 1))
+     (let ((end (point)))
+       (backward-word)
+       (delete-region (point) end))))
+ (add-to-list 'corfu-continue-commands 'my/corfu-backward-word)
  )
 #+end_src
 
