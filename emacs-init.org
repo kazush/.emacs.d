@@ -3118,6 +3118,8 @@ As of 3/19/2022, this does not work with Chrome. Works well with Firefox.
 (use-package org-download
   :hook ((org-mode . org-download-enable)
          (dired-mode . org-download-enable))
+  :custom
+  (org-download-screenshot-method "spectacle -b -r -o %s")
   :config
   (setq-default org-download-image-dir "~/org/images"))
 #+end_src
