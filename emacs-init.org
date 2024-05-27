@@ -3118,32 +3118,9 @@ As of 3/19/2022, this does not work with Chrome. Works well with Firefox.
 (use-package org-download
   :hook ((org-mode . org-download-enable)
          (dired-mode . org-download-enable))
+  :bind ("C-c o s" . org-download-screenshot)
   :custom
-  (org-download-screenshot-method "spectacle -b -r -o %s")
-  :config
-  (setq-default org-download-image-dir "~/org/images"))
-#+end_src
-
-** Automatic Screenshort Insertion
-
-Copied from [[https://orgmode.org/worg/org-hacks.html#org8431aea][here.]]
-
-#+begin_src emacs-lisp
-(defun my-org-screenshot ()
-  "Take a screenshot into a time stamped unique-named file in the
-same directory as the org-buffer and insert a link to this file."
-  (interactive)
-  (setq filename
-        (concat
-         (make-temp-name
-          (concat (buffer-file-name)
-                  "_"
-                  (format-time-string "%Y%m%d_%H%M%S_")) ) ".png"))
-  (call-process "import" nil nil nil filename)
-  (insert (concat "[[" filename "]]"))
-  (org-display-inline-images))
-(with-eval-after-load "org"
-  (define-key org-mode-map (kbd "C-c o i") #'my-org-screenshot))
+  (org-download-screenshot-method "spectacle -b -r -o %s"))
 #+end_src
 
 * EXWM
