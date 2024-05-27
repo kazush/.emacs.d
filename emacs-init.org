@@ -2164,7 +2164,7 @@ if [[ -n "${EMACS_VTERM_PATH}" ]]; then
     . "$f"
   fi
 fi
-src
+#+end_src
 
 #+begin_src emacs-lisp
 (use-package vterm
