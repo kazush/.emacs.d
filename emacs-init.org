@@ -3120,7 +3120,9 @@ As of 3/19/2022, this does not work with Chrome. Works well with Firefox.
          (dired-mode . org-download-enable))
   :bind ("C-c o s" . org-download-screenshot)
   :custom
-  (org-download-screenshot-method "spectacle -b -r -o %s"))
+  (org-download-screenshot-method "spectacle -b -r -o %s")
+  (org-download-image-dir "./images")
+  (org-download-heading-lvl nil))
 #+end_src
 
 * EXWM
