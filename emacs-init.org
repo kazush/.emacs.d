@@ -1568,6 +1568,15 @@ Mostly borrowed from https://taipapamotohus.com/post/dired/.
   :hook (dired-mode . nerd-icons-dired-mode))
 #+end_src
 
+** websearch
+#+begin_src emacs-lisp
+(use-package websearch
+  :custom
+  (websearch-custom-keymap-prefix "C-c /")
+  (websearch-custom-default-engine "google")
+  :config
+  (websearch-mode))
+#+end_src
 * Window and workspace management
 
 ** Persp-mode
