@@ -1,7 +1,9 @@
 ;; Initial GUI configuration
 
 (defvar my/default-font-family "Monospace")
-(defvar my/default-font-size 13)
+(defvar my/default-font-size (cond
+                              ((string= system-name "em780") 11)
+                              (t 13)))
 
 (set-face-attribute 'default nil
                     :foreground "#abb2bf"
