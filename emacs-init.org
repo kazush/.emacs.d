@@ -283,7 +283,7 @@ called in hooks.
   (interactive)
   (set-face-attribute 'default nil
                       :foreground "#abb2bf"
-                      :background "#282c34")
+                      :background (if window-system "#282c34" "#000000"))
   (set-face-attribute 'region nil
                       :foreground 'unspecified
                       :background "RoyalBlue4")
@@ -2523,7 +2523,7 @@ Eldoc-box displays eldoc contents in a child frame but is currently diabled.
   :custom
   (whitespace-style '(face trailing tabs tab-mark))
   :config
-  (set-face-background 'whitespace-tab "gray70")
+  (set-face-background 'whitespace-tab (if window-system "gray70" "color-52"))
   ;; (set-face-background 'whitespace-trailing "gray25")
   )
 #+end_src
@@ -3040,7 +3040,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
                       :background 'unspecified
                       :inherit 'org-block-begin-line)
   (set-face-attribute 'org-block nil
-                      :background "#252938")
+                      :background (if window-system "#252938" "color-236"))
 
   ;; Enable template expansion with '<' prefix.
   (require 'org-tempo)
