@@ -779,6 +779,7 @@ More visual feedback on some operations such as undo, yank, kill-region, etc.
 
 #+begin_src emacs-lisp
 (use-package fancy-narrow
+  :disabled
   :bind (:map my/edit-map
               ("n" . my/hydra-narrow/body))
   :hook (prog-mode . fancy-narrow-mode)
