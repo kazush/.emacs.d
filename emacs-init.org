@@ -2967,6 +2967,13 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
 (add-hook 'sh-base-mode-hook #'my/setup-sh-mode)
 #+end_src
 
+** Pine Script
+
+#+begin_src emacs-lisp
+(use-package pine-script-mode
+  :mode (("\\.pine" . pine-script-mode)))
+#+end_src
+
 * Org mode
 
 #+begin_src emacs-lisp
