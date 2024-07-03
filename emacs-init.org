@@ -1598,7 +1598,6 @@ with EXWM. For example, this package manipulates frame params on dialog windows
               ("o" . my/persp-switch-to-last-persp)))
  :custom
  (persp-keymap-prefix (kbd "C-z"))
- (persp-set-ido-hooks t)
  (persp-auto-save-opt 0)
  (persp-auto-resume-time -1)
  (persp-add-buffer-on-after-change-major-mode t)
