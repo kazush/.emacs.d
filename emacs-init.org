@@ -2926,8 +2926,15 @@ MQL is a subset of C++.
 ;; MQL4
 (add-to-list 'auto-mode-alist '("\\.mq[45h]\\'" . c++-mode))
 
+;; add extensions to dumb-jump
+(with-eval-after-load 'dumb-jump
+  (dolist (ext '("mq4" "mq5" "mqh"))
+    (add-to-list 'dumb-jump-language-file-exts
+                 `(:language "c++" :ext ,ext :agtype "cpp" :rgtype "cpp") t)))
+
 ;; Add format of compilation error message.
-(add-to-list 'compilation-error-regexp-alist '("^\\(.+\\)(\\([0-9]+\\),\\([0-9]+\\)) : \\(error\\|warning\\).*$" 1 2 3))
+(add-to-list 'compilation-error-regexp-alist
+             '("^\\(.+\\)(\\([0-9]+\\),\\([0-9]+\\)) : \\(error\\|warning\\).*$" 1 2 3))
 #+end_src
 
 ** Java
