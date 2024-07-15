@@ -1597,6 +1597,7 @@ with EXWM. For example, this package manipulates frame params on dialog windows
         ("C-x C-b" . my/persp-list-buffers)
         ("C-x k" . persp-kill-buffer)
         (:map persp-key-map
+              ("N" . my/persp-new)
               ("o" . my/persp-switch-to-last-persp)))
  :custom
  (persp-keymap-prefix (kbd "C-z"))
@@ -1658,6 +1659,15 @@ with EXWM. For example, this package manipulates frame params on dialog windows
    (if (= arg 4)
        (list-buffers)
      (with-persp-buffer-list () (list-buffers))))
+
+ (defun my/persp-new (name)
+  "Create a new persp"
+  (interactive "spersp name: ")
+  (persp-add-new name)
+  (persp-switch name)
+  (let ((scratch-buffer (get-scratch-buffer-create)))
+    (persp-add-buffer scratch-buffer)
+    (switch-to-buffer scratch-buffer)))
  )
 #+end_src
 
