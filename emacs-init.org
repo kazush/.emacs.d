@@ -900,7 +900,7 @@ vertico and related packages are used for completion framework.
          ("M-s g" . consult-grep)
          ("M-s G" . consult-git-grep)
          ("M-s r" . consult-ripgrep)
-         ("M-s l" . my/consult-line)
+         ("M-s l" . consult-line)
          ("M-s L" . consult-line-multi)
          ("M-s k" . consult-keep-lines)
          ("M-s u" . consult-focus-lines)
@@ -983,14 +983,6 @@ vertico and related packages are used for completion framework.
   ;;;; 4. locate-dominating-file
   ;; (setq consult-project-function (lambda (_) (locate-dominating-file "." ".git")))
 
-  (defun my/consult-line (&optional prefix)
-    (interactive "P")
-    (if prefix
-        (consult-line)
-      (if (use-region-p)
-          (consult-line (buffer-substring (region-beginning) (region-end)))
-        (consult-line (thing-at-point 'symbol)))))
-
   (defun consult-exwm-preview-fix (buf-or-name &optional norecord force-same-window)
     "Kludge to stop EXWM buffers from stealing focus during Consult previews."
     (when (derived-mode-p 'exwm-mode)
@@ -999,6 +991,16 @@ vertico and related packages are used for completion framework.
 
   (advice-add
    #'switch-to-buffer :after #'consult-exwm-preview-fix)
+
+  ;; Set symbol in region or at point as initial input.
+  (dolist (cmd '(consult-line consult-line-multi consult-keep-lines consult-focus-lines
+                              consult-grep consult-ripgrep consult-git-grep))
+    (eval
+     `(consult-customize
+       ,cmd
+       :initial (if (use-region-p)
+                    (buffer-substring (region-beginning) (region-end))
+                  (thing-at-point 'symbol)))))
   )
 #+end_src
 
