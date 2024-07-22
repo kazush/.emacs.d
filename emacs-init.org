@@ -3165,6 +3165,7 @@ As of 3/19/2022, this does not work with Chrome. Works well with Firefox.
 ** Docker Tramp
 #+begin_src emacs-lisp
 (use-package docker-tramp
+  :disabled
   :after tramp
   :custom
   (docker-tramp-use-names t)
