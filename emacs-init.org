@@ -3160,6 +3160,16 @@ As of 3/19/2022, this does not work with Chrome. Works well with Firefox.
   (org-download-heading-lvl nil))
 #+end_src
 
+* Docker / Containers
+
+** Docker Tramp
+#+begin_src emacs-lisp
+(use-package docker-tramp
+  :after tramp
+  :custom
+  (docker-tramp-use-names t)
+  (docker-tramp-docker-executable "podman"))
+#+end_src
 * EXWM
 
 #+begin_src emacs-lisp
