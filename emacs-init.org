@@ -2189,7 +2189,8 @@ fi
 
 #+begin_src emacs-lisp
 (use-package vterm
-  :bind (("C-c s" . my/get-vterm))
+  :bind (("C-c s" . my/get-vterm)
+         ("C-c C-z" . my/vterm-send-ctrl-z))
   :commands (vterm)
   :config
   (defun my/newvterm ()
@@ -2203,6 +2204,10 @@ fi
   (defun my/get-vterm (arg)
     (interactive "p")
     (my/get-shellish arg 'my/newvterm "vterm"))
+
+  (defun my/vterm-send-ctrl-z ()
+    (interactive)
+    (vterm-send-key (kbd "C-z")))
   )
 #+end_src
 
