@@ -2589,7 +2589,8 @@ By default this is only enabled for yaml-mode for performance reasons.
 #+begin_src emacs-lisp
 (use-package magit
   :commands (magit-status)
-  :bind (("C-c m" . magit-status))
+  :bind (("C-c M s" . magit-status)
+         ("C-c M f" . magit-file-dispatch))
   :config
   (add-hook 'magit-process-find-password-functions 'magit-process-password-auth-source))
 #+end_src
