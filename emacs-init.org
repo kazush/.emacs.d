@@ -307,8 +307,17 @@ called in hooks.
                       :weight 'bold)
   (set-face-attribute 'ansi-color-blue nil
                       :foreground "DodgerBlue")
+  (set-face-attribute 'tab-bar nil
+                      :background "gray15")
+  (set-face-attribute 'tab-bar-tab-inactive nil
+                      :foreground "gray"
+                      :background "gray15")
+  (set-face-attribute 'tab-bar-tab nil
+                      :foreground "white"
+                      :background "gray15")
   (set-face-foreground 'font-lock-variable-name-face "khaki")
   (set-face-foreground 'font-lock-function-name-face "dodger blue")
+
   (unless (daemonp)
     (set-face-attribute 'mode-line-inactive nil
                         :foreground "darkgray"
@@ -440,6 +449,9 @@ prefix. This way which-key will be more useful.
 ** Key bindings
 
 #+begin_src emacs-lisp
+;; Bind C-z to tab bar prefix to replace persp-mode with tab bar.
+(global-set-key (kbd "C-z") tab-prefix-map)
+
 ;; Change key translation map
 ;; - bind function of C-? (DEL) to C-h
 ;; - bind function of C-h (help) to C-]
@@ -1593,6 +1605,7 @@ with EXWM. For example, this package manipulates frame params on dialog windows
 #+begin_src emacs-lisp
 (use-package-if-not-exwm
  persp-mode
+ :disabled
  :bind (("C-x b" . my/persp-switch-to-buffer)
         ("C-x C-b" . my/persp-list-buffers)
         ("C-x k" . persp-kill-buffer)
