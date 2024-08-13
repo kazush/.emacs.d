@@ -462,6 +462,9 @@ prefix. This way which-key will be more useful.
 (global-set-key (kbd "M-T") 'tabify)
 (global-set-key (kbd "C-x T") 'untabify)
 
+;; Make find-file-other-window the default behavior for find-file.
+(global-set-key (kbd "C-x C-f") 'find-file-other-window)
+
 ;; Bind some commands often used under C-x keymap.
 (global-set-key (kbd "C-x 5 k") 'delete-frame)
 (global-set-key (kbd "C-x K") 'kill-buffer-and-window)
@@ -879,7 +882,8 @@ vertico and related packages are used for completion framework.
 (use-package consult
   ;; Replace bindings. Lazily loaded due by `use-package'.
   :bind (;; C-c bindings (mode-specific-map)
-         ("C-c r" . consult-recent-file)
+         ("C-c r" . consult-recent-file-other-window)
+         ("C-c R" . consult-recent-file)
          ("C-c h" . consult-history)
          ("C-c m" . consult-mode-command)
          ("C-c k" . consult-kmacro)
@@ -931,7 +935,7 @@ vertico and related packages are used for completion framework.
   ;; Enable automatic preview at point in the *Completions* buffer. This is
   ;; relevant when you use the default completion UI.
   :hook (completion-list-mode . consult-preview-at-point-mode)
-  :commands (consult-buffer)
+  :commands (consult-buffer consult-xref)
 
   ;; The :init configuration is always executed (Not lazy)
   :init
@@ -966,12 +970,9 @@ vertico and related packages are used for completion framework.
   ;; For some commands and buffer sources it is useful to configure the
   ;; :preview-key on a per-command basis using the `consult-customize' macro.
   (consult-customize
-   consult-theme
-   :preview-key '(:debounce 0.2 any)
    consult-ripgrep consult-git-grep consult-grep
-   consult-bookmark consult-recent-file consult-xref
-   consult--source-bookmark consult--source-recent-file
-   consult--source-project-recent-file
+   consult-recent-file consult-recent-file-other-window
+   consult--source-recent-file consult--source-project-recent-file
    :preview-key "M-.")
 
   ;; Optionally configure the narrowing key.
@@ -995,14 +996,16 @@ vertico and related packages are used for completion framework.
   ;;;; 4. locate-dominating-file
   ;; (setq consult-project-function (lambda (_) (locate-dominating-file "." ".git")))
 
-  (defun consult-exwm-preview-fix (buf-or-name &optional norecord force-same-window)
-    "Kludge to stop EXWM buffers from stealing focus during Consult previews."
-    (when (derived-mode-p 'exwm-mode)
-      (when-let ((mini (active-minibuffer-window)))
-        (select-window (active-minibuffer-window)))))
+  (when-use-exwm
+   (defun consult-exwm-preview-fix (buf-or-name &optional norecord force-same-window)
+     "Kludge to stop EXWM buffers from stealing focus during Consult previews."
+     (when (derived-mode-p 'exwm-mode)
+       (when-let ((mini (active-minibuffer-window)))
+         (select-window (active-minibuffer-window)))))
 
-  (advice-add
-   #'switch-to-buffer :after #'consult-exwm-preview-fix)
+   (advice-add
+    #'switch-to-buffer :after #'consult-exwm-preview-fix)
+   )
 
   ;; Set symbol in region or at point as initial input.
   (dolist (cmd '(consult-line consult-line-multi consult-keep-lines consult-focus-lines
@@ -1013,6 +1016,22 @@ vertico and related packages are used for completion framework.
        :initial (if (use-region-p)
                     (buffer-substring (region-beginning) (region-end))
                   (thing-at-point 'symbol)))))
+
+  (defun consult-recent-file-other-window ()
+    "Find recent file using `completing-read'."
+    (interactive)
+    (find-file-other-window
+     (consult--read
+      (or
+       (mapcar #'consult--fast-abbreviate-file-name (bound-and-true-p recentf-list))
+       (user-error "No recent files, `recentf-mode' is %s"
+                   (if recentf-mode "enabled" "disabled")))
+      :prompt "Find recent file in other window: "
+      :sort nil
+      :require-match t
+      :category 'file
+      :state (consult--file-preview)
+      :history 'file-name-history)))
   )
 #+end_src
 
