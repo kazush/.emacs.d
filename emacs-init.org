@@ -3537,6 +3537,8 @@ Disabled atm as new distro is adopting pipewire.
 #+begin_src emacs-lisp
 (use-package ellama
   :bind ("C-c l" . ellama-chat)
+  :custom
+  (llm-warn-on-nonfree nil)
   :init
   ;; setup key bindings
   (setopt ellama-keymap-prefix "C-c L")
@@ -3549,7 +3551,7 @@ Disabled atm as new distro is adopting pipewire.
   ;; custom macro for local OpenAI compatible server
   (defmacro my/make-llm-local-server (&rest args)
     `(make-llm-openai-compatible
-      :url "http://localhost:8080/v1/"
+      :url "http://localhost:8000/v1/"
       :embedding-model "nomic-embed-text"
       ,@args))
 
