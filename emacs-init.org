@@ -480,7 +480,7 @@ prefix. This way which-key will be more useful.
                                 (interactive)
                                 (select-window
                                  (display-buffer
-                                  (get-buffer-create "*scratch*")))))
+                                  (get-scratch-buffer-create)))))
 
 ;; Move to another window with S-<arrow>.
 (when (fboundp 'windmove-default-keybindings)
@@ -557,7 +557,8 @@ Otherwise the same UI setup functions are called via ~emacs-startup-hook~.
   (when window-system
     (scroll-bar-mode -1)
     (fringe-mode 10))
-  (my/setup-faces))
+  (my/setup-faces)
+  (my/setup-fonts))
 
 ;; Hooks to forcibly reset UI for new frames by emacsclient.
 (add-hook 'server-after-make-frame-hook 'my/setup-ui)
