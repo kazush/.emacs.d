@@ -3036,23 +3036,23 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
 
 #+begin_src emacs-lisp
 (use-package org
-  :commands (org-agenda org-iswitchb org-capture)
+  :commands (org-agenda org-switchb org-capture)
   :bind (("C-c o a" . org-agenda)
-         ("C-c o b" . org-iswitchb)
+         ("C-c o b" . org-switchb)
          ("C-c o c" . org-capture)
          ("C-c o h" . org-insert-heading)
          ("C-c o H" . org-insert-subheading)
          ("C-c o l" . org-store-link)
-         ("C-c o j" . (lambda ()
-                        (interactive) (org-capture nil "j")))
-         ("C-c o m" . (lambda ()
-                        (interactive) (org-capture nil "m")))
-         ("C-c o t" . (lambda ()
-                        (interactive) (org-capture nil "t"))))
+         ("C-c o j" . my/org-capture-journal)
+         ("C-c o m" . my/org-capture-memo)
+         ("C-c o t" . my/org-capture-todo))
   :hook ((org . org-indent-mode)
          (org-agenda-mode . (lambda () (hl-line-mode 1)))
          (org-babel-after-execute . org-redisplay-inline-images))
   :custom
+  (org-use-sub-superscripts '{})
+  (org-export-with-sub-superscripts '{})
+  (org-image-actual-width nil)
   (org-src-preserve-indentation t)
   (org-edit-src-content-indentation 0)
   (org-src-window-setup 'other-window)
@@ -3083,6 +3083,15 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
   (org-stuck-projects
    '("+PROJECT/-DONE-SOMEDAY" ("TODO" "WAIT")))
   :config
+  (defun my/org-capture-journal ()
+    (interactive)
+    (org-capture nil "j"))
+  (defun my/org-capture-memo ()
+    (interactive)
+    (org-capture nil "m"))
+  (defun my/org-capture-todo ()
+    (interactive)
+    (org-capture nil "t"))
   ;; Faces
   (set-face-attribute 'org-level-1 nil
                       :foreground "darkgray")
