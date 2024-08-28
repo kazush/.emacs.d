@@ -3224,6 +3224,19 @@ As of 3/19/2022, this does not work with Chrome. Works well with Firefox.
   (org-download-heading-lvl nil))
 #+end_src
 
+** Org-roam
+
+#+begin_src emacs-lisp
+(use-package org-roam
+  :init
+  (unless (f-dir-p "~/org-roam")
+    (mkdir "~/org-roam"))
+  :bind (("C-c o r f" . org-roam-node-find)
+         ("C-c o r i" . org-roam-node-insert)
+         ("C-c o r l" . org-roam-buffer-toggle))
+  :config
+  (org-roam-setup))
+#+end_src
 * Docker / Containers
 
 ** Docker Tramp
