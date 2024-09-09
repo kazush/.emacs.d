@@ -3357,6 +3357,17 @@ As of 3/19/2022, this does not work with Chrome. Works well with Firefox.
   (org-download-heading-lvl nil))
 #+end_src
 
+** org-remoteimg
+
+Display remote images specified by URLs inline in org-mode.
+
+#+begin_src emacs-lisp
+(use-package org-remoteimg
+  :straight (org-remoteimg :type git :host github :repo "gaoDean/org-remoteimg")
+  :custom
+  (org-display-remote-inline-images 'cache) ;; enable caching
+  )
+#+end_src
 ** Org-roam
 
 #+begin_src emacs-lisp
