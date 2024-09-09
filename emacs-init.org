@@ -3193,7 +3193,8 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
          ("C-c o j" . my/org-capture-journal)
          ("C-c o m" . my/org-capture-memo)
          ("C-c o t" . my/org-capture-todo))
-  :hook ((org . org-indent-mode)
+  :hook ((org-mode . org-indent-mode)
+         (org-mode . visual-line-mode)
          (org-agenda-mode . (lambda () (hl-line-mode 1)))
          (org-babel-after-execute . org-redisplay-inline-images))
   :custom
