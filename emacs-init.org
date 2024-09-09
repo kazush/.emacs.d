@@ -1525,6 +1525,33 @@ A little enhancement to recentf.
 (use-package yasnippet-snippets)
 #+end_src
 
+** Tempo
+
+simple macros are defined using built-in Tempo.
+
+#+begin_src emacs-lisp
+(use-package tempo
+  :config
+  (add-to-list 'completion-at-point-functions #'tempo-complete-tag)
+  ;; keys are in the form of either '@<word>' or '<<word>'.
+  (setq my/tempo-match-finder "\\W\\([@<][[:word:]]+\\)\\=")
+
+  ;; Template definitions.
+  (tempo-define-template "time" '((format-time-string "%H:%M:%S") p >) "@time" "Insert current time")
+  (tempo-define-template "today" '((format-time-string "%Y-%m-%d") p >) "@today" "Insert today's date")
+  (tempo-define-template "tomorrow" '((format-time-string "%Y-%m-%d" (time-add (current-time) (* 24 3600))) p >) "@tomorrow" "Insert tomorrow's date")
+  (tempo-define-template "yesterday" '((format-time-string "%Y-%m-%d" (time-subtract (current-time) (* 24 3600))) p >) "@yesterday" "Insert yesterday's date")
+
+  (defun my/tempo-setup ()
+    "Setup my Tempo configuration for the current buffer."
+    (interactive)
+    (setq-local tempo-match-finder my/tempo-match-finder)
+    )
+  (add-hook 'org-mode-hook 'my/tempo-setup 100)
+  (add-hook 'text-mode-hook 'my/tempo-setup 100)
+  )
+#+end_src
+
 ** Projectile
 
 #+begin_src emacs-lisp
