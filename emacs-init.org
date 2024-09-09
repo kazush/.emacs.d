@@ -189,6 +189,10 @@ Customization for miscellaneous built-in features.
 ;; Automatically focus help and man windows when displayed.
 (setq help-window-select t)
 (setq Man-notify-method 'aggressive)
+
+;; Add word-wrap-whitespace-mode to visual line mode so line wrapping works as
+;; expected for non English text.
+(add-hook 'visual-line-mode-hook #'word-wrap-whitespace-mode)
 #+end_src
 
 Change the format of buffer name to /<unique dir suffix>/<filename>/.
@@ -249,7 +253,13 @@ TODO: watch [[https://protesilaos.com/codelog/2020-04-10-emacs-smerge-ediff/][th
   (ediff-split-window-function 'split-window-horizontally))
 #+end_src
 
-** EasyPG
+** Authinfo
+
+#+begin_src emacs-lisp
+(setq auth-sources '("~/.authinfo.gpg"))
+#+end_src
+
+*** EasyPG
 
 IIRC this is a workaround for some issues with authinfo that I don't
 remember. Not sure if this is still needed to make authinfo work in my
