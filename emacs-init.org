@@ -1617,6 +1617,11 @@ Correct indentation on bullet lists in Markdown mode.
   :hook (visual-line-mode . adaptive-wrap-prefix-mode))
 #+end_src
 
+* Misc utilities and enhancements
+** Dired
+
+Mostly borrowed from https://taipapamotohus.com/post/dired/.
+
 *** Dired+
 
 #+begin_src emacs-lisp
@@ -1645,19 +1650,115 @@ Correct indentation on bullet lists in Markdown mode.
 
 #+begin_src emacs-lisp
 (use-package nerd-icons-dired
+  :diminish
   :after dired
   :hook (dired-mode . nerd-icons-dired-mode))
 #+end_src
 
-** websearch
+*** Dired hacks
+
 #+begin_src emacs-lisp
-(use-package websearch
-  :custom
-  (websearch-custom-keymap-prefix "C-c /")
-  (websearch-custom-default-engine "google")
+(use-package dired-hacks
+  :after dired
+  :bind (:map dired-mode-map
+              ("i" . dired-subtree-insert)
+              (";" . dired-subtree-remove))
+  :init
+  (define-key dired-mode-map "/" dired-filter-map)
+  (define-key dired-filter-map "M" dired-filter-mark-map)
   :config
-  (websearch-mode))
+  (global-dired-collapse-mode)
+  )
 #+end_src
+
+** engine-mode
+#+begin_src emacs-lisp
+(use-package engine-mode
+  :config
+  (defengine amazon-jp
+    "https://amazon.co.jp/s?k=%s"
+    :keybinding "a")
+
+  (defengine duckduckgo
+    "https://duckduckgo.com/?q=%s"
+    :term-transformation-hook (lambda (term) (if current-prefix-arg
+                                                 (concat "\"" term "\"")
+                                               term)))
+
+  (defengine deepl
+    "https://www.deepl.com/ja/translator#en/ja/%s"
+    :keybinding "d")
+
+  (defengine github
+    "https://github.com/search?ref=simplesearch&q=%s")
+
+  (defengine google
+    "https://www.google.com/search?ie=utf-8&oe=utf-8&q=%s"
+    :term-transformation-hook (lambda (term) (if current-prefix-arg
+                                                 (concat "\"" term "\"")
+                                               term))
+    :keybinding "g")
+
+  (defengine google-images
+    "https://www.google.com/images?hl=en&source=hp&biw=1440&bih=795&gbv=2&aq=f&aqi=&aql=&oq=&q=%s")
+
+  (defengine google-maps
+    "https://maps.google.com/maps?q=%s"
+    :docstring "Mappin' it up."
+    :keybinding "m")
+
+  (defengine google-translate
+    "https://translate.google.com/?sl=auto&tl=ja&text=%s&op=translate"
+    :keybinding "t")
+
+  (defengine twitter
+    "https://twitter.com/search?q=%s"
+    :keybinding "x")
+
+  (defengine wikipedia
+    "https://www.wikipedia.org/search-redirect.php?language=en&go=Go&search=%s"
+    :keybinding "w"
+    :docstring "Searchin' the wikis.")
+
+  (defengine wiktionary
+    "https://www.wikipedia.org/search-redirect.php?family=wiktionary&language=en&go=Go&search=%s")
+
+  (defengine wolfram-alpha
+    "https://www.wolframalpha.com/input/?i=%s")
+
+  (defengine youtube
+    "https://www.youtube.com/results?aq=f&oq=&search_query=%s"
+    :keybinding "y")
+
+  (engine-mode t))
+#+end_src
+
+** go-translate
+
+#+begin_src emacs-lisp
+(use-package plz)
+(use-package go-translate
+  :bind (("C-c y" . gt-do-translate))
+  :config
+  (setq gt-langs '(en ja))
+  (setq gt-default-translator
+        (gt-translator :taker (gt-taker :langs '(en ja) :text 'word)
+                       :engines (gt-google-engine)
+                       :render (gt-buffer-render
+                                :buffer-name "*gt-result*"
+                                :window-config '((display-buffer-at-bottom))
+                                :then (lambda (_) (pop-to-buffer "*gt-result*")))))
+
+  ;; Add key bindings for the render buffer.
+  (advice-add #'gt-keybinds :after
+              (lambda (fn &rest args)
+                (gt-buffer-render-key ("SPC")  #'scroll-up-command)
+                (gt-buffer-render-key ("N")  #'scroll-up-command)
+                (gt-buffer-render-key ("S-SPC")  #'scroll-up-command)
+                (gt-buffer-render-key ("P")  #'scroll-down-command)))
+  )
+#+end_src
+
 * Window and workspace management
 
 ** Persp-mode
