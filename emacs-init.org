@@ -3372,15 +3372,44 @@ Display remote images specified by URLs inline in org-mode.
 
 #+begin_src emacs-lisp
 (use-package org-roam
-  :init
+  :bind (("C-c n f" . org-roam-node-find)
+         ("C-c n i" . org-roam-node-insert)
+         ("C-c n l" . org-roam-buffer-toggle)
+         :map org-mode-map
+         ("C-M-i" . completion-at-point)
+         :map org-roam-dailies-map
+         ("Y" . org-roam-dailies-capture-yesterday)
+         ("T" . org-roam-dailies-capture-tomorrow))
+  :bind-keymap
+  ("C-c n d" . org-roam-dailies-map)
+  :custom
+  (org-roam-capture-templates
+   '(("d" "default" plain "%?" :target
+      (file+head "${slug}.org" "#+title: ${title}\n")
+      :unnarrowed t)))
+  (org-roam-dailies-capture-templates
+   '(("d" "default" entry "* %<%H:%M:%S>: %?" :target
+      (file+head "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d %A>\n")
+      :empty-lines-before 1)))
+  :config
   (unless (f-dir-p "~/org-roam")
     (mkdir "~/org-roam"))
-  :bind (("C-c o r f" . org-roam-node-find)
-         ("C-c o r i" . org-roam-node-insert)
-         ("C-c o r l" . org-roam-buffer-toggle))
-  :config
-  (org-roam-setup))
+  (require 'org-roam-dailies)
+  (org-roam-db-autosync-enable))
 #+end_src
+
+*** org-roam-timestamps
+
+add ctime and mtime properties to org-roam nodes.
+
+#+begin_src emacs-lisp
+(use-package org-roam-timestamps
+  :diminish
+  :after org-roam
+  :config
+  (org-roam-timestamps-mode))
+#+end_src
+
 * Docker / Containers
 
 ** Docker Tramp
