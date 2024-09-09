@@ -1607,21 +1607,14 @@ Do not forget to install aspell.
     )
   )
 #+end_src
-* Misc utilities and enhancements
 
-** Dired
+** Adaptive Wrap
 
-Mostly borrowed from https://taipapamotohus.com/post/dired/.
-
-*** Dired subtree
+Correct indentation on bullet lists in Markdown mode.
 
 #+begin_src emacs-lisp
-  (use-package dired-subtree
-    :disabled
-    :after dired
-    :bind (:map dired-mode-map
-                ("i" . dired-subtree-insert)
-                (";" . dired-subtree-remove)))
+(use-package adaptive-wrap
+  :hook (visual-line-mode . adaptive-wrap-prefix-mode))
 #+end_src
 
 *** Dired+
