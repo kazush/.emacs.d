@@ -3705,7 +3705,6 @@ Macros to retrive API keys for LLM servce providers.
 
 #+begin_src emacs-lisp
 (use-package ellama
-  :bind ("C-c l" . ellama-chat)
   :bind-keymap
   ("C-c L" . ellama-command-map)
   :custom
