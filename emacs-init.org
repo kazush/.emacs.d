@@ -1671,94 +1671,6 @@ Mostly borrowed from https://taipapamotohus.com/post/dired/.
   )
 #+end_src
 
-** engine-mode
-#+begin_src emacs-lisp
-(use-package engine-mode
-  :config
-  (defengine amazon-jp
-    "https://amazon.co.jp/s?k=%s"
-    :keybinding "a")
-
-  (defengine duckduckgo
-    "https://duckduckgo.com/?q=%s"
-    :term-transformation-hook (lambda (term) (if current-prefix-arg
-                                                 (concat "\"" term "\"")
-                                               term)))
-
-  (defengine deepl
-    "https://www.deepl.com/ja/translator#en/ja/%s"
-    :keybinding "d")
-
-  (defengine github
-    "https://github.com/search?ref=simplesearch&q=%s")
-
-  (defengine google
-    "https://www.google.com/search?ie=utf-8&oe=utf-8&q=%s"
-    :term-transformation-hook (lambda (term) (if current-prefix-arg
-                                                 (concat "\"" term "\"")
-                                               term))
-    :keybinding "g")
-
-  (defengine google-images
-    "https://www.google.com/images?hl=en&source=hp&biw=1440&bih=795&gbv=2&aq=f&aqi=&aql=&oq=&q=%s")
-
-  (defengine google-maps
-    "https://maps.google.com/maps?q=%s"
-    :docstring "Mappin' it up."
-    :keybinding "m")
-
-  (defengine google-translate
-    "https://translate.google.com/?sl=auto&tl=ja&text=%s&op=translate"
-    :keybinding "t")
-
-  (defengine twitter
-    "https://twitter.com/search?q=%s"
-    :keybinding "x")
-
-  (defengine wikipedia
-    "https://www.wikipedia.org/search-redirect.php?language=en&go=Go&search=%s"
-    :keybinding "w"
-    :docstring "Searchin' the wikis.")
-
-  (defengine wiktionary
-    "https://www.wikipedia.org/search-redirect.php?family=wiktionary&language=en&go=Go&search=%s")
-
-  (defengine wolfram-alpha
-    "https://www.wolframalpha.com/input/?i=%s")
-
-  (defengine youtube
-    "https://www.youtube.com/results?aq=f&oq=&search_query=%s"
-    :keybinding "y")
-
-  (engine-mode t))
-#+end_src
-
-** go-translate
-
-#+begin_src emacs-lisp
-(use-package plz)
-(use-package go-translate
-  :bind (("C-c y" . gt-do-translate))
-  :config
-  (setq gt-langs '(en ja))
-  (setq gt-default-translator
-        (gt-translator :taker (gt-taker :langs '(en ja) :text 'word)
-                       :engines (gt-google-engine)
-                       :render (gt-buffer-render
-                                :buffer-name "*gt-result*"
-                                :window-config '((display-buffer-at-bottom))
-                                :then (lambda (_) (pop-to-buffer "*gt-result*")))))
-
-  ;; Add key bindings for the render buffer.
-  (advice-add #'gt-keybinds :after
-              (lambda (fn &rest args)
-                (gt-buffer-render-key ("SPC")  #'scroll-up-command)
-                (gt-buffer-render-key ("N")  #'scroll-up-command)
-                (gt-buffer-render-key ("S-SPC")  #'scroll-up-command)
-                (gt-buffer-render-key ("P")  #'scroll-down-command)))
-  )
-#+end_src
-
 * Window and workspace management
 
 ** Persp-mode
@@ -3905,6 +3817,236 @@ Use groq as the LLM service.
   (keymap-unset org-ai-mode-map "C-c r" t)
   )
 #+end_src
+
+* Internet Information and Media Tools
+
+** elfeed
+
+#+begin_src emacs-lisp
+(use-package elfeed
+  :bind (("C-c F" . elfeed))
+  :bind (:map elfeed-search-mode-map
+              ("b" . my/elfeed-search-browse-url-with-eww)
+              ("B" . #'elfeed-search-browse-url)
+              :map elfeed-show-mode-map
+              ("b" . my/elfeed-show-visit-with-eww)
+              ("B" . #'elfeed-show-visit))
+  :config
+  (defun my/elfeed-search-browse-url-with-eww (entry)
+    (interactive (list (elfeed-search-selected :ignore-region)))
+    (let ((browse-url-browser-function #'eww-browse-url))
+      (elfeed-search-show-entry entry)
+      (elfeed-show-visit)))
+
+  (defun my/elfeed-show-visit-with-eww (&optional use-generic-p)
+    (interactive "P")
+    (let ((browse-url-browser-function #'eww-browse-url))
+      (elfeed-show-visit use-generic-p)))
+  )
+
+(use-package elfeed-goodies
+  :after elfeed
+  :custom
+  (elfeed-goodies/feed-source-column-width 20)
+  (elfeed-goodies/tag-column-width 20)
+  (elfeed-goodies/entry-pane-position 'right)
+  (elfeed-goodies/entry-pane-size 0.5)
+  :config
+  (elfeed-goodies/setup))
+
+(use-package elfeed-org
+  :after (elfeed org)
+  :custom
+  (rmh-elfeed-org-files (list "~/.elfeed.org"))
+  :config
+  (elfeed-org))
+#+end_src
+
+** engine-mode
+#+begin_src emacs-lisp
+(use-package engine-mode
+  :config
+  (defengine amazon-jp
+    "https://amazon.co.jp/s?k=%s"
+    :keybinding "a")
+
+  (defengine duckduckgo
+    "https://duckduckgo.com/?q=%s"
+    :term-transformation-hook (lambda (term) (if current-prefix-arg
+                                                 (concat "\"" term "\"")
+                                               term)))
+
+  (defengine deepl
+    "https://www.deepl.com/ja/translator#en/ja/%s"
+    :keybinding "d")
+
+  (defengine github
+    "https://github.com/search?ref=simplesearch&q=%s")
+
+  (defengine google
+    "https://www.google.com/search?ie=utf-8&oe=utf-8&q=%s"
+    :term-transformation-hook (lambda (term) (if current-prefix-arg
+                                                 (concat "\"" term "\"")
+                                               term))
+    :keybinding "g")
+
+  (defengine google-images
+    "https://www.google.com/images?hl=en&source=hp&biw=1440&bih=795&gbv=2&aq=f&aqi=&aql=&oq=&q=%s")
+
+  (defengine google-maps
+    "https://maps.google.com/maps?q=%s"
+    :docstring "Mappin' it up."
+    :keybinding "m")
+
+  (defengine google-translate
+    "https://translate.google.com/?sl=auto&tl=ja&text=%s&op=translate"
+    :keybinding "t")
+
+  (defengine twitter
+    "https://twitter.com/search?q=%s"
+    :keybinding "x")
+
+  (defengine wikipedia
+    "https://www.wikipedia.org/search-redirect.php?language=en&go=Go&search=%s"
+    :keybinding "w"
+    :docstring "Searchin' the wikis.")
+
+  (defengine wiktionary
+    "https://www.wikipedia.org/search-redirect.php?family=wiktionary&language=en&go=Go&search=%s")
+
+  (defengine wolfram-alpha
+    "https://www.wolframalpha.com/input/?i=%s")
+
+  (defengine youtube
+    "https://www.youtube.com/results?aq=f&oq=&search_query=%s"
+    :keybinding "y")
+
+  (engine-mode t))
+#+end_src
+
+** go-translate
+
+#+begin_src emacs-lisp
+(use-package plz)
+(use-package go-translate
+  :bind (("C-c y" . gt-do-translate))
+  :config
+  (setq gt-langs '(en ja))
+  (setq gt-default-translator
+        (gt-translator :taker (gt-taker :langs '(en ja) :text 'word)
+                       :engines (gt-google-engine)
+                       :render (gt-buffer-render
+                                :buffer-name "*gt-result*"
+                                :window-config '((display-buffer-at-bottom))
+                                :then (lambda (_) (pop-to-buffer "*gt-result*")))))
+
+  ;; Add key bindings for the render buffer.
+  (advice-add #'gt-keybinds :after
+              (lambda (fn &rest args)
+                (gt-buffer-render-key ("SPC")  #'scroll-up-command)
+                (gt-buffer-render-key ("N")  #'scroll-up-command)
+                (gt-buffer-render-key ("S-SPC")  #'scroll-up-command)
+                (gt-buffer-render-key ("P")  #'scroll-down-command)))
+  )
+#+end_src
+
+** consult-omni
+
+#+begin_src emacs-lisp
+;; consult-omni depends on browser-hist.
+(use-package browser-hist
+  :config
+  (setq browser-hist-default-browser 'firefox)
+  :commands (browser-hist-search))
+
+(use-package consult-gh
+  :straight (consult-gh :type git :host github :repo "armindarvish/consult-gh")
+  :commands (consult-gh-search-repos))
+
+(use-package consult-omni
+  :straight (consult-omni :type git
+                          :host github
+                          :repo "armindarvish/consult-omni"
+                          :files (:defaults "sources/*.el"))
+  :bind (("M-s /" . consult-omni-multi)
+         ("C-c / a" . consult-omni-apps)
+         ("C-c / e" . consult-omni-elfeed)
+         ("C-c / g" . consult-omni-google)
+         ("C-c / G" . consult-omni-gh)
+         ("C-c / l" . consult-omni-locate)
+         ("C-c / s" . consult-omni-multi-static)
+         ("C-c / w" . consult-omni-wikipedia)
+         ("C-c / y" . consult-omni-invidious))
+  :custom
+  ;; General settings that apply to all sources
+  (consult-omni-show-preview t) ;;; show previews
+  (consult-omni-preview-key "C-o") ;;; set the preview key to C-o
+  :config
+  ;; Load Sources Core code
+  (require 'consult-omni-sources)
+  (require 'consult-omni-apps)
+  (require 'consult-omni-bing)
+  (require 'consult-omni-browser-history)
+  (require 'consult-omni-elfeed)
+  (require 'consult-omni-invidious)
+  (require 'consult-omni-gh)
+  (require 'consult-omni-google)
+  (require 'consult-omni-google-autosuggest)
+  (require 'consult-omni-locate)
+  (require 'consult-omni-wikipedia)
+  (require 'consult-omni-youtube)
+
+  ;; Load Embark Actions
+  (require 'consult-omni-embark)
+
+  ;; Either load all source modules or a selected list
+
+  ;;; Select a list of modules you want to aload, otherwise all sources all laoded
+  ;; (setq consult-omni-sources-modules-to-load (list 'consult-omni-wkipedia 'consult-omni-notes))
+  (consult-omni-sources-load-modules)
+  ;;; set multiple sources for consult-omni-multi command. Change these lists as
+  ;;; needed for different interactive commands. Keep in mind that each source
+  ;;; has to be a key in `consult-omni-sources-alist'.
+  (setq consult-omni-multi-sources '(;; "calc"
+                                     ;; "File"
+                                     ;; "Buffer"
+                                     ;; "Bookmark"
+                                     "Apps"
+                                     ;; "gptel"
+                                     ;; "Brave"
+                                     ;; "Dictionary"
+                                     "Google"
+                                     "Wikipedia"
+                                     "elfeed"
+                                     ;; "mu4e"
+                                     ;; "buffers text search"
+                                     "Notes Search"
+                                     "Org Agenda"
+                                     "GitHub"
+                                     ;; "YouTube"
+                                     "Invidious"))
+
+  ;; Per source customization
+
+  ;;; Set API KEYs. It is recommended to use a function that returns the string for better security.
+  (setq consult-omni-google-customsearch-key
+        (auth-source-pick-first-password :host "google-cse-apikey"))
+  (setq consult-omni-google-customsearch-cx
+        (auth-source-pick-first-password :host "google-cse-id"))
+
+  ;; (setq consult-omni-brave-api-key "YOUR-BRAVE-API-KEY-OR-FUNCTION")
+  ;; (setq consult-omni-stackexchange-api-key "YOUR-STACKEXCHANGE-API-KEY-OR-FUNCTION")
+  ;; (setq consult-omni-pubmed-api-key "YOUR-PUBMED-API-KEY-OR-FUNCTION")
+  ;; (setq consult-omni-openai-api-key "YOUR-OPENAI-API-KEY-OR-FUNCTION")
+
+  ;;; Pick you favorite autosuggest command.
+  (setq consult-omni-default-autosuggest-command #'consult-omni-google-autosuggest)
+
+  ;;; Set your shorthand favorite interactive command
+  (setq consult-omni-default-interactive-command #'consult-omni-multi)
+  )
+#+end_src
+
 * Post Init Config
 
 Load postinit.org if exists.
