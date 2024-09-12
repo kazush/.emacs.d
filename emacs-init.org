@@ -270,15 +270,87 @@ environment.
 (setq epa-pinentry-mode 'loopback)
 #+end_src
 
-** shr
+** EWW
+
+#+begin_src emacs-lisp
+(use-package eww
+  :bind (:map eww-mode-map
+              ("j" . scroll-up-command)
+              ("k" . scroll-down-command)
+              ("N" . scroll-up-command)
+              ("P" . scroll-down-command)
+              ("T" . my/eww-toggle-auto-readable))
+  :hook ((eww-after-render . my/eww-maybe-auto-readable)
+         (eww-after-render . my/eww-set-initial-position))
+  :config
+
+  ;; Controls behaviour of auto readable feature.
+  (defvar my/eww-enable-auto-readable t)
+  (defun my/eww-toggle-auto-readable ()
+    (interactive)
+    (setq my/eww-enable-auto-readable (not my/eww-enable-auto-readable))
+    (when (derived-mode-p 'eww-mode)
+      (eww-reload)))
+
+  ;; Regexp of URLS that readable mode should be automatically enabled for.
+  (defvar my/eww-auto-readable-urls
+    '("cnn.co.jp" "apnews.com" "doorblog.jp"))
+
+  ;; Automatically enable readable mode for the sites specified above.
+  (defun my/eww-maybe-auto-readable ()
+    (let ((url (eww-current-url))
+          (pat-list my/eww-auto-readable-urls))
+      (while-let ((pat (car pat-list)))
+        (when (and my/eww-enable-auto-readable
+                   (string-match-p pat url))
+          (eww-readable)
+          (setq pat-list nil))
+        (setq pat-list (cdr pat-list)))))
+
+  ;; alist of (<URL pattern> . <text pattern>).
+  (defvar my/eww-set-initial-position-alist
+    '(("reddit.com/" . "submitted .+ ago by ")))
+
+  ;; Set initial position to directly get to the text of interest for the sites
+  ;; specified above. (e.g. a site with many skippable lines at the top)
+  (defun my/eww-set-initial-position ()
+    (let ((url (eww-current-url))
+          (alist my/eww-set-initial-position-alist))
+      (while-let ((site-data (car alist)))
+        (let ((url-pat (car site-data))
+              (text-pat (cdr site-data)))
+          (when (string-match-p url-pat url)
+            (let ((p (search-forward-regexp text-pat nil t)))
+              (when p
+                (goto-char p)
+                (beginning-of-line)
+                (set-window-start nil (window-point))
+                (setq alist nil))))
+          (setq alist (cdr alist))))))
+  )
+#+end_src
+
+** SHR
 
 This is a temporary measure. Set variables to try to avoid unwanted line breaks.
 
 #+begin_src emacs-lisp
 (use-package shr
+  :bind (:map shr-map
+              ("j" . scroll-up-command)
+              ("k" . scroll-down-command)
+              ("RET" . my/shr-browse-url))
   :custom
   (shr-use-fonts nil)
   (shr-max-width 100000)
+  :config
+
+  ;; Forcibly use EWW to browse a URL.
+  (defun my/shr-browse-url (&optional external mouse-event new-window)
+    (interactive (list current-prefix-arg last-nonmenu-event))
+    (let ((url (get-text-property (point) 'shr-url))
+          (browse-url-browser-function #'eww-browse-url))
+      (browse-url url)))
   )
 #+end_src
 
