@@ -1760,6 +1760,20 @@ Mostly borrowed from https://taipapamotohus.com/post/dired/.
   (global-dired-collapse-mode)
   )
 #+end_src
+** SHR
+*** shr-tag-pre-highlight
+
+#+begin_src emacs-lisp
+(use-package shr-tag-pre-highlight
+  :after shr
+  :config
+  (add-to-list 'shr-external-rendering-functions
+               '(pre . shr-tag-pre-highlight))
+  (when (version< emacs-version "26")
+    (with-eval-after-load 'eww
+      (advice-add 'eww-display-html :around
+                  'eww-display-html--override-shr-external-rendering-functions))))
+#+end_src
 
 * Window and workspace management
 
