@@ -402,13 +402,15 @@ called in hooks.
   (set-face-attribute 'ansi-color-blue nil
                       :foreground "DodgerBlue")
   (set-face-attribute 'tab-bar nil
-                      :background "gray15")
+                      :family "Monospace"
+                      :background "gray15"
+                      :inherit 'unspecified)
   (set-face-attribute 'tab-bar-tab-inactive nil
                       :foreground "gray"
                       :background "gray15")
   (set-face-attribute 'tab-bar-tab nil
                       :foreground "white"
-                      :background "gray15")
+                      :background "gray20")
   (set-face-foreground 'font-lock-variable-name-face "khaki")
   (set-face-foreground 'font-lock-function-name-face "dodger blue")
 
@@ -545,6 +547,10 @@ prefix. This way which-key will be more useful.
 #+begin_src emacs-lisp
 ;; Bind C-z to tab bar prefix to replace persp-mode with tab bar.
 (global-set-key (kbd "C-z") tab-prefix-map)
+(defun my/new-tab-with-scratch ()
+  (interactive)
+  (switch-to-buffer-other-tab (get-scratch-buffer-create)))
+(define-key tab-prefix-map "s" #'my/new-tab-with-scratch)
 
 ;; Change key translation map
 ;; - bind function of C-? (DEL) to C-h
