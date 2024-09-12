@@ -3170,6 +3170,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
      ("security")
      ("tech")
      ("trading")
+     ("youtube")
      ))
   (org-agenda-custom-commands
    '(("x" "Unscheduled TODO" tags-todo "-SCHEDULED>=\"<now>\"" nil)))
