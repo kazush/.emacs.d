@@ -270,6 +270,15 @@ environment.
 (setq epa-pinentry-mode 'loopback)
 #+end_src
 
+** shr
+
+#+begin_src emacs-lisp
+(use-package shr
+  :custom
+  (shr-max-width 100000)
+  )
+#+end_src
+
 * User Interface
 
 Configure different features and settings that are related to user interface.
