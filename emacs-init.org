@@ -272,9 +272,12 @@ environment.
 
 ** shr
 
+This is a temporary measure. Set variables to try to avoid unwanted line breaks.
+
 #+begin_src emacs-lisp
 (use-package shr
   :custom
+  (shr-use-fonts nil)
   (shr-max-width 100000)
   )
 #+end_src
