@@ -3864,20 +3864,45 @@ Use groq as the LLM service.
               :map elfeed-show-mode-map
               ("b" . my/elfeed-show-visit-with-eww)
               ("B" . #'elfeed-show-visit))
+  :hook (elfeed-show-mode . visual-line-mode)
+  :custom
+  (elfeed-search-remain-on-entry t)  ;; for navigation from split entry pane.
   :config
+  ;; Set external program to retrieve a URL.
+  (setq my/eww-retrieve-command '("curl"))
+  ;; (setq my/eww-retrieve-command
+  ;;       '("google-chrome" "--headless" "--dump-dom" "--user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"))
+
+  ;; Show an feed entry in a split pane using display-buffer-alist.
+  (setq elfeed-show-entry-switch #'pop-to-buffer)
+  (add-to-list 'display-buffer-alist
+               '("\\`\\*elfeed-entry\\*"
+                 (display-buffer-reuse-window display-buffer-in-direction)
+                 (direction . right)
+                 (window-width . 0.5)))
+
+  ;; Close the window when q is pressed in the elfeed-entry buffer.
+  (defun my/elfeed-close-entry-window ()
+    (interactive)
+    (delete-window))
+  (advice-add #'elfeed-kill-buffer :after 'my/elfeed-close-entry-window)
+
   (defun my/elfeed-search-browse-url-with-eww (entry)
     (interactive (list (elfeed-search-selected :ignore-region)))
-    (let ((browse-url-browser-function #'eww-browse-url))
+    (let ((browse-url-browser-function #'eww-browse-url)
+          (eww-retrieve-command my/eww-retrieve-command))
       (elfeed-search-show-entry entry)
       (elfeed-show-visit)))
 
   (defun my/elfeed-show-visit-with-eww (&optional use-generic-p)
     (interactive "P")
-    (let ((browse-url-browser-function #'eww-browse-url))
+    (let ((browse-url-browser-function #'eww-browse-url)
+          (eww-retrieve-command my/eww-retrieve-command))
       (elfeed-show-visit use-generic-p)))
   )
 
 (use-package elfeed-goodies
+  :disabled
   :after elfeed
   :custom
   (elfeed-goodies/feed-source-column-width 20)
