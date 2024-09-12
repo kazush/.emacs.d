@@ -3955,10 +3955,12 @@ Use groq as the LLM service.
   :bind (("C-c F" . elfeed))
   :bind (:map elfeed-search-mode-map
               ("b" . my/elfeed-search-browse-url-with-eww)
-              ("B" . #'elfeed-search-browse-url)
+              ("B" . elfeed-search-browse-url)
               :map elfeed-show-mode-map
+              ("j" . scroll-up-command)
+              ("k" . scroll-down-command)
               ("b" . my/elfeed-show-visit-with-eww)
-              ("B" . #'elfeed-show-visit))
+              ("B" . elfeed-show-visit))
   :hook (elfeed-show-mode . visual-line-mode)
   :custom
   (elfeed-search-remain-on-entry t)  ;; for navigation from split entry pane.
