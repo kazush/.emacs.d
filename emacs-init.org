@@ -3920,6 +3920,34 @@ Use groq as the LLM service.
   (elfeed-org))
 #+end_src
 
+*** elfeed-tube
+
+#+begin_src emacs-lisp
+(use-package elfeed-tube
+  :after elfeed
+  :commands (elfeed-tube-add-feeds)
+  :custom
+  (elfeed-tube-auto-save-p t)
+  (elfeed-tube-auto-fetch-p t)
+  (elfeed-tube-captions-languages
+   '("ja" "japanese" "japanese (auto generated)" "en" "english" "english (auto generated)"))
+  :bind (:map elfeed-show-mode-map
+              ("F" . elfeed-tube-fetch)
+              ([remap save-buffer] . elfeed-tube-save)
+              :map elfeed-search-mode-map
+              ("F" . elfeed-tube-fetch)
+              ([remap save-buffer] . elfeed-tube-save))
+  :config
+  (elfeed-tube-setup)
+  )
+
+(use-package elfeed-tube-mpv
+  :after elfeed
+  :bind (:map elfeed-show-mode-map
+              ("C-c C-f" . elfeed-tube-mpv-follow-mode)
+              ("C-c C-w" . elfeed-tube-mpv-where)))
+#+end_src
+
 ** engine-mode
 #+begin_src emacs-lisp
 (use-package engine-mode
