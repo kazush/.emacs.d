@@ -3387,6 +3387,14 @@ As of 3/19/2022, this does not work with Chrome. Works well with Firefox.
   (org-download-heading-lvl nil))
 #+end_src
 
+** org-appear
+
+#+begin_src emacs-lisp
+(use-package org-appear
+  :straight (org-appear :type git :host github :repo "awth13/org-appear")
+  :hook (org-mode . org-appear-mode)
+  )
+#+end_src
 ** org-remoteimg
 
 Display remote images specified by URLs inline in org-mode.
