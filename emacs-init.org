@@ -3198,6 +3198,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
          (org-agenda-mode . (lambda () (hl-line-mode 1)))
          (org-babel-after-execute . org-redisplay-inline-images))
   :custom
+  (org-startup-indented t)
   (org-use-sub-superscripts '{})
   (org-export-with-sub-superscripts '{})
   (org-image-actual-width nil)
@@ -3289,6 +3290,10 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
                       :inherit 'org-block-begin-line)
   (set-face-attribute 'org-block nil
                       :background (if window-system "#252938" "color-236"))
+  (set-face-attribute 'org-code nil
+                      :foreground "sea green"
+                      :family "Monaco")
+
 
   ;; Enable template expansion with '<' prefix.
   (require 'org-tempo)
@@ -3347,7 +3352,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
    "⭠ now ─────────────────────────────────────────────────")
 
   ;; Ellipsis styling
-  org-ellipsis "…"
+  (setq org-ellipsis "…")
   (set-face-attribute 'org-ellipsis nil :inherit 'default :box nil))
 
 (use-package org-modern-indent
@@ -3910,6 +3915,7 @@ Use groq as the LLM service.
 
 #+begin_src emacs-lisp
 (use-package org-ai
+  :diminish
   :after org
   :straight (org-ai :type git :host github :repo "rksm/org-ai"
                     :local-repo "org-ai"
