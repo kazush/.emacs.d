@@ -1687,6 +1687,7 @@ Correct indentation on bullet lists in Markdown mode.
 
 #+begin_src emacs-lisp
 (use-package adaptive-wrap
+  :disabled
   :hook (visual-line-mode . adaptive-wrap-prefix-mode))
 #+end_src
 
