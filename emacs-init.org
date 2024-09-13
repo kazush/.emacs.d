@@ -1636,6 +1636,11 @@ A little enhancement to recentf.
      ("@tomorrow" "`(format-time-string \"%Y-%m-%d\" (time-add (current-time) (* 24 3600)))`" "tomorrow")
      ("@yesterday" "`(format-time-string \"%Y-%m-%d\" (time-subtract (current-time) (* 24 3600)))`" "yesterday")
      ))
+
+  (yas-define-snippets
+   'org-mode
+   '(("<el" "#+begin_src emacs-lisp\n$0\n#+end_src" "emacs-lisp")
+     ))
   )
 
 (use-package yasnippet-snippets)
