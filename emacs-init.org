@@ -1639,7 +1639,7 @@ A little enhancement to recentf.
 
   (yas-define-snippets
    'org-mode
-   '(("<el" "#+begin_src emacs-lisp\n$0\n#+end_src" "emacs-lisp")
+   '(("<el" "#+begin_src emacs-lisp\n$0\n#+end_src" "simple emacs-lisp block")
      ))
   )
 
