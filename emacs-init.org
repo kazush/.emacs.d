@@ -578,9 +578,8 @@ prefix. This way which-key will be more useful.
 ;; Make switch to scratch buffer easier, but often I forgot the key binding.
 (global-set-key (kbd "M-S") #'(lambda ()
                                 (interactive)
-                                (select-window
-                                 (display-buffer
-                                  (get-scratch-buffer-create)))))
+                                (pop-to-buffer
+                                  (get-scratch-buffer-create))))
 
 ;; Move to another window with S-<arrow>.
 (when (fboundp 'windmove-default-keybindings)
@@ -605,6 +604,7 @@ prefix. This way which-key will be more useful.
 (global-set-key (kbd "C-c c") 'compile)
 (global-set-key (kbd "C-c v") 'view-mode)
 (global-set-key (kbd "C-c B") 'browse-url-at-point)
+(global-set-key (kbd "C-c K") 'bury-buffer)
 #+end_src
 
 ** Input Method
