@@ -604,6 +604,9 @@ prefix. This way which-key will be more useful.
                                 (pop-to-buffer
                                   (get-scratch-buffer-create))))
 
+;; To be used along with scroll-other-window-up (M-C-v).
+(global-set-key (kbd "M-V") #'scroll-other-window-down)
+
 ;; Move to another window with S-<arrow>.
 (when (fboundp 'windmove-default-keybindings)
   (windmove-default-keybindings))
@@ -1465,9 +1468,25 @@ Dabbrev settings copied from the GitHub Corfu page.
 
 #+begin_src emacs-lisp
 (use-package corfu-popupinfo
- :straight nil
- :after corfu
- :hook (corfu-mode . corfu-popupinfo-mode))
+  :straight nil
+  :after corfu
+  :hook (corfu-mode . corfu-popupinfo-mode)
+  :config
+
+  ;; Scroll up/down by half frame-height by default.
+  (defun my/corfu-popupinfo-scroll-wrapper (orig-fn &optional n)
+    (interactive "P")
+    (let ((half-frame-height (with-selected-frame
+                                 corfu-popupinfo--frame
+                               (/ (window-height
+                                   (get-buffer-window " *corfu-popupinfo*")) 2))))
+      (funcall orig-fn (or n half-frame-height))))
+
+  (advice-add #'corfu-popupinfo-scroll-up
+              :around #'my/corfu-popupinfo-scroll-wrapper)
+  (advice-add #'corfu-popupinfo-scroll-down
+              :around #'my/corfu-popupinfo-scroll-wrapper)
+  )
 #+end_src
 
 *** nerd-icons-corfu
