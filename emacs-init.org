@@ -4128,6 +4128,7 @@ Use groq as the LLM service.
               :map elfeed-show-mode-map
               ("j" . scroll-up-command)
               ("k" . scroll-down-command)
+              ("v" . elfeed-show-visit)
               ("b" . my/elfeed-show-visit-with-eww)
               ("B" . elfeed-show-visit))
   :hook (elfeed-show-mode . visual-line-mode)
