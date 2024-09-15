@@ -339,19 +339,40 @@ This is a temporary measure. Set variables to try to avoid unwanted line breaks.
   :bind (:map shr-map
               ("j" . scroll-up-command)
               ("k" . scroll-down-command)
-              ("RET" . my/shr-browse-url))
+              ("RET" . my/shr-browse-url-with-eww))
   :custom
   (shr-use-fonts nil)
   (shr-max-width 100000)
   :config
 
   ;; Forcibly use EWW to browse a URL.
-  (defun my/shr-browse-url (&optional external mouse-event new-window)
+  (defun my/shr-browse-url-with-eww (&optional external mouse-event new-window)
     (interactive (list current-prefix-arg last-nonmenu-event))
     (let ((url (get-text-property (point) 'shr-url))
           (browse-url-browser-function #'eww-browse-url))
       (browse-url url)))
   )
+#+end_src
+
+** Browse URL
+
+Add small wrappers so that I can launch intended browser as needed.
+
+#+begin_src emacs-lisp
+(defun my/browse-url-at-point-with-default-browser ()
+  (interactive)
+  (let ((browse-url-browser-function #'browse-url-default-browser))
+    (call-interactively #'browse-url-at-point)))
+
+(defun my/browse-url-at-point-with-eww ()
+  (interactive)
+  (let ((browse-url-browser-function #'eww-browse-url))
+    (call-interactively #'browse-url-at-point)))
+
+(defun my/browse-url-at-point (&optional arg)
+  (interactive "P")
+  (if arg (my/browse-url-at-point-with-eww)
+    (my/browse-url-at-point-with-default-browser)))
 #+end_src
 
 * User Interface
@@ -601,10 +622,10 @@ prefix. This way which-key will be more useful.
   (global-set-key (kbd "s-f") #'find-file-other-window))
 
 ;; Bind some commands often used under C-c keymap.
-(global-set-key (kbd "C-c c") 'compile)
-(global-set-key (kbd "C-c v") 'view-mode)
-(global-set-key (kbd "C-c B") 'browse-url-at-point)
-(global-set-key (kbd "C-c K") 'bury-buffer)
+(global-set-key (kbd "C-c c") #'compile)
+(global-set-key (kbd "C-c v") #'view-mode)
+(global-set-key (kbd "C-c B") #'my/browse-url-at-point)
+(global-set-key (kbd "C-c K") #'bury-buffer)
 #+end_src
 
 ** Input Method
