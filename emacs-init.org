@@ -3966,6 +3966,7 @@ Macros to retrive API keys for LLM servce providers.
 
 #+begin_src emacs-lisp
 (use-package ellama
+  :bind ("C-c m" . ellama-chat)
   :bind-keymap
   ("C-c L" . ellama-command-map)
   :custom
@@ -4015,15 +4016,26 @@ Macros to retrive API keys for LLM servce providers.
             ("gemini-pro" . (my/make-llm-gemini
                              :chat-model "gemini-1.5-pro"))
             ("groq-llama-3.1" . (my/make-llm-groq
-                             :chat-model "llama-3.1-70b-versatile"))
+                                 :chat-model "llama-3.1-70b-versatile"))
             ("groq-mixtral-8x7b" . (my/make-llm-groq
-                             :chat-model "mixtral-8x7b-32768"))
+                                    :chat-model "mixtral-8x7b-32768"))
             ("ezo-common" . (my/make-llm-local-server
                              :chat-model "ezo-common"))
             ("ezo-humanities" . (my/make-llm-local-server
                                  :chat-model "ezo-humanities"))
             ("elyza" . (my/make-llm-local-server
                         :chat-model "elyza"))))
+
+  ;; Change AI's nickname as per the selected model.
+  (defun my/ellama-update-assistant-nick ()
+    (setq ellama-assistant-nick
+          (format-message
+           "AI (%s)"
+           (capitalize (cl-struct-slot-value (type-of ellama-provider)
+                                             'chat-model ellama-provider)))))
+
+  (advice-add #'ellama-provider-select :after #'my/ellama-update-assistant-nick)
+  (my/ellama-update-assistant-nick)
 
   ;; Disabled ellama-naming-provider and ellama-translation-provider to take
   ;; into account the situation where no local LLM server is running on the
