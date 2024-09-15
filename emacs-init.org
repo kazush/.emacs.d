@@ -309,7 +309,7 @@ environment.
 
   ;; alist of (<URL pattern> . <text pattern>).
   (defvar my/eww-set-initial-position-alist
-    '(("reddit.com/" . "submitted .+ ago by ")))
+    '(("reddit.com/" . "submitted .+ ago \\(\\* \\)?by ")))
 
   ;; Set initial position to directly get to the text of interest for the sites
   ;; specified above. (e.g. a site with many skippable lines at the top)
