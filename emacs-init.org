@@ -2807,7 +2807,9 @@ Eldoc-box displays eldoc contents in a child frame but is currently diabled.
   :custom
   (whitespace-style '(face trailing tabs tab-mark))
   :config
-  (set-face-background 'whitespace-tab (if window-system "gray25" "color-52"))
+  (set-face-attribute 'whitespace-tab nil
+                       :foreground "gray30"
+                       :background 'unspecified)
   ;; (set-face-background 'whitespace-trailing "gray25")
   )
 #+end_src
