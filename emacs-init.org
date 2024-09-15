@@ -568,6 +568,8 @@ prefix. This way which-key will be more useful.
 #+begin_src emacs-lisp
 ;; Bind C-z to tab bar prefix to replace persp-mode with tab bar.
 (global-set-key (kbd "C-z") tab-prefix-map)
+ ;; Remap tab-rename as C-z r will be bound to my/consult-recent-file-other-tab
+(define-key tab-prefix-map "R" #'tab-rename)
 (defun my/new-tab-with-scratch ()
   (interactive)
   (switch-to-buffer-other-tab (get-scratch-buffer-create)))
@@ -1020,7 +1022,7 @@ vertico and related packages are used for completion framework.
 (use-package consult
   ;; Replace bindings. Lazily loaded due by `use-package'.
   :bind (;; C-c bindings (mode-specific-map)
-         ("C-c r" . consult-recent-file-other-window)
+         ("C-c r" . my/consult-recent-file-other-window)
          ("C-c R" . consult-recent-file)
          ("C-c h" . consult-history)
          ("C-c m" . consult-mode-command)
@@ -1068,7 +1070,10 @@ vertico and related packages are used for completion framework.
          ;; Minibuffer history
          :map minibuffer-local-map
          ("M-s" . consult-history)                 ;; orig. next-matching-history-element
-         ("M-r" . consult-history))                ;; orig. previous-matching-history-element
+         ("M-r" . consult-history)                 ;; orig. previous-matching-history-element
+         :map tab-prefix-map
+         ("r" . my/consult-recent-file-other-tab)
+         )
 
   ;; Enable automatic preview at point in the *Completions* buffer. This is
   ;; relevant when you use the default completion UI.
@@ -1109,7 +1114,7 @@ vertico and related packages are used for completion framework.
   ;; :preview-key on a per-command basis using the `consult-customize' macro.
   (consult-customize
    consult-ripgrep consult-git-grep consult-grep
-   consult-recent-file consult-recent-file-other-window
+   consult-recent-file
    consult--source-recent-file consult--source-project-recent-file
    :preview-key "M-.")
 
@@ -1155,7 +1160,7 @@ vertico and related packages are used for completion framework.
                     (buffer-substring (region-beginning) (region-end))
                   (thing-at-point 'symbol)))))
 
-  (defun consult-recent-file-other-window ()
+  (defun my/consult-recent-file-other-window ()
     "Find recent file using `completing-read'."
     (interactive)
     (find-file-other-window
@@ -1170,6 +1175,26 @@ vertico and related packages are used for completion framework.
       :category 'file
       :state (consult--file-preview)
       :history 'file-name-history)))
+
+  (defun my/consult-recent-file-other-tab ()
+    "Find recent file in other tab using `completing-read'."
+    (interactive)
+    (find-file-other-tab
+     (consult--read
+      (or
+       (mapcar #'consult--fast-abbreviate-file-name (bound-and-true-p recentf-list))
+       (user-error "No recent files, `recentf-mode' is %s"
+                   (if recentf-mode "enabled" "disabled")))
+      :prompt "Find recent file in other tab: "
+      :sort nil
+      :require-match t
+      :category 'file
+      :state (consult--file-preview)
+      :history 'file-name-history)))
+
+  (consult-customize
+   my/consult-recent-file-other-window my/consult-recent-file-other-tab
+   :preview-key "M-.")
   )
 #+end_src
 
