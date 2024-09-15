@@ -3310,7 +3310,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
       "* TODO %?\n  %i\n  %a")
      ))
   (org-todo-keywords
-   '((sequence "TODO(t)" "WAIT(w)" "|" "DONE(d)" "SOMEDAY(s)")))
+   '((sequence "TODO(t)" "WAIT(w)" "SOMEDAY(s)" "|" "DONE(d)" "CANCELLED(c)")))
   (org-log-done 'time)
   (org-agenda-files (list org-directory))
   (org-tag-alist
