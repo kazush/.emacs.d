@@ -4285,13 +4285,40 @@ Use groq as the LLM service.
   :bind (("C-c y" . gt-do-translate))
   :config
   (setq gt-langs '(en ja))
-  (setq gt-default-translator
-        (gt-translator :taker (gt-taker :langs '(en ja) :text 'word)
+
+  (defun my/gt-strip-linebreak (ts)
+    (with-slots (text) ts
+      (setf text
+            (mapcar (lambda (s) (string-replace "\n" " " s)) text))
+      ))
+
+  (setq gt-chatgpt-key (my/get-groq-apikey))
+  (setq my/gt-google-translate
+        (gt-translator :taker (gt-taker
+                               :langs '(en ja)
+                               :text 'word
+                               :then #'my/gt-strip-linebreak)
                        :engines (gt-google-engine)
                        :render (gt-buffer-render
                                 :buffer-name "*gt-result*"
                                 :window-config '((display-buffer-at-bottom))
+                                :then (lambda (_) (pop-to-buffer "*gt-result*"))))
+        my/gt-groq-llama-3.1
+        (gt-translator :taker (gt-taker
+                               :langs '(en ja)
+                               :text 'sentence
+                               :then #'my/gt-strip-linebreak)
+                       :engines (gt-chatgpt-engine
+                                 :host "https://api.groq.com/openai"
+                                 :model "llama-3.1-70b-versatile")
+                       :render (gt-buffer-render
+                                :buffer-name "*gt-result*"
+                                :window-config '((display-buffer-at-bottom))
                                 :then (lambda (_) (pop-to-buffer "*gt-result*")))))
+
+  (setq gt-preset-translators
+        `((google-translate . ,my/gt-google-translate)
+          (groq-llama-3.1 . ,my/gt-groq-llama-3.1)))
 
   ;; Add key bindings for the render buffer.
   (advice-add #'gt-keybinds :after
