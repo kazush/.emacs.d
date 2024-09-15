@@ -4121,7 +4121,8 @@ Use groq as the LLM service.
 
 #+begin_src emacs-lisp
 (use-package elfeed
-  :bind (("C-c F" . elfeed))
+  :bind (("C-c F" . elfeed)
+         ("<f12>" . elfeed))
   :bind (:map elfeed-search-mode-map
               ("b" . my/elfeed-search-browse-url-with-eww)
               ("B" . elfeed-search-browse-url)
