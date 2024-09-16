@@ -3274,6 +3274,8 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
 
 * Org mode
 
+** Basic Config
+
 #+begin_src emacs-lisp
 (use-package org
   :commands (org-agenda org-switchb org-capture)
@@ -3349,6 +3351,27 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
    '(("x" "Unscheduled TODO" tags-todo "-SCHEDULED>=\"<now>\"" nil)))
   (org-stuck-projects
    '("+PROJECT/-DONE-SOMEDAY" ("TODO" "WAIT")))
+
+  ;; Moved from org-modern
+  (org-auto-align-tags nil)
+  (org-tags-column 0)
+  (org-fold-catch-invisible-edits 'show-and-error)
+  (org-special-ctrl-a/e t)
+  (org-insert-heading-respect-content t)
+  ;; Org styling, hide markup etc.
+  (org-hide-emphasis-markers t)
+  (org-pretty-entities t)
+  ;; Agenda styling
+  (org-agenda-tags-column 0)
+  (org-agenda-block-separator ?─)
+  (org-agenda-time-grid
+   '((daily today require-timed)
+     (800 1000 1200 1400 1600 1800 2000)
+     " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄"))
+  (org-agenda-current-time-string
+   "⭠ now ─────────────────────────────────────────────────")
+  (org-ellipsis "⇣")
+
   :config
   (defun my/org-capture-journal ()
     (interactive)
@@ -3385,7 +3408,8 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
                       :background (if window-system "#252938" "color-236"))
   (set-face-attribute 'org-code nil
                       :foreground "sea green"
-                      :family "Monaco")
+                      :family "Inconsolata Nerd Font")
+  (set-face-attribute 'org-ellipsis nil :inherit 'default :box nil)
 
   ;; Patched org-do-emphasis-faces to allow nested emphasis markers.
 
@@ -3477,45 +3501,28 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
   (require 'ob-js)
   (require 'ob-css)
   )
+#+end_src
 
+** Bebel Extensions
+
+#+begin_src emacs-lisp
 (use-package ob-ipython :disabled)
 (use-package ob-go)
-
 (use-package ob-async)
+#+end_src
 
-(use-package org-bullets
-  :disabled
-  :hook (org-mode . (lambda () (org-bullets-mode 1))))
+** org-modern
 
+#+begin_src emacs-lisp
 (use-package org-modern
-  :hook (org-mode . org-modern-mode)
-  :config
-  (setq
-   ;; Edit settings
-   org-auto-align-tags nil
-   org-tags-column 0
-   org-fold-catch-invisible-edits 'show-and-error
-   org-special-ctrl-a/e t
-   org-insert-heading-respect-content t
+  :hook ((org-mode . org-modern-mode)
+         (org-agenda-finalize . org-modern-agenda)))
+#+end_src
 
-   ;; Org styling, hide markup etc.
-   org-hide-emphasis-markers t
-   org-pretty-entities t
 
-   ;; Agenda styling
-   org-agenda-tags-column 0
-   org-agenda-block-separator ?─
-   org-agenda-time-grid
-   '((daily today require-timed)
-     (800 1000 1200 1400 1600 1800 2000)
-     " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄")
-   org-agenda-current-time-string
-   "⭠ now ─────────────────────────────────────────────────")
+** org-modern-indent
 
-  ;; Ellipsis styling
-  (setq org-ellipsis "…")
-  (set-face-attribute 'org-ellipsis nil :inherit 'default :box nil))
-
+#+begin_src emacs-lisp
 (use-package org-modern-indent
   :straight (org-modern-indent
              :type git
@@ -3523,17 +3530,23 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
              :repo "jdtsmith/org-modern-indent")
   :config
   (add-hook 'org-mode-hook #'org-modern-indent-mode 90))
+#+end_src
 
+** org-cliplink
+
+#+begin_src emacs-lisp
 (use-package org-cliplink
   :bind (("C-c o L" . org-cliplink)))
+#+end_src
 
+#+begin_src emacs-lisp
 (use-package ox-hugo
   :after ox
   :custom
   (org-hugo-default-section-directory "posts"))
 #+end_src
 
-** Org-download
+** org-download
 
 As of 3/19/2022, this does not work with Chrome. Works well with Firefox.
 
@@ -3567,7 +3580,7 @@ Display remote images specified by URLs inline in org-mode.
   (org-display-remote-inline-images 'cache) ;; enable caching
   )
 #+end_src
-** Org-roam
+** org-roam
 
 #+begin_src emacs-lisp
 (use-package org-roam
@@ -3583,6 +3596,7 @@ Display remote images specified by URLs inline in org-mode.
   :bind-keymap
   ("C-c n d" . org-roam-dailies-map)
   :custom
+  (org-roam-directory "~/org/roam")
   (org-roam-capture-templates
    '(("d" "default" plain "%?" :target
       (file+head "${slug}.org" "#+title: ${title}\n")
@@ -3592,10 +3606,10 @@ Display remote images specified by URLs inline in org-mode.
       (file+head "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d %A>\n")
       :empty-lines-before 1)))
   :init
-  (add-to-list 'org-agenda-files "~/org-roam" 'append)
+  (add-to-list 'org-agenda-files "~/org/roam" 'append)
   :config
-  (unless (f-dir-p "~/org-roam")
-    (mkdir "~/org-roam"))
+  (unless (f-dir-p "~/org/roam")
+    (mkdir "~/org/roam" t))
   (require 'org-roam-dailies)
   (org-roam-db-autosync-enable))
 #+end_src
