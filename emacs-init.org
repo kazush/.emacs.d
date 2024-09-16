@@ -3979,6 +3979,12 @@ Macros to retrive API keys for LLM servce providers.
 
 (defun my/get-groq-apikey ()
   (auth-source-pick-first-password :host "groq-apikey"))
+
+(defun my/get-sambanova-apikey ()
+  (auth-source-pick-first-password :host "sambanova-apikey"))
+
+(defun my/get-cohere-apikey ()
+  (auth-source-pick-first-password :host "cohere-apikey"))
 #+end_src
 
 ** Ellama - Emacs client for ollama
@@ -4013,6 +4019,18 @@ Macros to retrive API keys for LLM servce providers.
       :key (my/get-groq-apikey)
       ,@args))
 
+  (defmacro my/make-llm-sambanova (&rest args)
+    `(make-llm-openai-compatible
+      :url "https://api.sambanova.ai/v1/"
+      :key (my/get-sambanova-apikey)
+      ,@args))
+
+  (defmacro my/make-llm-cohere (&rest args)
+    `(make-llm-openai-compatible
+      :url "http://localhost:6600/v1/"
+      :key (my/get-cohere-apikey)
+      ,@args))
+
   (require 'llm-gemini)
   (defmacro my/make-llm-gemini (&rest args)
     `(make-llm-gemini
@@ -4038,6 +4056,10 @@ Macros to retrive API keys for LLM servce providers.
                                  :chat-model "llama-3.1-70b-versatile"))
             ("groq-mixtral-8x7b" . (my/make-llm-groq
                                     :chat-model "mixtral-8x7b-32768"))
+            ("sambanova-llama-3.1" . (my/make-llm-sambanova
+                                      :chat-model "Meta-Llama-3.1-405B-Instruct"))
+            ("cohere-command-r-plus" . (my/make-llm-cohere
+                                      :chat-model "command-r-plus"))
             ("ezo-common" . (my/make-llm-local-server
                              :chat-model "ezo-common"))
             ("ezo-humanities" . (my/make-llm-local-server
