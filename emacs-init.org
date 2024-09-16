@@ -54,7 +54,7 @@ Some tiny macros to increase code readability and take care of the issue with
        (use-package ,name ,@args)))
 #+end_src
 
-* General config
+* Basic config
 
 Miscellaneous built-in features are configured and customzied here.
 
@@ -435,6 +435,10 @@ called in hooks.
   (set-face-foreground 'font-lock-variable-name-face "khaki")
   (set-face-foreground 'font-lock-function-name-face "dodger blue")
 
+
+  (set-face-attribute 'outline-1 nil :height 1.2)
+  (set-face-attribute 'outline-2 nil :height 1.05)
+
   (unless (daemonp)
     (set-face-attribute 'mode-line-inactive nil
                         :foreground "darkgray"
@@ -643,6 +647,7 @@ Specify Japanese input method ~Mozc~ (which bases Google Japanese Input method).
   (default-input-method "japanese-mozc")
   (mozc-candidate-style 'echo-area)
   :bind (("<muhenkan>" . toggle-input-method)
+         ("M-SPC" . toggle-input-method)  ;; temporary measure
          :map mozc-mode-map
               ("<muhenkan>" . my/deactivate-input-method))
   :config
