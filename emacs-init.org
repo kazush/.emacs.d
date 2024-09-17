@@ -3500,6 +3500,14 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
   (require 'ob-sed)
   (require 'ob-js)
   (require 'ob-css)
+
+  ;; For Encrypting contents.
+  (require 'org-crypt)
+  (org-crypt-use-before-save-magic)
+  (setq org-tags-exclude-from-inheritance (quote ("crypt")))
+  ;; GPG key to use for encryption
+  ;; Either the Key ID or set to nil to use symmetric encryption.
+  (setq org-crypt-key (getenv "ORG_CRYP_KEY"))
   )
 #+end_src
 
@@ -3600,10 +3608,23 @@ Display remote images specified by URLs inline in org-mode.
   (org-roam-capture-templates
    '(("d" "default" plain "%?" :target
       (file+head "${slug}.org" "#+title: ${title}\n")
-      :unnarrowed t)))
+      :unnarrowed t)
+     ("e" "encrypted" plain "%?" :target
+      (file+head "secure/${slug}.org.gpg" "#+title: ${title}\n")
+      :unnarrowed t)
+     ("a" "account" entry "* ${title}\n%?" :target
+      (file+head "secure/accounts.org.gpg" "#+title: Account Information\n")
+      :unnarrowed t)
+     ("c" "contact" entry "* ${title}\n%?" :target
+      (file+head "secure/contacts.org.gpg" "#+title: Personal Contacts\n")
+      :unnarrowed t)
+     ))
   (org-roam-dailies-capture-templates
-   '(("d" "default" entry "* %T %?" :target
+   '(("d" "default" entry "* %T\n%?" :target
       (file+head "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d %A>\n")
+      :empty-lines-before 1)
+     ("e" "encrypted" entry "* %T\n%?" :target
+      (file+head "secure/%<%Y-%m-%d>.org.gpg" "#+title: Personal Notes: %<%Y-%m-%d %A>\n")
       :empty-lines-before 1)))
   :init
   (add-to-list 'org-agenda-files "~/org/roam" 'append)
