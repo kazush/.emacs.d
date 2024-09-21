@@ -3384,7 +3384,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
     (org-capture nil "t"))
   ;; Faces
   (set-face-attribute 'org-level-1 nil
-                      :foreground "darkgray")
+                      :foreground "lightgray")
   (set-face-attribute 'org-level-2 nil
                       :foreground "steelblue3")
   (set-face-attribute 'org-level-3 nil
