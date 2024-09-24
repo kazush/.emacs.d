@@ -4130,6 +4130,29 @@ Macros to retrive API keys for LLM servce providers.
               "llama3-70b-8192"
               "mixtral-8x7b-32768"))
 
+  (gptel-make-ollama "Ollama"
+    :host "localhost:11434"
+    :stream t
+    :models '("qwen2.5-coder:latest"
+              "deepseek-coder-v2:latest"
+              "ezo-common-gemma2:9b"
+              "mistral-nemo-instruct:latest"
+              "llama3.1:latest"))
+
+  (gptel-make-openai "SambaNova"
+    :host "api.sambanova.ai"
+    :endpoint "/v1/chat/completions"
+    :stream t
+    :key #'my/get-groq-apikey
+    :models '("Meta-Llama-3.1-405B-Instruct"))
+
+  (gptel-make-openai "Cohere"
+    :host "localhost:6600"
+    :endpoint "/v1/chat/completions"
+    :stream t
+    :key #'my/get-groq-apikey
+    :models '("command-r-plus"))
+
   (defun my/gptel-get-backend (key)
     (alist-get key gptel--known-backends nil nil 'string=))
 
