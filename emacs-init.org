@@ -2140,17 +2140,6 @@ the two windows.
 
 (defvar my/side-window-height .3)
 
-;; To open a new window below the current buffer.
-(add-to-list 'display-buffer-alist
-             `(,(rx bos "*" (or "term" "shell" "eshell" "vterm") (* not-newline) "*" eos)
-               (lambda (buf alist)
-                 (let ((win (get-buffer-window buf)))
-                   (if win win
-                     (display-buffer-in-side-window buf alist))))
-               (side . bottom) (slot . -1) (preserve-size . (nil . t))
-               ;; (window-parameters . ((no-other-window . t) (no-delete-other-windows . t)))
-               (window-height . ,my/side-window-height)))
-
 (add-to-list 'display-buffer-alist
              `(,(rx bos "*"
                     (or "Completion" "compilation" "Buffer List" (regexp "build.*") "xref")
@@ -2234,18 +2223,6 @@ the two windows.
     (if (my/shellish-buffer-p (car buflist) shell-str)
         (car buflist) (my/find-last-shellish-buffer (cdr buflist) shell-str))))
 
-(defun my/chdir (dir)
-  "Change directory to DIR."
-  (let* ((proc (get-buffer-process (current-buffer)))
-         (pmark (process-mark proc)))
-    (goto-char pmark)
-    (unless comint-process-echoes
-      (insert (concat "cd " dir)) (insert "\n"))
-    (sit-for 0)  ; force redisplay
-    ;; (comint-send-string proc (concat "cd " dir "\n"))
-    (comint-send-input)
-    (set-marker pmark (point))))
-
 (defvar my/last-non-shellish-buffer nil)
 
 (defun my/remember-last-non-shellish-buffer ()
@@ -2253,6 +2230,12 @@ the two windows.
   (let ((buf (current-buffer)))
     (unless (my/shellish-buffer-p buf)
       (setq my/last-non-shellish-buffer buf))))
+
+(defvar my/shellish-tab-name "*shell tab*")
+
+(defun my/get-display-buffer-action-for-shellish ()
+  "Return display-buffer's ACTION parameter applied to shellish buffers."
+  `(display-buffer-in-tab . ((tab-name . ,my/shellish-tab-name))))
 
 (defun my/get-shellish (arg shellfunc shell-str)
   "Switch to the shell-ish buffer last used or create new without prefix (ARG).
@@ -2262,7 +2245,8 @@ the two windows.
   - With double prefixes, unconditionally create new one by calling SHELLFUNC."
   (interactive "p")
   (let ((b (my/find-last-shellish-buffer (buffer-list (selected-frame))
-                                         shell-str)))
+                                         shell-str))
+        (display-buffer-overriding-action (my/get-display-buffer-action-for-shellish)))
     (cond ((or (not b) (= arg 16))
            (my/remember-last-non-shellish-buffer)
            (call-interactively shellfunc))
@@ -2270,6 +2254,9 @@ the two windows.
           ;;  (select-window (display-buffer my/last-non-shellish-buffer)))
           ((= arg 4)
            (call-interactively my/display-shellish-buffer-list))
+          ((string= (alist-get 'name (tab-bar-get-buffer-tab (current-buffer)))
+                    my/shellish-tab-name)
+           (tab-bar-close-tab))
           ((my/shellish-buffer-p (current-buffer) shell-str)
            (delete-window (get-buffer-window (current-buffer))))
           (b
