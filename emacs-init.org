@@ -4053,7 +4053,7 @@ Macros to retrive API keys for LLM servce providers.
   ;;          :chat-model "deepseek-coder-v2:latest"))
 
   (setopt ellama-provider (my/make-llm-gemini
-                           :chat-model "gemini-1.5-flash"))
+                           :chat-model "gemini-1.5-flash-002"))
   ;; Predefined llm providers for interactive switching.
   ;; You shouldn't add ollama providers here - it can be selected interactively
   ;; without it. It is just example.
@@ -4062,6 +4062,10 @@ Macros to retrive API keys for LLM servce providers.
                                :chat-model "gemini-1.5-flash"))
             ("gemini-pro" . (my/make-llm-gemini
                              :chat-model "gemini-1.5-pro"))
+            ("gemini-flash-002" . (my/make-llm-gemini
+                               :chat-model "gemini-1.5-flash-002"))
+            ("gemini-pro-002" . (my/make-llm-gemini
+                             :chat-model "gemini-1.5-pro-002"))
             ("groq-llama-3.1" . (my/make-llm-groq
                                  :chat-model "llama-3.1-70b-versatile"))
             ("groq-mixtral-8x7b" . (my/make-llm-groq
@@ -4117,7 +4121,10 @@ Macros to retrive API keys for LLM servce providers.
 
   (gptel-make-gemini "Gemini"
     :key #'my/get-gemini-apikey
-    :models '("gemini-1.5-flash" "gemini-1.5-pro")
+    :models '("gemini-1.5-flash"
+              "gemini-1.5-pro"
+              "gemini-1.5-flash-002"
+              "gemini-1.5-pro-002")
     :stream t)
 
   (gptel-make-openai "Groq"
@@ -4158,7 +4165,7 @@ Macros to retrive API keys for LLM servce providers.
 
   ;; Set default backend.
   (setq gptel-backend (my/gptel-get-backend "Gemini"))
-  (setq gptel-model "gemini-1.5-flash")
+  (setq gptel-model "gemini-1.5-flash-002")
   )
 #+end_src
 
