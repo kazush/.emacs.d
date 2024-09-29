@@ -2725,6 +2725,7 @@ Eldoc-box displays eldoc contents in a child frame but is currently diabled.
 
 #+begin_src emacs-lisp
 (use-package smartparens
+  :disabled
   :diminish smartparens-mode
   :bind (("C-M-f" . sp-forward-slurp-sexp)
          ("C-M-b" . sp-backward-slurp-sexp)
