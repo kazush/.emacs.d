@@ -4512,7 +4512,7 @@ Use groq as the LLM service.
          ("C-c / a" . consult-omni-apps)
          ("C-c / e" . consult-omni-elfeed)
          ("C-c / g" . consult-omni-google)
-         ("C-c / G" . consult-omni-gh)
+         ("C-c / G" . consult-omni-github)
          ("C-c / l" . consult-omni-locate)
          ("C-c / s" . consult-omni-multi-static)
          ("C-c / w" . consult-omni-wikipedia)
