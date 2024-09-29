@@ -3346,7 +3346,10 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
          ("C-c o l" . org-store-link)
          ("C-c o j" . my/org-capture-journal)
          ("C-c o m" . my/org-capture-memo)
-         ("C-c o t" . my/org-capture-todo))
+         ("C-c o t" . my/org-capture-todo)
+         :map org-mode-map
+         ("M-p" . org-babel-previous-src-block)
+         ("M-n" . org-babel-next-src-block))
   :hook ((org-mode . org-indent-mode)
          (org-mode . visual-line-mode)
          (org-agenda-mode . (lambda () (hl-line-mode 1)))
@@ -3539,6 +3542,8 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
 
   (advice-add #'org-do-emphasis-faces :override #'my/org-do-emphasis-faces)
 
+  ;; Specify which major-mode to be used for a given language of src block
+  (setf (alist-get "python" org-src-lang-modes nil nil #'equal) 'python-ts)
 
   ;; Enable template expansion with '<' prefix.
   (require 'org-tempo)
@@ -3574,9 +3579,11 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
 ** Bebel Extensions
 
 #+begin_src emacs-lisp
-(use-package ob-ipython :disabled)
 (use-package ob-go)
-(use-package ob-async)
+(use-package ob-async
+  :after org
+  :config
+  (setq ob-async-no-async-languages-alist '("jupyter-python" "jupyter-julia")))
 #+end_src
 
 ** org-modern
