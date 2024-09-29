@@ -205,6 +205,16 @@ Change the format of buffer name to /<unique dir suffix>/<filename>/.
 (setq uniquify-ignore-buffers-re "^\\*")
 #+end_src
 
+** Electric Pair Mode
+Enable electric pair mode not that I'm moving away from smartparens.
+
+#+begin_src emacs-lisp
+(use-package elec-pair
+  :straight (:type built-in)
+  :config
+  (electric-pair-mode 1))
+#+end_src
+
 ** Run chmod +x on save for script files
 
 Emacs now has built-in function for this so I'll just use it instead of custom
