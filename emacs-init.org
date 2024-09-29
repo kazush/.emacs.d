@@ -2561,13 +2561,35 @@ fi
   (setq lsp-keymap-prefix (kbd "C-c l"))
   ;; (setq lsp-signature-auto-activate nil)
   (setq lsp-signature-render-documentation nil)
-  )
+  :config
+
+  ;; Hack to enable LSP in org-src-mode buffers.
+  ;; https://github.com/emacs-lsp/lsp-mode/issues/2842#issuecomment-870807018
+  (defun org-babel-edit-prep:python (babel-info)
+    (setq-local buffer-file-name (->> babel-info caddr (alist-get :tangle)))
+    (lsp))
+  ;; Use advice as org-babel-edit-prep:jupyter-<lang> will be defined ob-jupyter.el.
+  (advice-add #'org-babel-edit-prep:jupyter-python :after
+              #'org-babel-edit-prep:python))
 
 (use-package lsp-ui
   :after lsp-mode
+  :bind (:map lsp-ui-doc-frame-mode-map
+              ("C-b" . lsp-ui-doc-hide)
+              ("C-f" . lsp-ui-doc-hide)
+              ("C-g" . lsp-ui-doc-hide)
+              ;; ("C-n" . my/lsp-ui-doc-scroll-up-by-1)
+              ;; ("C-p" . my/lsp-ui-doc-scroll-down-by-1)
+              ("<down>" . my/lsp-ui-doc-scroll-up-by-1)
+              ("<up>" . my/lsp-ui-doc-scroll-down-by-1)
+              ("C-v" . my/lsp-ui-doc-scroll-up)
+              ("M-v" . my/lsp-ui-doc-scroll-down)
+              ("<next>" . my/lsp-ui-doc-scroll-up)
+              ("<prior>" . my/lsp-ui-doc-scroll-down))
   :custom
-  (lsp-ui-doc-show-with-cursor nil)
-  (lsp-ui-doc-delay 0.2)
+  (lsp-ui-doc-position 'at-point)
+  (lsp-ui-doc-show-with-cursor t)
+  (lsp-ui-doc-delay 1.0)
   :config
   ;; (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
   ;; (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references)
@@ -2583,13 +2605,57 @@ fi
                       :background "royal blue"
                       :distant-foreground 'unspecified
                       :box '(:line-width -1 :color "white"))
+
+  (setf (alist-get 'no-accept-focus lsp-ui-doc-frame-parameters) t)
+
+  ;; Temporarily bind scroll-up/down keys when child frame is visible.
+  (defun my/lsp-ui-doc-scroll (scroll-func &rest args)
+    (when (lsp-ui-doc--frame-visible-p)
+      (with-selected-frame (lsp-ui-doc--get-frame)
+        (lsp-ui-doc--with-buffer
+         (apply scroll-func args)))))
+
+  (defun my/lsp-ui-doc-scroll-up (&optional n)
+    (interactive "P")
+    (my/lsp-ui-doc-scroll 'scroll-up n))
+
+  (defun my/lsp-ui-doc-scroll-down (&optional n)
+    (interactive "P")
+    (my/lsp-ui-doc-scroll 'scroll-down n))
+
+  (defun my/lsp-ui-doc-scroll-up-by-1 (&optional n)
+    (interactive "p")
+    (my/lsp-ui-doc-scroll-up n))
+
+  (defun my/lsp-ui-doc-scroll-down-by-1 (&optional n)
+    (interactive "p")
+    (my/lsp-ui-doc-scroll-down n))
+
+  (defun my/lsp-ui-doc-on-show-frame (&rest args)
+    (when (lsp-ui-doc--visible-p)
+      (setf (alist-get #'lsp-ui-doc-mode minor-mode-overriding-map-alist)
+            lsp-ui-doc-frame-mode-map)))
+
+  (defun my/lsp-ui-doc-on-hide-frame (&rest args)
+    (setf (alist-get #'lsp-ui-doc-mode minor-mode-overriding-map-alist
+                     nil 'remove) nil))
+
+  (advice-add #'lsp-ui-doc--display :after #'my/lsp-ui-doc-on-show-frame)
+  (advice-add #'lsp-ui-doc--hide-frame :after #'my/lsp-ui-doc-on-hide-frame)
+
+  (dolist (sym '( my/lsp-ui-doc-scroll my/lsp-ui-doc-scroll-up
+                  my/lsp-ui-doc-scroll-down my/lsp-ui-doc-scroll-up-by-1
+                  my/lsp-ui-doc-scroll-down-by-1))
+    (put sym 'completion-predicate #'ignore))
   )
 
 (use-package lsp-pyright
-  :after lsp-mode)
+  :hook (python-base-mode . (lambda ()
+                              (require 'lsp-pyright)
+                              (lsp))))
 
 (use-package lsp-treemacs
-  :after lsp-mode)
+  :requires lsp-mode)
 
 (defvar my/lsp-enabled-mode-hook-list
   (if (< (string-to-number emacs-version) 29)
