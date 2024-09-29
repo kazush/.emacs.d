@@ -551,7 +551,7 @@ prefix. This way which-key will be more useful.
 
 #+begin_src emacs-lisp
 (define-prefix-command 'my/edit-map)
-(global-set-key (kbd "M-SPC") 'my/edit-map)
+(global-set-key (kbd "C-c SPC") 'my/edit-map)
 (define-key my/edit-map " " #'set-mark-command)
 #+end_src
 
@@ -2004,7 +2004,7 @@ by selecting a character assigned to each position.
 #+begin_src emacs-lisp
 ;; ace-jump-mode
 (use-package ace-jump-mode
-  :bind (("C-c SPC" . ace-jump-char-mode)
+  :bind (("C-c C-SPC" . ace-jump-char-mode)
          :map my/wm-map
          ("j" . ace-jump-char-mode))
   :config
@@ -2731,55 +2731,43 @@ Eldoc-box displays eldoc contents in a child frame but is currently diabled.
   :hook (flymake-mode . flymake-diagnostic-at-point-mode))
 #+end_src
 
-** Smartparen
+** puni (structured editing)
 
 #+begin_src emacs-lisp
-(use-package smartparens
-  :disabled
-  :diminish smartparens-mode
-  :bind (("C-M-f" . sp-forward-slurp-sexp)
-         ("C-M-b" . sp-backward-slurp-sexp)
-         ("M-f" . sp-forward-symbol)
-         ("M-F" . forward-word)
-         ("M-b" . sp-backward-symbol)
-         ("M-B" . backward-word)
-         ("C-c >" . sp-slurp-hybrid-sexp)
-         ("C-c }" . sp-rewrap-sexp)
-         ("C-c ]" . sp-unwrap-sexp))
-  :hook ((prog-mode . turn-on-smartparens-mode)
-         (markdown-mode . turn-on-smartparens-mode))
-  :init (require 'smartparens-config)
+(use-package puni
+  :diminish
+  :bind (("C-d" . delete-char)  ;; don't override C-d
+         ("C-)" . puni-slurp-forward)
+         ("C-(" . puni-barf-forward)
+         ("C-c '" . my/puni-wrap-single-quote)
+         ("C-c \"" . my/puni-wrap-double-quote)
+         ("C-c (" . puni-wrap-round)
+         ("C-c [" . puni-wrap-square)
+         ("C-c {" . puni-wrap-curly)
+         :map my/edit-map
+         ("'" . my/puni-wrap-single-quote)
+         ("\"" . my/puni-wrap-double-quote)
+         ("(" . puni-wrap-round)
+         ("[" . puni-wrap-square)
+         ("{" . puni-wrap-curly))
+  :custom
+  (puni-confirm-when-delete-unbalanced-active-region nil)
   :config
-  (defun my-sp-pair-function (id action context)
-    (if (eq action 'insert)
-        ;; t to pair, nil to not pair
-        (or (looking-at "[[:space:][:punct:]]")
-            (sp-point-before-eol-p id action context))
-      t))
 
-  (defun my-sp-pair-less-than-function (id action context)
-    (if (eq action 'insert)
-        (and (eq major-mode 'web-mode)
-             (my-sp-pair-function id action context))
-      t))
+  (defun my/def-pairs (pairs)
+    (dolist (wdef pairs)
+      (fset (intern (concat
+                     "my/puni-wrap-"
+                     (symbol-name (car wdef))))
+            `(lambda (&optional n)
+               (interactive "P")
+               (puni-wrap-next-sexps
+                (puni--parse-interactive-argument-for-wrap n)
+                ,(cadr wdef) ,(cddr wdef))))))
 
-  (sp-pair "(" ")" :when '(my-sp-pair-function) :wrap "C-c (")
-  (sp-pair "{" "}" :when '(my-sp-pair-function) :wrap "C-c {")
-  (sp-pair "[" "]" :when '(my-sp-pair-function) :wrap "C-c [")
-  (sp-pair "<" ">" :when '(my-sp-pair-less-than-function) :wrap "C-c <")
-  (sp-pair "\"" "\"" :when '(my-sp-pair-function) :wrap "C-c \"")
-  (sp-pair "'" "'" :when '(my-sp-pair-function) :wrap "C-c '")
-  (sp-pair "`" "`" :when '(my-sp-pair-function) :wrap "C-c `")
-
-  (defun my-create-newline-and-enter-sexp (&rest _ignored)
-    "Open a new brace or bracket expression, with relevant newlines and indent."
-    (newline)
-    (indent-according-to-mode)
-    (forward-line -1)
-    (indent-according-to-mode))
-
-  (sp-local-pair 'c++-mode "{" nil :post-handlers '((my-create-newline-and-enter-sexp "RET")))
-  (sp-local-pair 'go-mode "{" nil :post-handlers '((my-create-newline-and-enter-sexp "RET"))))
+  (my/def-pairs '((single-quote . ("'" . "'"))
+                  (double-quote . ("\"" . "\""))))
+  )
 #+end_src
 
 ** Dumb jump
