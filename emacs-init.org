@@ -2181,6 +2181,15 @@ the two windows.
 ;;                   (my/display-buffer-in-bottom-window bufname 1)))
 #+end_src
 
+** Olivetti
+
+#+begin_src emacs-lisp
+(use-package olivetti
+  :bind ("C-c O" . olivetti-mode)
+  :custom
+  (olivetti-body-width 128))
+#+end_src
+
 * Shell modes
 
 ** Custom window/buffer management for shell-ish modes
