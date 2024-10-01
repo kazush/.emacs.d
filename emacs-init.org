@@ -569,6 +569,13 @@ prefix. This way which-key will be more useful.
 (global-set-key (kbd "C-c i") 'my/info-map)
 #+end_src
 
+*** Search
+
+#+begin_src emacs-lisp
+(define-prefix-command 'my/search-map)
+(global-set-key (kbd "M-s /") 'my/search-map)
+#+end_src
+
 *** Misc
 
 #+begin_src emacs-lisp
@@ -3706,7 +3713,11 @@ Display remote images specified by URLs inline in org-mode.
   (unless (f-dir-p "~/org/roam")
     (mkdir "~/org/roam" t))
   (require 'org-roam-dailies)
-  (org-roam-db-autosync-enable))
+  (org-roam-db-autosync-enable)
+
+  ;; add org-roam-directory to consult-omni-notes's source list
+  (when (boundp 'consult-omni-notes-files)
+    (add-to-list 'consult-omni-notes-files org-roam-directory)))
 #+end_src
 
 *** org-roam-timestamps
@@ -4515,15 +4526,17 @@ Use groq as the LLM service.
                           :host github
                           :repo "armindarvish/consult-omni"
                           :files (:defaults "sources/*.el"))
-  :bind (("M-s /" . consult-omni-multi)
-         ("C-c / a" . consult-omni-apps)
-         ("C-c / e" . consult-omni-elfeed)
-         ("C-c / g" . consult-omni-google)
-         ("C-c / G" . consult-omni-github)
-         ("C-c / l" . consult-omni-locate)
-         ("C-c / s" . consult-omni-multi-static)
-         ("C-c / w" . consult-omni-wikipedia)
-         ("C-c / y" . consult-omni-invidious))
+  :bind ( :map my/search-map
+          ("/" . consult-omni-multi)
+          ("a" . consult-omni-apps)
+          ("e" . consult-omni-elfeed)
+          ("g" . consult-omni-google)
+          ("G" . consult-omni-github)
+          ("l" . consult-omni-locate)
+          ("n" . consult-omni-notes)
+          ("s" . consult-omni-multi-static)
+          ("w" . consult-omni-wikipedia)
+          ("y" . consult-omni-youtube))
   :custom
   ;; General settings that apply to all sources
   (consult-omni-show-preview t) ;;; show previews
@@ -4536,6 +4549,7 @@ Use groq as the LLM service.
   (require 'consult-omni-browser-history)
   (require 'consult-omni-elfeed)
   (require 'consult-omni-invidious)
+  (require 'consult-omni-notes)
   (require 'consult-omni-gh)
   (require 'consult-omni-google)
   (require 'consult-omni-google-autosuggest)
@@ -4562,16 +4576,19 @@ Use groq as the LLM service.
                                      ;; "gptel"
                                      ;; "Brave"
                                      ;; "Dictionary"
+                                     "Org Agenda"
+                                     "locate"
+                                     "Notes Search"
+                                     "Browser History"
                                      "Google"
                                      "Wikipedia"
                                      "elfeed"
                                      ;; "mu4e"
                                      ;; "buffers text search"
-                                     "Notes Search"
-                                     "Org Agenda"
                                      "GitHub"
-                                     ;; "YouTube"
-                                     "Invidious"))
+                                     "YouTube"
+                                     ;; "Invidious"
+                                     ))
 
   ;; Per source customization
 
@@ -4580,6 +4597,8 @@ Use groq as the LLM service.
         (auth-source-pick-first-password :host "google-cse-apikey"))
   (setq consult-omni-google-customsearch-cx
         (auth-source-pick-first-password :host "google-cse-id"))
+  (setq consult-omni-youtube-search-key
+        (auth-source-pick-first-password :host "google-youtube-apikey"))
 
   ;; (setq consult-omni-brave-api-key "YOUR-BRAVE-API-KEY-OR-FUNCTION")
   ;; (setq consult-omni-stackexchange-api-key "YOUR-STACKEXCHANGE-API-KEY-OR-FUNCTION")
