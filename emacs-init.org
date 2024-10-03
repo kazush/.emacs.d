@@ -4533,7 +4533,7 @@ Use groq as the LLM service.
           ("g" . consult-omni-google)
           ("G" . consult-omni-github)
           ("l" . consult-omni-locate)
-          ("n" . consult-omni-notes)
+          ("n" . consult-omni-notes-search)
           ("s" . consult-omni-multi-static)
           ("w" . consult-omni-wikipedia)
           ("y" . consult-omni-youtube))
