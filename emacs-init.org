@@ -4339,7 +4339,7 @@ Use groq as the LLM service.
   (elfeed-search-remain-on-entry t)  ;; for navigation from split entry pane.
   :config
   ;; Set external program to retrieve a URL.
-  (setq my/eww-retrieve-command '("curl" "-L" "--user-agent" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"))
+  (setq my/eww-retrieve-command '("curl" "--http2" "-L" "--user-agent" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"))
   ;; (setq my/eww-retrieve-command
   ;;       '("google-chrome" "--headless" "--dump-dom" "--user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"))
 
