@@ -1867,6 +1867,30 @@ Mostly borrowed from https://taipapamotohus.com/post/dired/.
       (advice-add 'eww-display-html :around
                   'eww-display-html--override-shr-external-rendering-functions))))
 #+end_src
+** Japanese Holidays
+
+#+begin_src emacs-lisp
+(use-package japanese-holidays
+  :after calendar
+  :config
+  (setq calendar-holidays
+        (append japanese-holidays holiday-local-holidays holiday-other-holidays))
+  (setq calendar-mark-holidays-flag t)
+  (setq japanese-holiday-weekend '(0 6)
+        japanese-holiday-weekend-marker
+        '(holiday nil nil nil nil nil japanese-holiday-saturday))
+  (add-hook 'calendar-today-visible-hook 'japanese-holiday-mark-weekend)
+  (add-hook 'calendar-today-invisible-hook 'japanese-holiday-mark-weekend)
+
+  (defun my/japanese-holiday-show (&rest _args)
+    (let* ((date (calendar-cursor-to-date t))
+           (calendar-date-display-form '((format "%s年 %s月 %s日（%s）" year month day dayname)))
+           (date-string (calendar-date-string date))
+           (holiday-list (calendar-check-holidays date)))
+      (when holiday-list
+        (message "%s: %s" date-string (mapconcat #'identity holiday-list "; ")))))
+  (add-hook 'calendar-move-hook 'my/japanese-holiday-show))
+#+end_src
 
 * Window and workspace management
 
