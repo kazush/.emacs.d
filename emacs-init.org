@@ -666,20 +666,25 @@ Specify Japanese input method ~Mozc~ (which bases Google Japanese Input method).
   :bind (("<muhenkan>" . toggle-input-method)
          ("M-SPC" . toggle-input-method)  ;; temporary measure
          :map mozc-mode-map
-              ("<muhenkan>" . my/deactivate-input-method))
+         ("<muhenkan>" . my/deactivate-input-method))
   :config
   (defun my/deactivate-input-method ()
     (interactive)
     (deactivate-input-method))
-  )
 
+  (set-face-attribute 'mozc-preedit-selected-face nil
+                      :foreground "#c0c0c0" :background "RoyalBlue4"))
 #+end_src
 
 #+begin_src emacs-lisp
 (use-package mozc-cand-posframe
   :after mozc
   :config
-  (setq mozc-candidate-style 'posframe))
+  (setq mozc-candidate-style 'posframe)
+  (set-face-attribute 'mozc-cand-posframe-normal-face nil
+                      :foreground "#c0c0c0" :background "gray15")
+  (set-face-attribute 'mozc-cand-posframe-focused-face nil
+                      :foreground "#c0c0c0" :background "RoyalBlue4"))
 #+end_src
 
 ** Misc input tweaks
