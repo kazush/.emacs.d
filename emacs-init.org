@@ -1868,6 +1868,15 @@ Mostly borrowed from https://taipapamotohus.com/post/dired/.
   :bind (:map dired-mode-map
               ("V" . dired-open-xdg)))
 #+end_src
+** Async
+
+#+begin_src emacs-lisp
+(use-package async
+  :config
+  (dired-async-mode 1)
+  (async-bytecomp-package-mode 1))
+#+end_src
+
 ** SHR
 *** shr-tag-pre-highlight
 
