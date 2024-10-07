@@ -1846,17 +1846,27 @@ Mostly borrowed from https://taipapamotohus.com/post/dired/.
 *** Dired hacks
 
 #+begin_src emacs-lisp
-(use-package dired-hacks
+(use-package dired-subtree
   :after dired
   :bind (:map dired-mode-map
               ("i" . dired-subtree-insert)
-              (";" . dired-subtree-remove))
-  :init
-  (define-key dired-mode-map "/" dired-filter-map)
-  (define-key dired-filter-map "M" dired-filter-mark-map)
-  :config
-  (global-dired-collapse-mode)
-  )
+              (";" . dired-subtree-remove)))
+
+(use-package dired-filter
+  :after dired
+  :bind ( :map dired-mode-map
+          ("/" . dired-filter-map)
+          :map dired-filter-map
+          ("M" . dired-filter-mark-map)))
+
+(use-package dired-collapse
+  :after dired
+  :hook (dired-mode . dired-collapse-mode))
+
+(use-package dired-open
+  :after dired
+  :bind (:map dired-mode-map
+              ("V" . dired-open-xdg)))
 #+end_src
 ** SHR
 *** shr-tag-pre-highlight
