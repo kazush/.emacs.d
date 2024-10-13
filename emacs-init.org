@@ -2807,6 +2807,7 @@ Eldoc-box displays eldoc contents in a child frame but is currently diabled.
 
 ** Flycheck & Flymake
 
+*** flycheck
 #+begin_src emacs-lisp
 (use-package flycheck
   :diminish
@@ -2814,7 +2815,14 @@ Eldoc-box displays eldoc contents in a child frame but is currently diabled.
   :hook (prog-mode . flycheck-mode))
 
 (use-package flycheck-popup-tip
-  :hook (flycheck-mode-hook . flycheck-popup-tip-mode))
+  :hook (flycheck-mode . flycheck-popup-tip-mode))
+#+end_src
+
+*** flymake
+#+begin_src emacs-lisp
+(use-package flymake
+  :disabled
+  :hook (prog-mode . flymake-mode))
 
 (use-package flymake-diagnostic-at-point
   :hook (flymake-mode . flymake-diagnostic-at-point-mode))
@@ -3207,6 +3215,7 @@ but I'm trying lsp-mode out.
 #+begin_src emacs-lisp
 (use-package python
   :custom
+  (python-flymake-command '("ruff" "--quiet" "--stdin-filename=stdin" "-"))
   (python-indent-guess-indent-offset-verbose nil))
 
 (use-package yapfify
