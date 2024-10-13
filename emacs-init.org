@@ -1027,18 +1027,24 @@ vertico and related packages are used for completion framework.
   ;; Enable recursive minibuffers
   (setq enable-recursive-minibuffers t))
 
-(use-package extensions/vertico-directory
+(use-package vertico-directory
   :straight (:type built-in)
   :after vertico
   :bind (:map vertico-map
               ("C-l" . vertico-directory-up)
               ("\d" . vertico-directory-delete-char)))
 
-(use-package extensions/vertico-repeat
+(use-package vertico-repeat
   :straight (:type built-in)
   :after vertico
   :bind ("C-c -" . vertico-repeat)
   :hook (minibuffer-setup . vertico-repeat-save))
+
+(use-package vertico-multiform
+  :straight (:type built-in)
+  :after vertico
+  :config
+  (vertico-multiform-mode))
 
 (use-package savehist
   :diminish savehist-mode
