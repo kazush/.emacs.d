@@ -1849,11 +1849,13 @@ Mostly borrowed from https://taipapamotohus.com/post/dired/.
 (use-package dired-subtree
   :after dired
   :bind (:map dired-mode-map
+              ("I" . dired-insert-subdir)
               ("i" . dired-subtree-insert)
               (";" . dired-subtree-remove)))
 
 (use-package dired-filter
   :after dired
+  :hook (dired-mode . dired-filter-mode)
   :bind ( :map dired-mode-map
           ("/" . dired-filter-map)
           :map dired-filter-map
