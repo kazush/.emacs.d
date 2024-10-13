@@ -3412,13 +3412,12 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
 ** Shell scripts
 
 #+begin_src emacs-lisp
-(defun my/setup-sh-mode ()
-  (setq-local sh-basic-offset 2)
-  (setq-local tab-width 2)
-  (setq-local indent-tabs-mode nil))
-
-(add-hook 'sh-mode-hook #'my/setup-sh-mode)
-(add-hook 'sh-base-mode-hook #'my/setup-sh-mode)
+(use-package sh-script
+  :custom
+  (sh-basic-offset 2)
+  (tab-width 2)
+  (indent-tabs-mode nil)
+  (sh-shellcheck-arguments "-x"))
 #+end_src
 
 ** Pine Script
