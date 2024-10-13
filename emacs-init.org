@@ -1806,16 +1806,15 @@ Do not forget to install aspell.
 #+begin_src emacs-lisp
 (when (locate-library "file-template")
   (use-package file-template
-    :hook (find-file-not-found-functions . file-template-find-file-not-found-hook)
     :custom
     (file-template-insert-automatically t)
     (file-template-paths '(".templates" "~/lib/elisp/templates/"))
     (file-template-mapping-alist
      '(("\\.org$" . "template.org")
-       ("\\.mqh$" . "template.mph")
+       ("\\.mqh$" . "template.mqh")
        ("\\.mq5$" . "template.mq5")))
-    )
-  )
+    :config
+    (add-hook 'find-file-not-found-functions #'file-template-find-file-not-found-hook)))
 #+end_src
 
 ** Adaptive Wrap
