@@ -3735,6 +3735,9 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
 
 #+begin_src emacs-lisp
 (use-package org-cliplink
+  :custom
+  (org-cliplink-transport-implementation 'curl)
+  (org-cliplink-curl-transport-arguments '("--http2" "-L"))
   :bind (("C-c o L" . org-cliplink)))
 #+end_src
 
