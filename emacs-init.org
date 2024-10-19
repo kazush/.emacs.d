@@ -4741,10 +4741,24 @@ Load postinit.org if exists.
 ** GC settings
 
 Set GC parameters here to reset the initial value set in early-init.el.
+Also, add measurement of GC time with the code borrowed by https://akrl.sdf.org/#orgc15a10d.
 
 #+begin_src emacs-lisp
-(setq gc-cons-threshold (* 20 1024 1024))
-(setq gc-cons-percentage 0.2)
+(setq garbage-collection-messages nil)
+(setq gc-cons-threshold (* 100 1024 1024))
+
+(defmacro my/k-time (&rest body)
+  "Measure and return the time it takes evaluating BODY."
+  `(let ((time (current-time)))
+     ,@body
+     (float-time (time-since time))))
+
+(defun my/gc ()
+  (message "Garbage Collector has run for %.06fsec"
+           (my/k-time (garbage-collect))))
+
+(defvar my/k-gc-timer (run-with-idle-timer 15 t #'my/gc))
+(add-function :after after-focus-change-function #'my/gc)
 #+end_src
 
 * EOF
