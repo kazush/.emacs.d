@@ -284,12 +284,15 @@ environment.
 
 #+begin_src emacs-lisp
 (use-package eww
-  :bind (:map eww-mode-map
-              ("j" . scroll-up-command)
-              ("k" . scroll-down-command)
-              ("N" . scroll-up-command)
-              ("P" . scroll-down-command)
-              ("T" . my/eww-toggle-auto-readable))
+  :bind ( :map eww-mode-map
+          ("j" . scroll-up-command)
+          ("k" . scroll-down-command)
+          ("N" . scroll-up-command)
+          ("P" . scroll-down-command)
+          ("v" . eww-browse-with-external-browser)
+          ("T" . my/eww-toggle-auto-readable)
+          :map eww-link-keymap
+          ("v" . my/browse-url-at-point))
   :hook ((eww-after-render . my/eww-maybe-auto-readable)
          (eww-after-render . my/eww-set-initial-position))
   :config
@@ -304,7 +307,7 @@ environment.
 
   ;; Regexp of URLS that readable mode should be automatically enabled for.
   (defvar my/eww-auto-readable-urls
-    '("cnn.co.jp" "apnews.com" "doorblog.jp"))
+    '("cnn.co.jp" "apnews.com" "doorblog.jp" "mql5.com" "gizmodo.jp"))
 
   ;; Automatically enable readable mode for the sites specified above.
   (defun my/eww-maybe-auto-readable ()
@@ -4421,7 +4424,8 @@ Use groq as the LLM service.
               ("k" . scroll-down-command)
               ("v" . elfeed-show-visit)
               ("b" . my/elfeed-show-visit-with-eww)
-              ("B" . elfeed-show-visit))
+              ("B" . elfeed-show-visit)
+              ("RET" . my/elfeed-show-visit-with-eww))
   :hook (elfeed-show-mode . visual-line-mode)
   :custom
   (elfeed-search-remain-on-entry t)  ;; for navigation from split entry pane.
