@@ -4662,7 +4662,7 @@ Use groq as the LLM service.
 ;; consult-omni depends on browser-hist.
 (use-package browser-hist
   :config
-  (setq browser-hist-default-browser 'firefox)
+  (setq browser-hist-default-browser 'chrome)
   :commands (browser-hist-search))
 
 (use-package consult-gh
