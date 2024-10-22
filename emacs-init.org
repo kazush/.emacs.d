@@ -2211,7 +2211,7 @@ the two windows.
                     (window-minibuffer-p w)
                     (window-dedicated-p w)
                     (window-parameter w 'window-side)
-                    (seq-contains '(exwm-mode shell-mode eshell-mode term-mode vterm-mode)
+                    (seq-contains '(exwm-mode shell-mode eshell-mode term-mode vterm-mode eat-mode)
                                   (with-current-buffer b major-mode)))
                 (setq buflist (cdr buflist))
               (setq win w)
@@ -2281,11 +2281,11 @@ the two windows.
   "Return if BUF is a shell-ish buffer."
   (let ((mode (with-current-buffer buf major-mode))
         (shell-pattern (if filter filter
-                         (rx (or "term" "shell" "eshell" "vterm")))))
+                         (rx (or "term" "shell" "eshell" "vterm" "eat")))))
     (and (string-match-p
           (concat "\\`\\*" shell-pattern ".*\\*\\'")
           (buffer-name buf))
-         (seq-contains '(shell-mode eshell-mode term-mode vterm-mode) mode))))
+         (seq-contains '(shell-mode eshell-mode term-mode vterm-mode eat-mode) mode))))
 
 (defun my/get-shellish-buffers ()
   "Return a lit of shellish buffers or nil if none."
@@ -2601,6 +2601,37 @@ fi
       (multi-term-internal)
       ;; Switch buffer
       (select-window (display-buffer term-buffer))))
+  )
+#+end_src
+
+** Eat
+
+Yet another terminal emulator. Trying out now.
+
+#+begin_src emacs-lisp
+(use-package eat
+  :bind (("C-c s" . my/get-eat))
+  :straight '(eat :type git
+                  :host codeberg
+                  :repo "akib/emacs-eat"
+                  :files ("*.el" ("term" "term/*.el") "*.texi"
+                          "*.ti" ("terminfo/e" "terminfo/e/*")
+                          ("terminfo/65" "terminfo/65/*")
+                          ("integration" "integration/*")
+                          (:exclude ".dir-locals.el" "*-tests.el")))
+  :config
+  (defun my/neweat ()
+    "Create a new eat with specified buffer name."
+    (interactive)
+    (if (my/find-last-shellish-buffer (buffer-list (selected-frame)) "eat")
+        (vterm (format "*eat<%s>*"
+                       (read-string "Shell buffer name: ")))
+      (eat)))
+
+  (defun my/get-eat (arg)
+    (interactive "p")
+    (my/get-shellish arg 'my/neweat "eat"))
+
   )
 #+end_src
 
