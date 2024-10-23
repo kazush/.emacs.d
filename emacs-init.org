@@ -605,6 +605,9 @@ prefix. This way which-key will be more useful.
 (define-key key-translation-map [?\C-h] [?\C-?])
 (define-key key-translation-map [?\C-\]] [?\C-h])
 
+;; ibuffer
+(global-set-key (kbd "C-x B") 'ibuffer)
+
 ;; Bind tabify and untabify.
 (global-set-key (kbd "M-T") 'tabify)
 (global-set-key (kbd "C-x T") 'untabify)
