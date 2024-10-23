@@ -4364,10 +4364,10 @@ Macros to retrive API keys for LLM servce providers.
 
   (gptel-make-gemini "Gemini"
     :key #'my/get-gemini-apikey
-    :models '("gemini-1.5-flash"
-              "gemini-1.5-pro"
-              "gemini-1.5-flash-002"
-              "gemini-1.5-pro-002")
+    :models '(gemini-1.5-flash
+              gemini-1.5-pro
+              gemini-1.5-flash-latest
+              gemini-1.5-pro-latest)
     :stream t)
 
   (gptel-make-openai "Groq"
@@ -4375,40 +4375,41 @@ Macros to retrive API keys for LLM servce providers.
     :endpoint "/openai/v1/chat/completions"
     :stream t
     :key #'my/get-groq-apikey
-    :models '("llama-3.1-70b-versatile"
-              "llama-3.1-8b-instant"
-              "llama3-70b-8192"
-              "mixtral-8x7b-32768"))
+    :models '(llama-3.1-70b-versatile
+              llama-3.1-8b-instant
+              llama3-groq-70b-8192-tool-use-preview
+              mixtral-8x7b-32768
+              llama-3.2-90b-vision-preview))
 
   (gptel-make-ollama "Ollama"
     :host "localhost:11434"
     :stream t
-    :models '("qwen2.5-coder:latest"
-              "deepseek-coder-v2:latest"
-              "ezo-common-gemma2:9b"
-              "mistral-nemo-instruct:latest"
-              "llama3.1:latest"))
+    :models '(qwen2.5-coder:latest
+              deepseek-coder-v2:latest
+              ezo-common-gemma2:9b
+              mistral-nemo-instruct:latest
+              llama3.1:latest))
 
   (gptel-make-openai "SambaNova"
     :host "api.sambanova.ai"
     :endpoint "/v1/chat/completions"
     :stream t
-    :key #'my/get-groq-apikey
-    :models '("Meta-Llama-3.1-405B-Instruct"))
+    :key #'my/get-sambanova-apikey
+    :models '(Meta-Llama-3.1-405B-Instruct))
 
   (gptel-make-openai "Cohere"
     :host "localhost:6600"
     :endpoint "/v1/chat/completions"
     :stream t
-    :key #'my/get-groq-apikey
-    :models '("command-r-plus"))
+    :key #'my/get-cohere-apikey
+    :models '(command-r-plus))
 
   (defun my/gptel-get-backend (key)
     (alist-get key gptel--known-backends nil nil 'string=))
 
   ;; Set default backend.
   (setq gptel-backend (my/gptel-get-backend "Gemini"))
-  (setq gptel-model "gemini-1.5-flash-002")
+  (setq gptel-model 'gemini-1.5-flash-latest)
   )
 #+end_src
 
