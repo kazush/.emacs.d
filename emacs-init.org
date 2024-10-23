@@ -2329,13 +2329,13 @@ the two windows.
 
 (defvar my/last-non-shellish-buffer nil)
 
+(defvar my/shellish-tab-name "*shell tab*")
+
 (defun my/remember-last-non-shellish-buffer ()
   "Remember last non-shellish buffer."
   (let ((buf (current-buffer)))
     (unless (my/shellish-buffer-p buf)
       (setq my/last-non-shellish-buffer buf))))
-
-(defvar my/shellish-tab-name "*shell tab*")
 
 (defun my/get-display-buffer-action-for-shellish ()
   "Return display-buffer's ACTION parameter applied to shellish buffers."
@@ -2360,7 +2360,7 @@ the two windows.
            (call-interactively my/display-shellish-buffer-list))
           ((string= (alist-get 'name (tab-bar-get-buffer-tab (current-buffer)))
                     my/shellish-tab-name)
-           (tab-bar-close-tab))
+           (tab-bar-switch-to-recent-tab))
           ((my/shellish-buffer-p (current-buffer) shell-str)
            (delete-window (get-buffer-window (current-buffer))))
           (b
