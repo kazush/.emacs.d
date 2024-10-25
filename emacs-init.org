@@ -388,6 +388,21 @@ Add small wrappers so that I can launch intended browser as needed.
     (my/browse-url-at-point-with-default-browser)))
 #+end_src
 
+** Image Converter
+
+#+begin_src emacs-lisp
+(setq image-use-external-converter t)
+(setq image-converter--converters '((imagemagick :command "magick-elfeed" :probe ("-list" "format"))))
+(setq image-converter 'imagemagick)
+(setq image-converter-file-name-extensions '("avif"))
+
+;; Add support of avif to take care of some sites returning missing
+;; content-type header for avif.
+(add-to-list 'image-type-header-regexps '("\\`\0\0\0 ftypavif" . image-convert))
+(defun my/image-convert (orig image &optional format)
+  (apply orig (list image (or (and (eq format t) 'image/avif) format))))
+(advice-add 'image-convert :around #'my/image-convert)
+#+end_src
 * User Interface
 
 Configure different features and settings that are related to user interface.
@@ -4451,16 +4466,17 @@ Use groq as the LLM service.
 (use-package elfeed
   :bind (("C-c F" . elfeed)
          ("<f12>" . elfeed))
-  :bind (:map elfeed-search-mode-map
-              ("b" . my/elfeed-search-browse-url-with-eww)
-              ("B" . elfeed-search-browse-url)
-              :map elfeed-show-mode-map
-              ("j" . scroll-up-command)
-              ("k" . scroll-down-command)
-              ("v" . elfeed-show-visit)
-              ("b" . my/elfeed-show-visit-with-eww)
-              ("B" . elfeed-show-visit)
-              ("RET" . my/elfeed-show-visit-with-eww))
+  :bind ( :map elfeed-search-mode-map
+          ("<mouse-1>" . elfeed-search-show-entry)
+          ("b" . my/elfeed-search-browse-url-with-eww)
+          ("B" . elfeed-search-browse-url)
+          :map elfeed-show-mode-map
+          ("j" . scroll-up-command)
+          ("k" . scroll-down-command)
+          ("v" . elfeed-show-visit)
+          ("b" . my/elfeed-show-visit-with-eww)
+          ("B" . elfeed-show-visit)
+          ("RET" . my/elfeed-show-visit-with-eww))
   :hook (elfeed-show-mode . visual-line-mode)
   :custom
   (elfeed-search-remain-on-entry t)  ;; for navigation from split entry pane.
