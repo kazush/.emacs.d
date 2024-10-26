@@ -2715,9 +2715,13 @@ Yet another terminal emulator. Trying out now.
 
   ;; Hack to enable LSP in org-src-mode buffers.
   ;; https://github.com/emacs-lsp/lsp-mode/issues/2842#issuecomment-870807018
+  ;; Run lsp command after switching to the associated Org Src buffer.
   (defun org-babel-edit-prep:python (babel-info)
-    (setq-local buffer-file-name (->> babel-info caddr (alist-get :tangle)))
-    (lsp))
+    (let ((tangle (->> babel-info caddr (alist-get :tangle))))
+      (setq-local buffer-file-name
+                  (if (string= tangle "no")
+                      "~/tmp/__temp__.py"
+                    tangle))))
   ;; Use advice as org-babel-edit-prep:jupyter-<lang> will be defined ob-jupyter.el.
   (advice-add #'org-babel-edit-prep:jupyter-python :after
               #'org-babel-edit-prep:python))
@@ -2763,7 +2767,7 @@ Yet another terminal emulator. Trying out now.
     (when (lsp-ui-doc--frame-visible-p)
       (with-selected-frame (lsp-ui-doc--get-frame)
         (lsp-ui-doc--with-buffer
-         (apply scroll-func args)))))
+          (apply scroll-func args)))))
 
   (defun my/lsp-ui-doc-scroll-up (&optional n)
     (interactive "P")
