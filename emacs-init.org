@@ -3513,7 +3513,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
   (org-use-sub-superscripts '{})
   (org-export-with-sub-superscripts '{})
   (org-image-actual-width nil)
-  (org-src-preserve-indentation t)
+  (org-src-preserve-indentation nil)
   (org-edit-src-content-indentation 0)
   (org-src-window-setup 'other-window)
   (org-agenda-window-setup 'other-window)
