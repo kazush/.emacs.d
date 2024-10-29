@@ -2372,6 +2372,8 @@ the two windows.
           ;; ((and (= arg 64) b)
           ;;  (select-window (display-buffer my/last-non-shellish-buffer)))
           ((= arg 4)
+           (when b
+             (select-window (display-buffer b)))
            (call-interactively my/display-shellish-buffer-list))
           ((string= (alist-get 'name (tab-bar-get-buffer-tab (current-buffer)))
                     my/shellish-tab-name)
