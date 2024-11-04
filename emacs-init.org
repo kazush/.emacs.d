@@ -628,7 +628,7 @@ prefix. This way which-key will be more useful.
 (global-set-key (kbd "C-x T") 'untabify)
 
 ;; Make find-file-other-window the default behavior for find-file.
-(global-set-key (kbd "C-x C-f") 'find-file-other-window)
+;; (global-set-key (kbd "C-x C-f") 'find-file-other-window)
 
 ;; Bind some commands often used under C-x keymap.
 (global-set-key (kbd "C-x 5 k") 'delete-frame)
@@ -2087,6 +2087,47 @@ Pin a window so that find-file or other operations won't steal the window.
    (current-buffer)))
 
 (define-key my/wm-map "d" #'my/toggle-window-dedicated)
+#+end_src
+
+** Move to last buffer
+
+#+begin_src emacs-lisp
+(defun my/switch-to-last-buffer ()
+  "Switch to last buffer."
+  (interactive)
+  (let* ((b (other-buffer (current-buffer) 1))
+         (w (get-buffer-window b)))
+    (if w (select-window w)
+      (switch-to-buffer b))))
+(global-set-key (kbd "M-o") #'my/switch-to-last-buffer)
+#+end_src
+
+** Find file or buffer in new window
+
+#+begin_src emacs-lisp
+(defun my/switch-to-buffer-new-window (buffer-or-name &optional norecord)
+  (interactive
+   (list (read-buffer-to-switch "Switch to buffer in new window: ")))
+  (split-window-right)
+  (windmove-right)
+  (switch-to-buffer buffer-or-name norecord))
+(global-set-key (kbd "C-c b") #'my/switch-to-buffer-new-window)
+
+(defun my/find-file-new-window (filename &optional wildcards)
+  "Find file in a new window."
+  (interactive
+   (find-file-read-args "Find file in new window: "
+                        (confirm-nonexistent-file-or-buffer)))
+  (let ((value (find-file-noselect filename nil nil wildcards)))
+    (if (listp value)
+	      (progn
+	        (setq value (nreverse value))
+	        (my/switch-to-buffer-new-window (car value))
+	        (mapc 'switch-to-buffer (cdr value))
+	        value)
+      (my/switch-to-buffer-new-window value))))
+
+(global-set-key (kbd "C-c f") #'my/find-file-new-window)
 #+end_src
 
 ** Select another window in the reverse cyclic order
