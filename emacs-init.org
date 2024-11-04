@@ -1929,6 +1929,29 @@ Mostly borrowed from https://taipapamotohus.com/post/dired/.
   :bind (:map dired-mode-map
               ("V" . dired-open-xdg)))
 #+end_src
+
+*** Custom functions
+
+#+begin_src emacs-lisp
+(use-package dired
+  :straight (:type built-in)
+  :bind (("C-c d" . my/consult-dired-recent))
+  :config
+  (defun my/consult-dired-recent ()
+    (interactive)
+    (dired (consult--read
+            (or
+             (delete-dups (mapcar #'file-name-directory (bound-and-true-p recentf-list)))
+             (user-error "No recent files, `recentf-mode' is %s"
+                         (if recentf-mode "enabled" "disabled")))
+            :prompt "Dired with recent dir: "
+            :sort nil
+            :require-match t
+            :category 'file
+            :state (consult--file-preview)
+            :history 'file-name-history))))
+#+end_src
+
 ** Async
 
 #+begin_src emacs-lisp
