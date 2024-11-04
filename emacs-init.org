@@ -1079,7 +1079,7 @@ vertico and related packages are used for completion framework.
 (use-package consult
   ;; Replace bindings. Lazily loaded due by `use-package'.
   :bind (;; C-c bindings (mode-specific-map)
-         ("C-c r" . my/consult-recent-file-other-window)
+         ("C-c r" . my/consult-recent-file-new-window)
          ("C-c R" . consult-recent-file)
          ("C-c h" . consult-history)
          ("C-c m" . consult-mode-command)
@@ -1136,7 +1136,7 @@ vertico and related packages are used for completion framework.
   ;; Enable automatic preview at point in the *Completions* buffer. This is
   ;; relevant when you use the default completion UI.
   :hook (completion-list-mode . consult-preview-at-point-mode)
-  :commands (consult-buffer consult-xref)
+  :commands (consult-buffer consult-xref consult--read)
 
   ;; The :init configuration is always executed (Not lazy)
   :init
@@ -1228,6 +1228,22 @@ vertico and related packages are used for completion framework.
        (user-error "No recent files, `recentf-mode' is %s"
                    (if recentf-mode "enabled" "disabled")))
       :prompt "Find recent file in other window: "
+      :sort nil
+      :require-match t
+      :category 'file
+      :state (consult--file-preview)
+      :history 'file-name-history)))
+
+  (defun my/consult-recent-file-new-window ()
+    "Find recent file using `completing-read'."
+    (interactive)
+    (my/find-file-new-window
+     (consult--read
+      (or
+       (mapcar #'consult--fast-abbreviate-file-name (bound-and-true-p recentf-list))
+       (user-error "No recent files, `recentf-mode' is %s"
+                   (if recentf-mode "enabled" "disabled")))
+      :prompt "Find recent file in new window: "
       :sort nil
       :require-match t
       :category 'file
