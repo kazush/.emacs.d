@@ -2457,7 +2457,9 @@ the two windows.
            (call-interactively my/display-shellish-buffer-list))
           ((string= (alist-get 'name (tab-bar-get-buffer-tab (current-buffer)))
                     my/shellish-tab-name)
-           (tab-bar-switch-to-recent-tab))
+           (if (my/shellish-buffer-p (current-buffer) shell-str)
+               (tab-bar-switch-to-recent-tab)
+             (select-window (display-buffer b))))
           ((my/shellish-buffer-p (current-buffer) shell-str)
            (delete-window (get-buffer-window (current-buffer))))
           (b
