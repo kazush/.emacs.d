@@ -4798,6 +4798,7 @@ Use groq as the LLM service.
   ;; General settings that apply to all sources
   (consult-omni-show-preview t) ;;; show previews
   (consult-omni-preview-key "C-o") ;;; set the preview key to C-o
+  (consult-omni-default-count 20)  ;; get search results up to 20
   :config
   ;; Load Sources Core code
   (require 'consult-omni-sources)
