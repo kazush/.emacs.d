@@ -4579,7 +4579,7 @@ Use groq as the LLM service.
   (setq elfeed-show-entry-switch #'pop-to-buffer)
   (add-to-list 'display-buffer-alist
                '("\\`\\*elfeed-entry\\*"
-                 (display-buffer-reuse-window display-buffer-in-direction)
+                 (display-buffer-reuse-mode-window display-buffer-in-direction)
                  (direction . right)
                  (window-width . 0.5)))
 
