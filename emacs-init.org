@@ -4502,14 +4502,16 @@ Macros to retrive API keys for LLM servce providers.
     :endpoint "/v1/chat/completions"
     :stream t
     :key #'my/get-sambanova-apikey
-    :models '(Meta-Llama-3.1-405B-Instruct))
+    :models '(Meta-Llama-3.1-405B-Instruct
+              Llama-3.2-90B-Vision-Instruct))
 
   (gptel-make-openai "Cohere"
     :host "localhost:6600"
     :endpoint "/v1/chat/completions"
     :stream t
     :key #'my/get-cohere-apikey
-    :models '(command-r-plus))
+    :models '(command-r-plus
+              command-r-plus-08-2024))
 
   (defun my/gptel-get-backend (key)
     (alist-get key gptel--known-backends nil nil 'string=))
