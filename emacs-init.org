@@ -3982,6 +3982,8 @@ add ctime and mtime properties to org-roam nodes.
 (use-package org-roam-timestamps
   :diminish
   :after org-roam
+  :custom
+  (org-roam-timestamps-remember-timestamps nil)
   :config
   (org-roam-timestamps-mode))
 #+end_src
