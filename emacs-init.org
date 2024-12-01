@@ -4347,6 +4347,9 @@ Macros to retrive API keys for LLM servce providers.
 
 (defun my/get-cohere-apikey ()
   (auth-source-pick-first-password :host "cohere-apikey"))
+
+(defun my/get-hf-apikey ()
+  (auth-source-pick-first-password :host "huggingface-apikey"))
 #+end_src
 
 ** Ellama - Emacs client for ollama
@@ -4393,6 +4396,12 @@ Macros to retrive API keys for LLM servce providers.
       :key (my/get-cohere-apikey)
       ,@args))
 
+  (defmacro my/make-llm-hf (&rest args)
+    `(make-llm-openai-compatible
+      :url "https://api-inference.huggingface.co/v1/"
+      :key (my/get-hf-apikey)
+      ,@args))
+
   (require 'llm-gemini)
   (defmacro my/make-llm-gemini (&rest args)
     `(make-llm-gemini
@@ -4426,6 +4435,8 @@ Macros to retrive API keys for LLM servce providers.
                                       :chat-model "Meta-Llama-3.1-405B-Instruct"))
             ("cohere-command-r-plus" . (my/make-llm-cohere
                                       :chat-model "command-r-plus"))
+            ("hf-qwen2.5-coder" . (my/make-llm-hf
+                                      :chat-model "Qwen/Qwen2.5-Coder-32B-Instruct"))
             ("ezo-common" . (my/make-llm-local-server
                              :chat-model "ezo-common"))
             ("ezo-humanities" . (my/make-llm-local-server
@@ -4468,6 +4479,9 @@ Macros to retrive API keys for LLM servce providers.
   :config
   (when (fboundp 'org-element-lineage-map)
     (setq gptel-org-branching-context t))
+
+  (add-hook 'gptel-post-stream-hook 'gptel-auto-scroll)
+  (add-hook 'gptel-post-response-functions 'gptel-end-of-response)
 
   ;; Define backends.
 
@@ -4514,6 +4528,14 @@ Macros to retrive API keys for LLM servce providers.
     :key #'my/get-cohere-apikey
     :models '(command-r-plus
               command-r-plus-08-2024))
+
+  (gptel-make-openai "HuggingFace"
+    :host "api-inference.huggingface.co"
+    :endpoint "/v1/chat/completions"
+    :stream t
+    :key #'my/get-hf-apikey
+    :models '(Qwen/Qwen2.5-Coder-32B-Instruct
+              Qwen/Qwen2.5-72B-Instruct))
 
   (defun my/gptel-get-backend (key)
     (alist-get key gptel--known-backends nil nil 'string=))
