@@ -1847,7 +1847,7 @@ Do not forget to install aspell.
     (file-template-insert-automatically t)
     (file-template-paths '(".templates" "~/lib/elisp/templates/"))
     (file-template-mapping-alist
-     '(("\\.org$" . "template.org")
+     '(;; ("\\.org$" . "template.org")
        ("\\.mqh$" . "template.mqh")
        ("\\.mq5$" . "template.mq5")))
     :config
