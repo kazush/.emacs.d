@@ -4614,10 +4614,11 @@ Use groq as the LLM service.
                  (window-width . 0.5)))
 
   ;; Close the window when q is pressed in the elfeed-entry buffer.
-  (defun my/elfeed-close-entry-window ()
-    (interactive)
-    (delete-window))
-  (advice-add #'elfeed-kill-buffer :after 'my/elfeed-close-entry-window)
+  (advice-add #'elfeed-kill-buffer :after
+              (lambda () (delete-window)))
+  ;; Close the other windows when elfeed-entry buffer is opened.
+  (advice-add #'elfeed-search-show-entry :before
+              (lambda (entry) (delete-other-windows)))
 
   (defun my/elfeed-search-browse-url-with-eww (entry)
     (interactive (list (elfeed-search-selected :ignore-region)))
