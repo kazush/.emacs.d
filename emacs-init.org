@@ -4414,7 +4414,7 @@ Macros to retrive API keys for LLM servce providers.
   ;;          :chat-model "deepseek-coder-v2:latest"))
 
   (setopt ellama-provider (my/make-llm-gemini
-                           :chat-model "gemini-1.5-flash-002"))
+                           :chat-model "gemini-1.5-flash-latest"))
   ;; Predefined llm providers for interactive switching.
   ;; You shouldn't add ollama providers here - it can be selected interactively
   ;; without it. It is just example.
@@ -4423,12 +4423,14 @@ Macros to retrive API keys for LLM servce providers.
                                :chat-model "gemini-1.5-flash"))
             ("gemini-pro" . (my/make-llm-gemini
                              :chat-model "gemini-1.5-pro"))
-            ("gemini-flash-002" . (my/make-llm-gemini
-                               :chat-model "gemini-1.5-flash-002"))
-            ("gemini-pro-002" . (my/make-llm-gemini
-                             :chat-model "gemini-1.5-pro-002"))
-            ("groq-llama-3.1" . (my/make-llm-groq
-                                 :chat-model "llama-3.1-70b-versatile"))
+            ("gemini-flash-latest" . (my/make-llm-gemini
+                               :chat-model "gemini-1.5-flash-latest"))
+            ("gemini-pro-latest" . (my/make-llm-gemini
+                             :chat-model "gemini-1.5-pro-latest"))
+            ("groq-llama-3.3-specdec" . (my/make-llm-groq
+                                 :chat-model "llama-3.3-70b-specdec"))
+            ("groq-llama-3.3-versatile" . (my/make-llm-groq
+                                 :chat-model "llama-3.3-70b-versatile"))
             ("groq-mixtral-8x7b" . (my/make-llm-groq
                                     :chat-model "mixtral-8x7b-32768"))
             ("sambanova-llama-3.1" . (my/make-llm-sambanova
@@ -4502,7 +4504,9 @@ Macros to retrive API keys for LLM servce providers.
               llama-3.1-8b-instant
               llama3-groq-70b-8192-tool-use-preview
               mixtral-8x7b-32768
-              llama-3.2-90b-vision-preview))
+              llama-3.2-90b-vision-preview
+              llama-3.3-70b-specdec
+              llama-3.3-70b-versatile))
 
   (gptel-make-ollama "Ollama"
     :host "localhost:11434"
