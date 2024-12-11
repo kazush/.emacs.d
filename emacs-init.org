@@ -1012,6 +1012,13 @@ More visual feedback on some operations such as undo, yank, kill-region, etc.
     ("q" nil)))
 #+end_src
 
+** Tab bar
+
+#+begin_src emacs-lisp
+(use-package tab-bar
+  :bind (("C-z w" . tab-bar-move-window-to-tab)))
+#+end_src
+
 * Completion
 
 vertico and related packages are used for completion framework.
