@@ -2730,12 +2730,9 @@ Yet another terminal emulator. Trying out now.
                           (:exclude ".dir-locals.el" "*-tests.el")))
   :config
   (defun my/neweat ()
-    "Create a new eat with specified buffer name."
+    "Create a new eat session."
     (interactive)
-    (if (my/find-last-shellish-buffer (buffer-list (selected-frame)) "eat")
-        (vterm (format "*eat<%s>*"
-                       (read-string "Shell buffer name: ")))
-      (eat)))
+      (eat nil t))
 
   (defun my/get-eat (arg)
     (interactive "p")
