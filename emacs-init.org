@@ -3943,6 +3943,7 @@ Display remote images specified by URLs inline in org-mode.
   :bind-keymap
   ("C-c n d" . org-roam-dailies-map)
   :custom
+  (org-agenda-file-regexp "\\`[^.].*\\.org\\\(\\.gpg\\\)?\\'")
   (org-roam-directory "~/org/roam")
   (org-roam-capture-templates
    '(("d" "default" plain "%?" :target
@@ -3966,7 +3967,10 @@ Display remote images specified by URLs inline in org-mode.
       (file+head "secure/%<%Y-%m-%d>.org.gpg" "#+title: Personal Notes: %<%Y-%m-%d %A>\n")
       :empty-lines-before 1)))
   :init
-  (add-to-list 'org-agenda-files "~/org/roam" 'append)
+  (setq org-agenda-files
+        (append org-agenda-files
+                '("~/org/roam" "~/org/roam/secure"
+                  "~/org/roam/daily" "~/org/roam/daily/secure")))
   :config
   (unless (f-dir-p "~/org/roam")
     (mkdir "~/org/roam" t))
