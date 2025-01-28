@@ -2806,6 +2806,8 @@ Yet another terminal emulator. Trying out now.
   (setq lsp-keymap-prefix (kbd "C-c l"))
   ;; (setq lsp-signature-auto-activate nil)
   (setq lsp-signature-render-documentation nil)
+  :custom
+  (lsp-diagnostic-clean-after-change t)
   :config
 
   ;; Hack to enable LSP in org-src-mode buffers.
