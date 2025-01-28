@@ -594,6 +594,13 @@ prefix. This way which-key will be more useful.
 (global-set-key (kbd "M-s /") 'my/search-map)
 #+end_src
 
+*** AI map
+
+#+begin_src emacs-lisp
+(define-prefix-command 'my/ai-map)
+(global-set-key (kbd "C-c a") 'my/ai-map)
+#+end_src
+
 *** Misc
 
 #+begin_src emacs-lisp
@@ -3260,11 +3267,23 @@ Currentl disabled as I'm trying out diff-hl.
 #+end_src
 
 ** Code Completion
+*** Copilot
+
+~copilot-install-server~ needs to be run after a fresh install. Also, Node.js v18+ is needed.
+Manually enable ~copilot-mode~ when needed.
+
+#+begin_src emacs-lisp
+(use-package copilot
+  :straight (:host github :repo "copilot-emacs/copilot.el" :files ("*.el"))
+  :bind ( :map copilot-completion-map
+          ("C-<return>" . copilot-accept-completion)))  ;; tab conficts with others such as LSP.
+#+end_src
 
 *** Tabnine
 
 #+begin_src emacs-lisp
 (use-package tabnine
+  :disabled
   :straight (tabnine
              :type git
              :host github
@@ -3293,6 +3312,106 @@ Currentl disabled as I'm trying out diff-hl.
          ("M-]" . tabnine-next-completion)))
 #+end_src
 
+*** Codeium
+
+#+begin_src emacs-lisp
+(use-package codeium
+  :disabled
+  :straight '(:type git :host github :repo "Exafunction/codeium.el")
+  :commands (codeium-install codeium-diagnose codeium-completion-at-point)
+  :init
+  (defun my/start-codium ()
+    (interactive)
+    (add-to-list 'completion-at-point-functions #'codeium-completion-at-point))
+  ;; use globally
+  ;; or on a hook
+  ;; (add-hook 'python-mode-hook
+  ;;     (lambda ()
+  ;;         (setq-local completion-at-point-functions '(codeium-completion-at-point))))
+
+  ;; if you want multiple completion backends, use cape (https://github.com/minad/cape):
+  ;; (add-hook 'python-mode-hook
+  ;;     (lambda ()
+  ;;         (setq-local completion-at-point-functions
+  ;;             (list (cape-capf-super #'codeium-completion-at-point #'lsp-completion-at-point)))))
+  ;; an async company-backend is coming soon!
+
+  ;; codeium-completion-at-point is autoloaded, but you can
+  ;; optionally set a timer, which might speed up things as the
+  ;; codeium local language server takes ~0.2s to start up
+  ;; (add-hook 'emacs-startup-hook
+  ;;  (lambda () (run-with-timer 0.1 nil #'codeium-init)))
+
+  ;; :defer t ;; lazy loading, if you want
+  :config
+  ;; if you don't want to use customize to save the api-key
+  ;; (setq codeium/metadata/api_key "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx")
+
+  ;; get codeium status in the modeline
+  (setq codeium-mode-line-enable
+        (lambda (api) (not (memq api '(CancelRequest Heartbeat AcceptCompletion)))))
+  (add-to-list 'mode-line-format '(:eval (car-safe codeium-mode-line)) t)
+  ;; alternatively for a more extensive mode-line
+  ;; (add-to-list 'mode-line-format '(-50 "" codeium-mode-line) t)
+
+  ;; use M-x codeium-diagnose to see apis/fields that would be sent to the local language server
+  (setq codeium-api-enabled
+        (lambda (api)
+          (memq api '(GetCompletions Heartbeat CancelRequest GetAuthToken RegisterUser auth-redirect AcceptCompletion))))
+  ;; you can also set a config for a single buffer like this:
+  ;; (add-hook 'python-mode-hook
+  ;;     (lambda ()
+  ;;         (setq-local codeium/editor_options/tab_size 4)))
+
+  ;; You can overwrite all the codeium configs!
+  ;; for example, we recommend limiting the string sent to codeium for better performance
+  (defun my-codeium/document/text ()
+    (buffer-substring-no-properties (max (- (point) 3000) (point-min)) (min (+ (point) 1000) (point-max))))
+  ;; if you change the text, you should also change the cursor_offset
+  ;; warning: this is measured by UTF-8 encoded bytes
+  (defun my-codeium/document/cursor_offset ()
+    (codeium-utf8-byte-length
+     (buffer-substring-no-properties (max (- (point) 3000) (point-min)) (point))))
+  (setq codeium/document/text 'my-codeium/document/text)
+  (setq codeium/document/cursor_offset 'my-codeium/document/cursor_offset))
+#+end_src
+
+** AI Agents
+*** Aider
+#+begin_src emacs-lisp
+(use-package aider
+  :straight (:host github :repo "tninja/aider.el" :files ("aider.el"))
+  :commands (aider-transient-menu)
+  :bind ( :map my/ai-map
+          ("a" . aider-transient-menu))
+  :config
+  ;; Use claude-3-5-sonnet cause it is best in aider benchmark
+  ;; (setq aider-args '("--model" "anthropic/claude-3-5-sonnet-20241022"))
+  ;; (setenv "ANTHROPIC_API_KEY" (my/get-anthropic-apikey))
+  ;; Or use chatgpt model since it is most well known
+  ;; (setq aider-args '("--model" "gpt-4o-mini"))
+  ;; (setenv "OPENAI_API_KEY" <your-openai-api-key>)
+  ;; Or use gemini v2 model since it is very good and free
+  (setq aider-args '("--model" "gemini/gemini-2.0-flash-exp"))
+  (setenv "GEMINI_API_KEY" (my/get-gemini-apikey))
+  ;; Or use your personal config file
+  ;; (setq aider-args `("--config" ,(expand-file-name "~/.aider.conf.yml")))
+  )
+#+end_src
+
+*** Copilot Chat
+#+begin_src emacs-lisp
+(use-package copilot-chat
+  :straight (:host github :repo "chep/copilot-chat.el" :files ("*.el"))
+  :commands (copilot-chat-display)
+  :bind ( :map my/ai-map
+          ("c" . copilot-chat-display))
+  :custom
+  (copilot-chat-backend 'curl)
+  (copilot-chat-frontend 'shell-maker)
+  (copilot-chat-model "claude-3.5-sonnet") ;; "gpt-4o", "o1-preview"
+  )
+#+end_src
 ** Jupyter
 
 #+begin_src emacs-lisp
@@ -4358,6 +4477,15 @@ Macros to retrive API keys for LLM servce providers.
 
 (defun my/get-hf-apikey ()
   (auth-source-pick-first-password :host "huggingface-apikey"))
+
+(defun my/get-anthropic-apikey ()
+  (auth-source-pick-first-password :host "api.anthropic.com"))
+
+(defun my/get-openrouter-apikey ()
+  (auth-source-pick-first-password :host "openrouter-apikey"))
+
+(defun my/get-deepseek-apikey ()
+  (auth-source-pick-first-password :host "deepseek-apikey"))
 #+end_src
 
 ** Ellama - Emacs client for ollama
