@@ -4546,37 +4546,37 @@ Macros to retrive API keys for LLM servce providers.
       :key (my/get-gemini-apikey)
       ,@args))
 
-
   ;; (setopt ellama-provider
   ;;         (my/make-llm-local-server
   ;;          :chat-model "deepseek-coder-v2:latest"))
 
   (setopt ellama-provider (my/make-llm-gemini
-                           :chat-model "gemini-1.5-flash-latest"))
+                           :chat-model "gemini-2.0-flash-exp"))
   ;; Predefined llm providers for interactive switching.
   ;; You shouldn't add ollama providers here - it can be selected interactively
   ;; without it. It is just example.
   (setopt ellama-providers
           '(("gemini-flash" . (my/make-llm-gemini
-                               :chat-model "gemini-1.5-flash"))
-            ("gemini-pro" . (my/make-llm-gemini
-                             :chat-model "gemini-1.5-pro"))
-            ("gemini-flash-latest" . (my/make-llm-gemini
-                               :chat-model "gemini-1.5-flash-latest"))
-            ("gemini-pro-latest" . (my/make-llm-gemini
-                             :chat-model "gemini-1.5-pro-latest"))
+                               :chat-model "gemini-2.0-flash-exp"))
+            ("gemini-flash-thinking" . (my/make-llm-gemini
+                                        :chat-model "gemini-2.0-flash-thinking-exp"))
+            ("gemini-exp" . (my/make-llm-gemini
+                             :chat-model "gemini-exp-1206"))
             ("groq-llama-3.3-specdec" . (my/make-llm-groq
-                                 :chat-model "llama-3.3-70b-specdec"))
+                                         :chat-model "llama-3.3-70b-specdec"))
             ("groq-llama-3.3-versatile" . (my/make-llm-groq
-                                 :chat-model "llama-3.3-70b-versatile"))
+                                           :chat-model "llama-3.3-70b-versatile"))
             ("groq-mixtral-8x7b" . (my/make-llm-groq
                                     :chat-model "mixtral-8x7b-32768"))
             ("sambanova-llama-3.1" . (my/make-llm-sambanova
                                       :chat-model "Meta-Llama-3.1-405B-Instruct"))
+            ("sambanova-qwen-2.5" . (my/make-llm-sambanova
+                                     :chat-model "Qwen2.5-72B-Instruct"))
             ("cohere-command-r-plus" . (my/make-llm-cohere
-                                      :chat-model "command-r-plus"))
+                                        :chat-model "command-r-plus"))
             ("hf-qwen2.5-coder" . (my/make-llm-hf
-                                      :chat-model "Qwen/Qwen2.5-Coder-32B-Instruct"))
+                                   :chat-model "Qwen/Qwen2.5-Coder-32B-Instruct"))
+
             ("ezo-common" . (my/make-llm-local-server
                              :chat-model "ezo-common"))
             ("ezo-humanities" . (my/make-llm-local-server
@@ -4627,10 +4627,9 @@ Macros to retrive API keys for LLM servce providers.
 
   (gptel-make-gemini "Gemini"
     :key #'my/get-gemini-apikey
-    :models '(gemini-1.5-flash
-              gemini-1.5-pro
-              gemini-1.5-flash-latest
-              gemini-1.5-pro-latest)
+    :models '(gemini-2.0-flash-exp
+              gemini-2.0-flash-thinking-exp
+              gemini-exp-1206)
     :stream t)
 
   (gptel-make-openai "Groq"
@@ -4638,12 +4637,7 @@ Macros to retrive API keys for LLM servce providers.
     :endpoint "/openai/v1/chat/completions"
     :stream t
     :key #'my/get-groq-apikey
-    :models '(llama-3.1-70b-versatile
-              llama-3.1-8b-instant
-              llama3-groq-70b-8192-tool-use-preview
-              mixtral-8x7b-32768
-              llama-3.2-90b-vision-preview
-              llama-3.3-70b-specdec
+    :models '(llama-3.3-70b-specdec
               llama-3.3-70b-versatile))
 
   (gptel-make-ollama "Ollama"
@@ -4661,7 +4655,7 @@ Macros to retrive API keys for LLM servce providers.
     :stream t
     :key #'my/get-sambanova-apikey
     :models '(Meta-Llama-3.1-405B-Instruct
-              Llama-3.2-90B-Vision-Instruct))
+              Qwen2.5-72B-Instruct))
 
   (gptel-make-openai "Cohere"
     :host "localhost:6600"
@@ -4679,12 +4673,32 @@ Macros to retrive API keys for LLM servce providers.
     :models '(Qwen/Qwen2.5-Coder-32B-Instruct
               Qwen/Qwen2.5-72B-Instruct))
 
+  (gptel-make-anthropic "Anthropic"
+    :stream t
+    :key #'my/get-anthropic-apikey
+    :models '(claude-3.5-sonnet-20241022))
+
+  (gptel-make-openai "DeepSeek"
+    :host "api.deepseek.com"
+    :endpoint "/v1/chat/completions"
+    :stream t
+    :key #'my/get-deepseek-apikey
+    :models '(deepseek-chat
+              deepseek-reasoner))
+
+  (gptel-make-openai "OpenRouter"
+    :host "openrouter.ai"
+    :endpoint "/api/v1/chat/completions"
+    :stream t
+    :key #'my/get-openrouter-apikey
+    :models '(openai/o1-preview))
+
   (defun my/gptel-get-backend (key)
     (alist-get key gptel--known-backends nil nil 'string=))
 
   ;; Set default backend.
   (setq gptel-backend (my/gptel-get-backend "Gemini"))
-  (setq gptel-model 'gemini-1.5-flash-latest)
+  (setq gptel-model 'gemini-2.0-flash-exp)
   )
 #+end_src
 
@@ -4704,9 +4718,9 @@ Use groq as the LLM service.
   :hook (org-mode . org-ai-mode)
   :config
   ;; Use Llama 3.1 70B by Groq as the backend. The API key is in authinfo.
-  (setq org-ai-default-chat-model "llama-3.1-70b-versatile")
-  (setq org-ai-openai-chat-endpoint "https://api.groq.com/openai/v1/chat/completions")
-  (setq org-ai-openai-completion-endpoint "https://api.groq.com/openai/v1/completions")
+  (setq org-ai-default-chat-model "")
+  (setq org-ai-openai-chat-endpoint "https://openrouter.ai/api/v1/chat/completions")
+  (setq org-ai-openai-completion-endpoint "https://openrouter.ai/api/v1/completions")
 
   (org-ai-install-yasnippets)
 
