@@ -2997,16 +2997,17 @@ Eldoc-box displays eldoc contents in a child frame but is currently diabled.
          ("C-c (" . puni-wrap-round)
          ("C-c [" . puni-wrap-square)
          ("C-c {" . puni-wrap-curly)
+         ("C-c <" . puni-wrap-angle)
          :map my/edit-map
          ("'" . my/puni-wrap-single-quote)
          ("\"" . my/puni-wrap-double-quote)
          ("(" . puni-wrap-round)
          ("[" . puni-wrap-square)
-         ("{" . puni-wrap-curly))
+         ("{" . puni-wrap-curly)
+         ("<" . puni-wrap-angle))
   :custom
   (puni-confirm-when-delete-unbalanced-active-region nil)
   :config
-
   (defun my/def-pairs (pairs)
     (dolist (wdef pairs)
       (fset (intern (concat
