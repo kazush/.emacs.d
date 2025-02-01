@@ -2016,6 +2016,12 @@ Mostly borrowed from https://taipapamotohus.com/post/dired/.
         (message "%s: %s" date-string (mapconcat #'identity holiday-list "; ")))))
   (add-hook 'calendar-move-hook 'my/japanese-holiday-show))
 #+end_src
+** Valign
+
+#+begin_src emacs-lisp
+(use-package valign
+  :hook ((org-mode markdown-mode) . valign-mode))
+#+end_src
 
 * Window and workspace management
 
