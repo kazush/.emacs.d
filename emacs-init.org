@@ -648,10 +648,13 @@ prefix. This way which-key will be more useful.
 (global-set-key (kbd "C-x C-p") 'switch-to-prev-buffer)
 
 ;; Make switch to scratch buffer easier, but often I forgot the key binding.
-(global-set-key (kbd "M-S") #'(lambda ()
-                                (interactive)
-                                (pop-to-buffer
-                                  (get-scratch-buffer-create))))
+(defun my/toggle-popup-scratch-buffer ()
+  (interactive)
+  (let* ((buf (get-scratch-buffer-create))
+         (win (get-buffer-window buf)))
+    (if win (delete-window win)
+        (pop-to-buffer buf))))
+(global-set-key (kbd "M-S") #'my/toggle-popup-scratch-buffer)
 
 ;; To be used along with scroll-other-window-up (M-C-v).
 (global-set-key (kbd "M-V") #'scroll-other-window-down)
