@@ -4113,6 +4113,225 @@ add ctime and mtime properties to org-roam nodes.
   :config
   (org-roam-timestamps-mode))
 #+end_src
+** org-fragtog
+
+#+begin_src emacs-lisp
+(use-package org-fragtog
+  :after org
+  :straight (org-fragtog
+             :type git
+             :host github
+             :repo "io12/org-fragtog"
+             :files ("*.el"))
+  :hook (org-mode . org-fragtog-mode))
+#+end_src
+
+** Latex support
+
+#+begin_src emacs-lisp
+(use-package org
+  :custom
+  (org-preview-latex-default-process 'dvisvgm)
+  (org-latex-default-class "bxjsarticle")
+  (org-latex-pdf-process '("latexmk -xelatex %f"))
+  ;; (org-latex-pdf-process '("latexmk -e '$lualatex=q/lualatex %%S/' -e '$bibtex=q/bibtexu %B/' -e '$biber=q/biber --bblencoding=utf8 -u -U --output_safechars %B/' -e '$makeindex=q/upmendex -o %%D %%S/' -norc -gg -pdflua %f"))
+  ;; (org-latex-pdf-process '("latexmk -e '$latex=q/uplatex -kanji=utf8 -no-guess-input-enc %%S/' -e '$bibtex=q/bibtexu %B/' -e '$biber=q/biber --bblencoding=utf8 -u -U --output_safechars %B/' -e '$makeindex=q/upmendex -o %%D %%S/' -e '$dvipdf=q/dvipdfmx -o %%D %%S/' -norc -gg -pdfdvi %f"))
+  :config
+  (with-eval-after-load 'ox-latex
+    (add-to-list 'org-latex-classes
+                 '("jlreq-article"
+                   "\\ifdefined\\kanjiskip
+  \\documentclass[uplatex,dvipdfmx,11pt,paper=a4]{jlreq}
+\\else
+  \\documentclass[11pt,paper=a4]{jlreq}
+\\fi
+[NO-DEFAULT-PACKAGES]
+\\usepackage{amsmath}
+\\usepackage{newtxtext,newtxmath}
+\\ifdefined\\kanjiskip
+  \\usepackage{graphicx}
+  \\usepackage{hyperref}
+  \\usepackage{pxjahyper}
+  \\hypersetup{colorlinks=true}
+\\else
+  \\usepackage{graphicx}
+  \\usepackage{hyperref}
+  \\hypersetup{pdfencoding=auto,colorlinks=true}
+\\fi"
+                   ("\\section{%s}" . "\\section*{%s}")
+                   ("\\subsection{%s}" . "\\subsection*{%s}")
+                   ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                   ("\\paragraph{%s}" . "\\paragraph*{%s}")
+                   ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+
+    (add-to-list 'org-latex-classes
+                 '("jlreq-article-tate"
+                   "\\ifdefined\\kanjiskip
+  \\documentclass[uplatex,dvipdfmx,tate,11pt,paper=a4]{jlreq}
+\\else
+  \\documentclass[tate,11pt,paper=a4]{jlreq}
+\\fi
+[NO-DEFAULT-PACKAGES]
+\\usepackage{amsmath}
+\\usepackage{newtxtext,newtxmath}
+\\ifdefined\\kanjiskip
+  \\usepackage{graphicx}
+  \\usepackage{hyperref}
+  \\usepackage{pxjahyper}
+  \\hypersetup{colorlinks=true}
+\\else
+  \\usepackage{graphicx}
+  \\usepackage{hyperref}
+  \\hypersetup{pdfencoding=auto,colorlinks=true}
+\\fi"
+                   ("\\section{%s}" . "\\section*{%s}")
+                   ("\\subsection{%s}" . "\\subsection*{%s}")
+                   ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                   ("\\paragraph{%s}" . "\\paragraph*{%s}")
+                   ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+
+    (add-to-list 'org-latex-classes
+                 '("bxjsarticle"
+                   "\\documentclass[autodetect-engine,dvi=dvipdfmx,11pt,a4paper,ja=standard]{bxjsarticle}
+[NO-DEFAULT-PACKAGES]
+\\usepackage{amsmath}
+\\usepackage{newtxtext,newtxmath}
+\\usepackage{graphicx}
+\\usepackage{hyperref}
+\\ifdefined\\kanjiskip
+  \\usepackage{pxjahyper}
+  \\hypersetup{colorlinks=true}
+\\else
+  \\ifdefined\\XeTeXversion
+      \\hypersetup{colorlinks=true}
+  \\else
+    \\ifdefined\\directlua
+      \\hypersetup{pdfencoding=auto,colorlinks=true}
+    \\else
+      \\hypersetup{unicode,colorlinks=true}
+    \\fi
+  \\fi
+\\fi"
+                   ("\\section{%s}" . "\\section*{%s}")
+                   ("\\subsection{%s}" . "\\subsection*{%s}")
+                   ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                   ("\\paragraph{%s}" . "\\paragraph*{%s}")
+                   ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+    )
+
+  ;; Adjust left margin on overlay equations.
+  ;; source: https://www.reddit.com/r/emacs/comments/15vt0du/centering_latex_previews_in_org97/
+  (defun my/ov-at (&optional point)
+    "Get an overlay at POINT.
+  POINT defaults to the current `point'."
+    (or point (setq point (point)))
+    (car (overlays-at point)))
+  ;; https://www.reddit.com/r/emacs/comments/169keg7/comment/jzierha/?utm_source=share&utm_medium=web2x&context=3
+  (defun my/org-justify-fragment-overlay (beg end image &optional imagetype)
+    "Only equations at the beginning and also end of a line are justified."
+    (when (and (= beg (line-beginning-position)) (= end (line-end-position)))
+      (let* ((ov (my/ov-at))
+             (disp (overlay-get ov 'display)))
+        ;; (overlay-put ov 'line-prefix `(space :align-to (- center (0.5 . ,disp))))
+        (overlay-put ov 'line-prefix `(space :relative-width 10)))
+      ))
+  (advice-add 'org--make-preview-overlay :after 'my/org-justify-fragment-overlay)
+
+  ;; Config for latex preview which supports Japanese text in math mode with \text{}.
+
+  (plist-put org-format-latex-options :background "Transparent")
+
+  (setq org-format-latex-header "\\documentclass[a4paper,xelatex,ja=standard]{bxjsarticle}
+\\usepackage[usenames]{color}
+\[DEFAULT-PACKAGES]
+\[PACKAGES]
+\\usepackage{mathcomp}
+\\pagestyle{empty}             % do not remove
+% The settings below are copied from fullpage.sty
+\\setlength{\\textwidth}{\\paperwidth}
+\\addtolength{\\textwidth}{-3cm}
+\\setlength{\\oddsidemargin}{1.5cm}
+\\addtolength{\\oddsidemargin}{-2.54cm}
+\\setlength{\\evensidemargin}{\\oddsidemargin}
+\\setlength{\\textheight}{\\paperheight}
+\\addtolength{\\textheight}{-\\headheight}
+\\addtolength{\\textheight}{-\\headsep}
+\\addtolength{\\textheight}{-\\footskip}
+\\addtolength{\\textheight}{-3cm}
+\\setlength{\\topmargin}{1.5cm}
+\\addtolength{\\topmargin}{-2.54cm}")
+
+  (setf (alist-get 'dvisvgm org-preview-latex-process-alist)
+        '( :programs
+          ("xelatex" "dvisvgm")
+          :description "xdv > svg" :message "you need to install the programs: latex and dvisvgm." :image-input-type "xdv" :image-output-type "svg" :image-size-adjust
+          (1.7 . 1.5)
+          :latex-compiler
+          ("xelatex -no-pdf -interaction nonstopmode -output-directory %o %f")
+          :image-converter
+          ("dvisvgm %f --no-fonts --exact-bbox --scale=%S --output=%O")))
+  )
+#+end_src
+
+Install cdlatex to enable some useful features. cdlatex depends on texmathp.el in AUCTeX hence AUCTeX as well.
+
+#+begin_src emacs-lisp
+(use-package cdlatex
+  :hook ((LaTeX-mode . turn-on-cdlatex)
+         (latex-mode . turn-on-cdlatex)
+         (cdlatex-mode . my/setup-cdlatex-mode)
+         (org-cdlatex-mode . my/setup-cdlatex-mode))
+  :bind ( :map org-cdlatex-mode-map
+          ("$" . cdlatex-dollar)
+          ("(" . cdlatex-pbb)
+          ("{" . cdlatex-pbb)
+          ("[" . cdlatex-pbb)
+          ("|" . cdlatex-pbb)
+          ("<" . cdlatex-pbb))
+  :custom
+  (cdlatex-paired-parens "$([{")
+  :config
+  (defun my/setup-cdlatex-mode ()
+    "Setup config suitable for cdlatex-mode and org-cdlatex-mode."
+    (setq-local org-use-sub-superscripts t)
+    (setq-local org-export-with-sub-superscripts t)
+    (electric-pair-mode -1))
+)
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package auctex)
+#+end_src
+
+Here is a Workaround for latex preview scaling issues that I borrow from [[https://karthinks.com/software/scaling-latex-previews-in-emacs/]].
+
+#+begin_src emacs-lisp
+(use-package org
+  :hook (text-scale-mode . my/text-scale-adjust-latex-previews)
+  :config
+  (defun my/text-scale-adjust-latex-previews ()
+    "Adjust the size of latex preview fragments when changing the buffer's text scale."
+    (pcase major-mode
+      ('latex-mode
+       (dolist (ov (overlays-in (point-min) (point-max)))
+         (if (eq (overlay-get ov 'category)
+                 'preview-overlay)
+             (my/text-scale--resize-fragment ov))))
+      ('org-mode
+       (dolist (ov (overlays-in (point-min) (point-max)))
+         (if (eq (overlay-get ov 'org-overlay-type)
+                 'org-latex-overlay)
+             (my/text-scale--resize-fragment ov))))))
+
+  (defun my/text-scale--resize-fragment (ov)
+    (overlay-put
+     ov 'display
+     (cons 'image
+           (plist-put
+            (cdr (overlay-get ov 'display))
+            :scale (+ 1.0 (* 0.25 text-scale-mode-amount))))))
+  )
+#+end_src
 
 * Docker / Containers
 
