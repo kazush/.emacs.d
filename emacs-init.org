@@ -1096,7 +1096,7 @@ vertico and related packages are used for completion framework.
 (use-package consult
   ;; Replace bindings. Lazily loaded due by `use-package'.
   :bind (;; C-c bindings (mode-specific-map)
-         ("C-c r" . my/consult-recent-file-new-window)
+         ("C-c r" . my/consult-recent-file-other-window)
          ("C-c R" . consult-recent-file)
          ("C-c h" . consult-history)
          ("C-c m" . consult-mode-command)
@@ -2167,7 +2167,8 @@ Pin a window so that find-file or other operations won't steal the window.
 	        value)
       (my/switch-to-buffer-new-window value))))
 
-(global-set-key (kbd "C-c f") #'my/find-file-new-window)
+;; (global-set-key (kbd "C-c f") #'my/find-file-new-window)
+(global-set-key (kbd "C-c f") #'find-file-other-window)
 #+end_src
 
 ** Select another window in the reverse cyclic order
@@ -2311,35 +2312,28 @@ the two windows.
 
 (defvar my/dba-min-windows 3)
 (defun my/display-buffer-fallback-action (buf alist)
-  "Return a window to display buffer BUF.  ALIST is not used."
+  "Return a window to display buffer BUF.  ALIST is not used.
+
+If the nunber of windows in the frame is less than
+my/dba-min-windows, create a new window holizontally.  Otherwise,
+return the same window."
   (let ((win (get-buffer-window buf))
         (buflist (reverse (buffer-list (selected-frame)))))
     (if win win
-      (setq win (get-buffer-window "*scratch*"))
-      (unless (or win (< (count-windows) my/dba-min-windows))
-        (while buflist
-          (let* ((b (car buflist))
-                 (w (get-buffer-window b)))
-            (if (or (eq b (current-buffer))
-                    (null w)
-                    (not (window-live-p w))
-                    (window-minibuffer-p w)
-                    (window-dedicated-p w)
-                    (window-parameter w 'window-side)
-                    (seq-contains '(exwm-mode shell-mode eshell-mode term-mode vterm-mode eat-mode)
-                                  (with-current-buffer b major-mode)))
-                (setq buflist (cdr buflist))
-              (setq win w)
-              (setq buflist nil))))))
-    (if win
-        (set-window-buffer win buf))
+      (if (and (= (count-windows) 1)
+               (string= (buffer-name (current-buffer)) "*scratch*"))
+          (setq win (get-buffer-window (current-buffer)))
+        (when (< (count-windows) my/dba-min-windows)
+          (setq win (split-window-horizontally))))
+      (when win
+        (set-window-buffer win buf)))
     win))
 
 (setq display-buffer-fallback-action
       '((display-buffer--maybe-same-window
          display-buffer-reuse-window
-         ;; display-buffer-reuse-mode-window
          my/display-buffer-fallback-action
+         display-buffer-reuse-mode-window
          display-buffer--maybe-pop-up-frame-or-window
          display-buffer-in-previous-window
          display-buffer-use-some-window
