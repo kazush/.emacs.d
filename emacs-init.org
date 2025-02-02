@@ -2057,8 +2057,11 @@ Mostly borrowed from https://taipapamotohus.com/post/dired/.
 #+end_src
 ** Valign
 
+Align tables with variable pitch fonts.
+
 #+begin_src emacs-lisp
 (use-package valign
+  :diminish
   :hook ((org-mode markdown-mode) . valign-mode))
 #+end_src
 
@@ -4312,7 +4315,10 @@ add ctime and mtime properties to org-roam nodes.
         )
 
       ;; add vertical margin
-      (plist-put img :margin '(0 . 5))
+      (let ((margin
+             (if (string-match-p "\\([sS]erif\\|[mM]incho\\)" (face-attribute 'default :family))
+                 4 1)))
+        (plist-put img :margin `(0 . ,margin)))
       ))
 
   (advice-add 'org--make-preview-overlay :after 'my/org-adjust-preview-overlay)
