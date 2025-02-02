@@ -4289,10 +4289,16 @@ add ctime and mtime properties to org-roam nodes.
       ))
   (advice-add 'org--make-preview-overlay :after 'my/org-justify-fragment-overlay)
 
+
+  ;;
   ;; Config for latex preview which supports Japanese text in math mode with \text{}.
+  ;;
 
-  (plist-put org-format-latex-options :background "Transparent")
+  ;; Product svgs to have transparent fg/bg colors.
+  (plist-put org-format-latex-options :foreground nil)
+  (plist-put org-format-latex-options :background nil)
 
+  ;; Header for xelatex supporting Japanese text.
   (setq org-format-latex-header "\\documentclass[a4paper,xelatex,ja=standard]{bxjsarticle}
 \\usepackage[usenames]{color}
 \[DEFAULT-PACKAGES]
@@ -4313,15 +4319,16 @@ add ctime and mtime properties to org-roam nodes.
 \\setlength{\\topmargin}{1.5cm}
 \\addtolength{\\topmargin}{-2.54cm}")
 
+  ;; Use xelatex to produce svgs supporting Japanese text.
   (setf (alist-get 'dvisvgm org-preview-latex-process-alist)
         '( :programs
-          ("xelatex" "dvisvgm")
-          :description "xdv > svg" :message "you need to install the programs: latex and dvisvgm." :image-input-type "xdv" :image-output-type "svg" :image-size-adjust
-          (1.7 . 1.5)
-          :latex-compiler
-          ("xelatex -no-pdf -interaction nonstopmode -output-directory %o %f")
-          :image-converter
-          ("dvisvgm %f --no-fonts --exact-bbox --scale=%S --output=%O")))
+           ("xelatex" "dvisvgm")
+           :description "xdv > svg" :message "you need to install the programs: latex and dvisvgm." :image-input-type "xdv" :image-output-type "svg" :image-size-adjust
+           (1.7 . 1.5)
+           :latex-compiler
+           ("xelatex -no-pdf -interaction nonstopmode -output-directory %o %f")
+           :image-converter
+           ("dvisvgm %f --no-fonts --exact-bbox --scale=%S --output=%O")))
   )
 #+end_src
 
