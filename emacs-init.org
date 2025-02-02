@@ -1113,7 +1113,7 @@ vertico and related packages are used for completion framework.
 (use-package consult
   ;; Replace bindings. Lazily loaded due by `use-package'.
   :bind (;; C-c bindings (mode-specific-map)
-         ("C-c r" . my/consult-recent-file-other-window)
+         ("C-c r" . my/consult-recent-file)
          ("C-c R" . consult-recent-file)
          ("C-c h" . consult-history)
          ("C-c m" . consult-mode-command)
@@ -1251,6 +1251,28 @@ vertico and related packages are used for completion framework.
        :initial (if (use-region-p)
                     (buffer-substring (region-beginning) (region-end))
                   (thing-at-point 'symbol)))))
+
+  (defun my/consult-recent-file ()
+    "Find recent file using `completing-read'."
+    (interactive)
+    (let* ((filename
+            (consult--read
+             (or
+              (mapcar #'consult--fast-abbreviate-file-name (bound-and-true-p recentf-list))
+              (user-error "No recent files, `recentf-mode' is %s"
+                          (if recentf-mode "enabled" "disabled")))
+             :prompt "Find recent file in other window: "
+             :sort nil
+             :require-match t
+             :category 'file
+             :state (consult--file-preview)
+             :history 'file-name-history))
+           (value (find-file-noselect filename nil nil nil)))
+      (if (listp value)
+          (mapcar 'display-buffer (nreverse value))
+        (let ((win (display-buffer value)))
+          (when win
+            (select-window win))))))
 
   (defun my/consult-recent-file-other-window ()
     "Find recent file using `completing-read'."
