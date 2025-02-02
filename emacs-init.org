@@ -4173,6 +4173,7 @@ add ctime and mtime properties to org-roam nodes.
   :config
   (org-roam-timestamps-mode))
 #+end_src
+
 ** org-fragtog
 
 #+begin_src emacs-lisp
@@ -4280,24 +4281,41 @@ add ctime and mtime properties to org-roam nodes.
                    ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
     )
 
-  ;; Adjust left margin on overlay equations.
-  ;; source: https://www.reddit.com/r/emacs/comments/15vt0du/centering_latex_previews_in_org97/
-  (defun my/ov-at (&optional point)
-    "Get an overlay at POINT.
-  POINT defaults to the current `point'."
-    (or point (setq point (point)))
-    (car (overlays-at point)))
-  ;; https://www.reddit.com/r/emacs/comments/169keg7/comment/jzierha/?utm_source=share&utm_medium=web2x&context=3
-  (defun my/org-justify-fragment-overlay (beg end image &optional imagetype)
-    "Only equations at the beginning and also end of a line are justified."
-    (when (and (= beg (line-beginning-position)) (= end (line-end-position)))
-      (let* ((ov (my/ov-at))
-             (disp (overlay-get ov 'display)))
-        ;; (overlay-put ov 'line-prefix `(space :align-to (- center (0.5 . ,disp))))
-        (overlay-put ov 'line-prefix `(space :relative-width 10)))
-      ))
-  (advice-add 'org--make-preview-overlay :after 'my/org-justify-fragment-overlay)
+  ;;
+  ;; Adjust line prefix and vertical margin on overlay equations.
+  ;;
 
+  (defun my/org-adjust-preview-overlay (beg end image &optional imagetype)
+    "Adjust latex preview images as follows:
+       1) vertically align them with the text on the same line.
+       2) center equations in latex environments."
+    (let* ((ov (car (overlays-at beg end)))
+           (ovlbp (car (overlays-at (line-beginning-position))))
+           (disp (overlay-get ov 'display))
+           (img (cdr disp)))
+      (when (and (string-match-p "\\`\\s-*\\'" (buffer-substring
+                                                (line-beginning-position) beg))
+                 (string-match-p "\\(\\`\\|[\]$}]\\)\\s-*\\'"
+                                 (buffer-substring end (line-end-position))))
+        ;; Center equations in latex environments.
+        (overlay-put ov 'before-string (propertize " " 'display
+                                                   `(space :align-to (- center (0.5 . ,disp)))))
+
+        ;; Another option: Add 4 spaces to the current indentation level.
+        ;; (let* ((prefix-len (length (get-text-property beg 'line-prefix)))
+        ;;        (indent-width (+ prefix-len
+        ;;                         (length (buffer-substring
+        ;;                                  (line-beginning-position) beg))
+        ;;                         4)))
+        ;;   (overlay-put ov 'before-string (propertize " " 'display
+        ;;                                              `(space :width ,indent-width))))
+        )
+
+      ;; add vertical margin
+      (plist-put img :margin '(0 . 5))
+      ))
+
+  (advice-add 'org--make-preview-overlay :after 'my/org-adjust-preview-overlay)
 
   ;;
   ;; Config for latex preview which supports Japanese text in math mode with \text{}.
