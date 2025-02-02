@@ -2354,6 +2354,7 @@ the two windows.
 (setq fit-window-to-buffer-horizontally t)
 (setq window-resize-pixelwise t)
 (setq window-combination-resize t)
+(setq split-width-threshold 80)
 
 (defvar my/dba-min-windows 3)
 (defun my/display-buffer-fallback-action (buf alist)
@@ -2362,25 +2363,22 @@ the two windows.
 If the nunber of windows in the frame is less than
 my/dba-min-windows, create a new window holizontally.  Otherwise,
 return the same window."
-  (let ((win (get-buffer-window buf))
-        (buflist (reverse (buffer-list (selected-frame)))))
-    (if win win
-      (if (and (= (count-windows) 1)
-               (string= (buffer-name (current-buffer)) "*scratch*"))
-          (setq win (get-buffer-window (current-buffer)))
-        (when (< (count-windows) my/dba-min-windows)
-          (setq win (split-window-horizontally))))
-      (when win
-        (set-window-buffer win buf)))
-    win))
+  (let ((win (get-buffer-window buf)))
+    (cond
+     (win win)
+     ((or (< (count-windows) my/dba-min-windows))
+      (display-buffer--maybe-pop-up-frame-or-window buf alist))
+     ((not (buffer-file-name buf))
+      (display-buffer-use-some-window buf alist))
+     (t (or
+         (display-buffer-in-previous-window buf alist)
+         (display-buffer-same-window buf alist)
+         (display-buffer-reuse-mode-window buf alist))))))
 
 (setq display-buffer-fallback-action
       '((display-buffer--maybe-same-window
          display-buffer-reuse-window
          my/display-buffer-fallback-action
-         display-buffer-reuse-mode-window
-         display-buffer--maybe-pop-up-frame-or-window
-         display-buffer-in-previous-window
          display-buffer-use-some-window
          display-buffer-pop-up-frame)))
 
