@@ -2,6 +2,8 @@
 #+startup: content indent
 #+property: header-args :tangle yes
 
+*Note: This Emacs configuration required Emacs 29.1 or above.*
+
 * Use-package integration with straight.el
 
 Load ~use-package~ using straight.el
@@ -2812,25 +2814,63 @@ Yet another terminal emulator. Trying out now.
 ** Tree Sitter
 
 #+begin_src emacs-lisp
-(if (< (string-to-number emacs-version) 29)
-    (progn
-      (use-package tree-sitter
-        :config
-        (require 'tree-sitter-hl)
-        (set-face-attribute 'tree-sitter-hl-face:property nil
-                            :slant 'unspecified
-                            :inherit 'font-lock-property-use-face)
-        (global-tree-sitter-mode)
-        (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode))
-      (use-package tree-sitter-langs)
-      )
-  (use-package treesit-auto
-    :custom
-    (treesit-auto-install t)
-    (treesit-font-lock-level 4)
-    :config
-    (treesit-auto-add-to-auto-mode-alist 'all)
-    (global-treesit-auto-mode))
+(use-package treesit
+  :straight (:type built-in)
+  :custom
+  (treesit-font-lock-level 4)
+  (treesit-load-name-override-list
+   '((c++ "libtree-sitter-cpp" "tree_sitter_cpp")
+     (js "libtree-sitter-js" "tree_sitter_javascript")
+     (common-lisp "libtree-sitter-common-lisp" "tree_sitter_commonlisp")
+     (csharp "libtree-sitter-csharp" "tree_sitter_c_sharp")
+     (go-mod "libtree-sitter-go-mod" "tree_sitter_gomod")))
+  :init
+  ;; Remap major modes to tree-sitter powered modes.
+  (setq major-mode-remap-alist
+        (append
+         major-mode-remap-alist
+        '((c-mode . c-ts-mode)
+          (c++-mode . c++-ts-mode)
+          (csharp-mode . csharp-ts-mode)
+          (go-dot-mod-mode . go-mod-ts-mode)
+          (go-mode . go-ts-mode)
+          (java-mode . java-ts-mode)
+          (python-mode . python-ts-mode))))
+  :config
+  ;; setting treesit-language-source-alist via :custom not working
+  (setq treesit-language-source-alist
+   '((bash "https://github.com/tree-sitter/tree-sitter-bash")
+     (c "https://github.com/tree-sitter/tree-sitter-c")
+     (cmake "https://github.com/uyha/tree-sitter-cmake")
+     (common-lisp "https://github.com/theHamsta/tree-sitter-commonlisp")
+     (cpp "https://github.com/tree-sitter/tree-sitter-cpp" "v0.22.0")
+     (css "https://github.com/tree-sitter/tree-sitter-css")
+     (csharp "https://github.com/tree-sitter/tree-sitter-c-sharp")
+     (elisp "https://github.com/Wilfred/tree-sitter-elisp")
+     (go "https://github.com/tree-sitter/tree-sitter-go")
+     (go-mod "https://github.com/camdencheek/tree-sitter-go-mod")
+     (html "https://github.com/tree-sitter/tree-sitter-html")
+     (js . ("https://github.com/tree-sitter/tree-sitter-javascript" "master" "src"))
+     (json "https://github.com/tree-sitter/tree-sitter-json")
+     (lua "https://github.com/Azganoth/tree-sitter-lua")
+     (make "https://github.com/alemuller/tree-sitter-make")
+     (markdown "https://github.com/ikatyang/tree-sitter-markdown")
+     (python "https://github.com/tree-sitter/tree-sitter-python")
+     (r "https://github.com/r-lib/tree-sitter-r")
+     (rust "https://github.com/tree-sitter/tree-sitter-rust")
+     (toml "https://github.com/tree-sitter/tree-sitter-toml")
+     (tsx . ("https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src"))
+     (typescript . ("https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src"))
+     (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
+
+  ;; Install tree-sitter language grammar for all langues configured.
+  (defun my/treesit-install-all-languages ()
+    (interactive)
+    (dolist (ent treesit-language-source-alist)
+      (let ((lang (car ent)))
+        (unless (treesit-language-available-p lang)
+          (message "Installing %s grammar for tree-sitter" lang)
+          (treesit-install-language-grammar lang)))))
   )
 #+end_src
 
@@ -2982,7 +3022,7 @@ Currently eglot is disabled to try lsp-mode out again.
 ;; For c/c++-mode
 (with-eval-after-load 'eglot
   (add-to-list 'eglot-server-programs
-               '((c++-mode c-mode) "clangd"))
+               '((c++-ts-mode c-ts-mode) "clangd"))
   (add-hook 'c-mode-common-hook 'eglot-ensure))
 #+end_src
 
@@ -3492,16 +3532,21 @@ Manually enable ~copilot-mode~ when needed.
 
 ** C++
 
+Use c++-ts-mode by default.
+
+#+begin_src emacs-lisp
+(use-package c++-ts-mode
+  :defer t
+  :straight (:type built-in)
+  :init
+  (add-to-list 'major-mode-remap-alist '(c++-mode . c++-ts-mode))
+  )
+#+end_src
+
 I adopt Google coding style. ~C-c i [br]~ key bindings should universally work as
 formatting commands.
 
 #+begin_src emacs-lisp
-(use-package google-c-style
-  :hook
-  (c-mode-common . (lambda ()
-                     (google-set-c-style)
-                     (google-make-newline-indent))))
-
 (use-package modern-cpp-font-lock
   :diminish modern-c++-font-lock-mode
   :hook
@@ -3518,39 +3563,51 @@ formatting commands.
 
 ** Python
 
-I used to use anaconda mode for completion and sourc code navigation features,
-but I'm trying lsp-mode out.
-
 #+begin_src emacs-lisp
 (use-package python
+  :straight (:type built-in)
   :custom
+  (python-shell-completion-native-enable nil)
   (python-flymake-command '("ruff" "--quiet" "--stdin-filename=stdin" "-"))
   (python-indent-guess-indent-offset-verbose nil))
+#+end_src
 
+Use Black for formatter.
+
+#+begin_src emacs-lisp
+(use-package python-black
+  :after python
+  :hook ((python-mode python-ts-mode) . my/python-black-setup)
+  :config
+  (defun my/python-black-setup ()
+    (python-black-on-save-mode-enable-dwim)
+    (local-set-key (kbd "C-c i b") 'python-black-buffer)
+    (local-set-key (kbd "C-c i r") 'python-black-region))
+  )
+#+end_src
+
+Disable yapfify in favor of Black being tried out.
+
+#+begin_src emacs-lisp
 (use-package yapfify
+  :disabled
   :hook  ((python-mode python-base-mode) . my/setup-yapfify)
   :config
   (defun my/setup-yapfify ()
     (local-set-key (kbd "C-c i b") 'yapfify-buffer)
     (local-set-key (kbd "C-c i r") 'yapfify-region)))
+#+end_src
 
+Use pyvenv package to simply support virtualenv.
+~$HOME/.venv~ is the the default venv environment.
+
+#+begin_src emacs-lisp
 (use-package pyvenv
   :config
   (pyvenv-mode 1)
   ;; Enable default python environment.
   (when (f-dir-p "~/.venv")
     (pyvenv-activate "~/.venv")))
-
-;; https://github.com/jorgenschaefer/elpy/issues/887
-(defun python-shell-completion-native-try ()
-  "Return non-nil if can trigger native completion."
-  (with-eval-after-load 'python
-    '(let ((python-shell-completion-native-enable t)
-           (python-shell-completion-native-output-timeout
-            python-shell-completion-native-try-output-timeout))
-       (python-shell-completion-native-get-completions
-        (get-buffer-process (current-buffer))
-        nil "_"))))
 #+end_src
 
 ** Go
@@ -3681,7 +3738,7 @@ MQL is a subset of C++.
 
 #+begin_src emacs-lisp
 ;; MQL4
-(add-to-list 'auto-mode-alist '("\\.mq[45h]\\'" . c++-mode))
+(add-to-list 'auto-mode-alist '("\\.mq[45h]\\'" . c++-ts-mode))
 
 ;; add extensions to dumb-jump
 (with-eval-after-load 'dumb-jump
