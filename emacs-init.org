@@ -4482,6 +4482,49 @@ Here is a Workaround for latex preview scaling issues that I borrow from [[https
   )
 #+end_src
 
+** Citation
+
+Citar provides a rich UI frontend for org-cite. citar-org-roam provides more integration with org-roam.
+
+#+begin_src emacs-lisp
+(use-package citar
+  :no-require
+  :bind ("C-c n n" . citar-create-note)
+  :hook
+  (org-mode . citar-capf-setup)
+  :custom
+  (require 'bibtex)
+  (org-cite-global-bibliography '("~/lib/bib/references.bib"))
+  (org-cite-insert-processor 'citar)
+  (org-cite-follow-processor 'citar)
+  (org-cite-activate-processor 'citar)
+  (citar-notes-paths '("~/org/roam/literature"))
+  (citar-bibliography org-cite-global-bibliography))
+
+(use-package citar-embark
+  :after (citar embark)
+  :no-require
+  :config (citar-embark-mode))
+
+(use-package citar-org-roam
+  :after citar
+  :custom
+  (citar-org-roam-subdir "literature")
+  (citar-org-roam-note-title-template "[${author}] ${title}")
+  (citar-org-roam-capture-template-key "n")
+  :config
+  (add-to-list
+   'org-roam-capture-templates
+   '("n" "literature note" plain
+     "%?"
+     :target
+     (file+head
+      "%(expand-file-name (or citar-org-roam-subdir \"\") org-roam-directory)/${citar-citekey}.org"
+      "#+title: ${note-title}\n#+author: ${citar-author}\n#+released_on: ${citar-date}\n\n")
+     :unnarrowed t) 'append)
+  (citar-org-roam-mode))
+#+end_src
+
 * Docker / Containers
 
 ** Docker Tramp
