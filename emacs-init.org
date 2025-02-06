@@ -761,6 +761,14 @@ Specify Japanese input method ~Mozc~ (which bases Google Japanese Input method).
   (diminish 'eldoc-mode))
 #+end_src
 
+
+*** doom-modeline
+
+#+begin_src emacs-lisp
+(use-package doom-modeline
+  :hook (after-init . doom-modeline-mode))
+#+end_src
+
 ** Setup UI look & feel
 
 When running as daemon, apparently these functions need to be called whenever a
@@ -3799,6 +3807,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
 
 #+begin_src emacs-lisp
 (use-package org
+  :diminish (org-indent-mode)
   :commands (org-agenda org-switchb org-capture)
   :bind (("C-c o a" . org-agenda)
          ("C-c o b" . org-switchb)
@@ -4507,6 +4516,7 @@ Citar provides a rich UI frontend for org-cite. citar-org-roam provides more int
   :config (citar-embark-mode))
 
 (use-package citar-org-roam
+  :diminish
   :after citar
   :custom
   (citar-org-roam-subdir "literature")
