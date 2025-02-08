@@ -3824,9 +3824,6 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
          ("C-c o h" . org-insert-heading)
          ("C-c o H" . org-insert-subheading)
          ("C-c o l" . org-store-link)
-         ("C-c o j" . my/org-capture-journal)
-         ("C-c o m" . my/org-capture-memo)
-         ("C-c o t" . my/org-capture-todo)
          :map org-mode-map
          ("M-p" . org-babel-previous-src-block)
          ("M-n" . org-babel-next-src-block))
@@ -3835,6 +3832,9 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
          (org-agenda-mode . (lambda () (hl-line-mode 1)))
          (org-babel-after-execute . org-redisplay-inline-images))
   :custom
+  (org-agenda-file-regexp "\\`[^.].*\\.org\\\(\\.gpg\\\)?\\'")
+  (org-agenda-start-on-weekday calendar-week-start-day)
+  (org-agenda-window-setup 'other-window)
   (org-log-into-drawer t)
   (org-list-allow-alphabetical t)
   (org-startup-indented t)
@@ -3844,26 +3844,15 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
   (org-src-preserve-indentation nil)
   (org-edit-src-content-indentation 0)
   (org-src-window-setup 'other-window)
-  (org-agenda-window-setup 'other-window)
   (org-hide-leading-stars t)
   (org-src-fontify-natively t)
   (org-confirm-babel-evaluate nil)
   (org-hide-emphasis-markers t)
-  (org-capture-templates
-   '(("j" "Journal"
-      entry (file+olp+datetree "~/org/journal.org")
-      "* %?\n\n  %i\n\n  From: %a")
-     ("m" "Memo"
-      entry (file "~/org/notes.org")
-      "* %? %T\n\n  %i\n\n  From: %a")
-     ("t" "Todo"
-      entry (file "~/org/todo.org")
-      "* TODO %?\n  %i\n  %a")
-     ))
   (org-todo-keywords
-   '((sequence "TODO(t)" "WAIT(w)" "SOMEDAY(s)" "|" "DONE(d)" "CANCELLED(c)")))
+   '((sequence "TODO(t)" "IN-PROGRESS(i)" "WAIT(w)" "|" "DONE(d)" "CANCELLED(c)" "SOMEDAY(s)")))
   (org-log-done 'time)
-  (org-agenda-files (list org-directory))
+  (org-capture-templates nil) ;; Migrated to org-roam-capture.
+  (org-agenda-files nil)  ;; will be configured in org-roam package config.
   (org-tag-alist
    '(("ai")
      ("algo")
@@ -3906,27 +3895,12 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
   (org-hide-emphasis-markers t)
   (org-pretty-entities t)
   ;; Agenda styling
-  (org-agenda-tags-column 0)
   (org-agenda-block-separator ?─)
-  (org-agenda-time-grid
-   '((daily today require-timed)
-     (800 1000 1200 1400 1600 1800 2000)
-     " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄"))
+  (org-agenda-time-grid nil)
   (org-agenda-current-time-string
    "⭠ now ─────────────────────────────────────────────────")
   (org-ellipsis "⇣")
-
   :config
-  (defun my/org-capture-journal ()
-    (interactive)
-    (org-capture nil "j"))
-  (defun my/org-capture-memo ()
-    (interactive)
-    (org-capture nil "m"))
-  (defun my/org-capture-todo ()
-    (interactive)
-    (org-capture nil "t"))
-
   ;; Faces
   (set-face-attribute 'org-document-title nil
                       :height 1.5)
@@ -4069,11 +4043,11 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
   (setq org-tags-exclude-from-inheritance (quote ("crypt")))
   ;; GPG key to use for encryption
   ;; Either the Key ID or set to nil to use symmetric encryption.
-  (setq org-crypt-key (getenv "ORG_CRYP_KEY"))
+  (setq org-crypt-key (getenv "ORG_CRYPT_KEY"))
   )
 #+end_src
 
-** Bebel Extensions
+** org-bebel extensions
 
 #+begin_src emacs-lisp
 (use-package ob-go)
@@ -4169,8 +4143,7 @@ As of 3/19/2022, this does not work with Chrome. Works well with Firefox.
 #+begin_src emacs-lisp
 (use-package org-appear
   :straight (org-appear :type git :host github :repo "awth13/org-appear")
-  :hook (org-mode . org-appear-mode)
-  )
+  :hook (org-mode . org-appear-mode))
 #+end_src
 ** org-remoteimg
 
@@ -4183,92 +4156,6 @@ Display remote images specified by URLs inline in org-mode.
   (org-display-remote-inline-images 'cache) ;; enable caching
   )
 #+end_src
-** org-roam
-
-#+begin_src emacs-lisp
-(use-package org-roam
-  :after org
-  :bind (("C-c n f" . org-roam-node-find)
-         ("C-c n i" . org-roam-node-insert)
-         ("C-c n l" . org-roam-buffer-toggle)
-         :map org-mode-map
-         ("C-M-i" . completion-at-point)
-         :map org-roam-dailies-map
-         ("Y" . org-roam-dailies-capture-yesterday)
-         ("T" . org-roam-dailies-capture-tomorrow))
-  :bind-keymap
-  ("C-c n d" . org-roam-dailies-map)
-  :custom
-  (org-agenda-file-regexp "\\`[^.].*\\.org\\\(\\.gpg\\\)?\\'")
-  (org-roam-directory "~/org/roam")
-  (org-roam-capture-templates
-   '(("d" "default" plain "%?" :target
-      (file+head "${slug}.org" "#+title: ${title}\n")
-      :unnarrowed t)
-     ("e" "encrypted" plain "%?" :target
-      (file+head "secure/${slug}.org.gpg" "#+title: ${title}\n")
-      :unnarrowed t)
-     ("a" "account" entry "* ${title}\n%?" :target
-      (file+head "secure/accounts.org.gpg" "#+title: Account Information\n")
-      :unnarrowed t)
-     ("c" "contact" entry "* ${title}\n%?" :target
-      (file+head "secure/contacts.org.gpg" "#+title: Personal Contacts\n")
-      :unnarrowed t)
-     ))
-  (org-roam-dailies-capture-templates
-   '(("d" "default" entry "* %T\n%?" :target
-      (file+head "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d %A>\n")
-      :empty-lines-before 1)
-     ("e" "encrypted" entry "* %T\n%?" :target
-      (file+head "secure/%<%Y-%m-%d>.org.gpg" "#+title: Personal Notes: %<%Y-%m-%d %A>\n")
-      :empty-lines-before 1)))
-  :init
-  (setq org-agenda-files
-        (append org-agenda-files
-                '("~/org/roam" "~/org/roam/secure"
-                  "~/org/roam/daily" "~/org/roam/daily/secure")))
-  :config
-  (unless (f-dir-p "~/org/roam")
-    (mkdir "~/org/roam" t))
-  (require 'org-roam-dailies)
-  (org-roam-db-autosync-enable)
-
-  ;; add org-roam-directory to consult-omni-notes's source list
-  (when (boundp 'consult-omni-notes-files)
-    (add-to-list 'consult-omni-notes-files org-roam-directory)))
-#+end_src
-
-*** org-roam-ui
-#+begin_src emacs-lisp
-(use-package org-roam-ui
-  :diminish
-  :straight ( :host github
-              :repo "org-roam/org-roam-ui"
-              :branch "main"
-              :files ("*.el" "out"))
-  :after org-roam
-  :bind ("C-c n g" . org-roam-ui-mode)
-  :config
-  (setq org-roam-ui-sync-theme t
-        org-roam-ui-follow t
-        org-roam-ui-update-on-save t
-        org-roam-ui-open-on-start t))
-#+end_src
-
-*** org-roam-timestamps
-
-add ctime and mtime properties to org-roam nodes.
-
-#+begin_src emacs-lisp
-(use-package org-roam-timestamps
-  :diminish
-  :after org-roam
-  :custom
-  (org-roam-timestamps-remember-timestamps nil)
-  :config
-  (org-roam-timestamps-mode))
-#+end_src
-
 ** org-fragtog
 
 #+begin_src emacs-lisp
