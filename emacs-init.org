@@ -282,6 +282,15 @@ environment.
 (setq epa-pinentry-mode 'loopback)
 #+end_src
 
+** Plstore
+
+#+begin_src emacs-lisp
+(use-package plstore
+  :straight (:type built-in)
+  :custom
+  (plstore-encrypt-to (getenv "PLSTORE_GPG_KEY")))
+#+end_src
+
 ** EWW
 
 #+begin_src emacs-lisp
@@ -4550,6 +4559,34 @@ Citar provides a rich UI frontend for org-cite. citar-org-roam provides more int
       "#+title: ${note-title}\n#+author: ${citar-author}\n#+released_on: ${citar-date}\n\n")
      :unnarrowed t) 'append)
   (citar-org-roam-mode))
+#+end_src
+
+
+** org-gcal
+
+#+begin_src emacs-lisp
+(use-package org-gcal
+  :straight (:type git :host github :repo "kidd/org-gcal.el")
+  :commands (org-gcal-fetch org-gcal-reload-client-id-secret)
+  :init
+  (setq org-agenda-files (append
+                          org-agenda-files
+                          '("~/org/gcal.org"
+                            "~/org/us-market-holidays.org"
+                            "~/org/economic-calendar.org")))
+  (defun my/org-gcal-setup ()
+    (interactive)
+    (let* ((authinfo (car (auth-source-search :host "org-gcal")))
+           (client (plist-get authinfo :client))
+           (secret (auth-source-pick-first-password :host "org-gcal"))
+           (calendar (plist-get authinfo :calendar)))
+      (setq org-gcal-client-id client)
+      (setq org-gcal-client-secret secret)
+      (setq org-gcal-fetch-file-alist
+            `((,calendar . "~/org/gcal.org")
+              ("monex.co.jp_hkslb9v1kj95se5r8ag2mms4k8@group.calendar.google.com" . "~/org/us-market-holidays.org")
+              ("monex.co.jp_vm8hs3tiu5cp7gdlk04bla79o0@group.calendar.google.com" . "~/org/economic-calendar.org")))
+      (org-gcal-reload-client-id-secret))))
 #+end_src
 
 * Docker / Containers
