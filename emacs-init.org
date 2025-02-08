@@ -4077,7 +4077,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
       (file+head "fleeting/${slug}.org" "#+title: ${title}\n")
       :unnarrowed t)
      ("c" "contact" entry "* ${title}\n%?" :target
-      (file+head "contacts.org.gpg" "#+title: Personal Contacts\n")
+      (file+head "contacts.org" "#+title: Personal Contacts\n")
       :unnarrowed t)
      ("e" "encrypted" plain "%?" :target
       (file+head "secure/${slug}.org.gpg" "#+title: ${title}\n")
