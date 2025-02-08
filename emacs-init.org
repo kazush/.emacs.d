@@ -4124,7 +4124,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
            (org-capture-templates
             `(("j" "add a new journal entry to the selected project"
                entry (file+olp+datetree ,prj-file "Journal")
-               "* %?")
+               "* %<%H:%S> %?")
               ("t" "add a new task entry to the selected project"
                entry (file+olp ,prj-file "Tasks")
                "* TODO %?\n"))))
@@ -4154,7 +4154,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
            (org-capture-templates
             `(("d" "add a new diary entry"
                entry (file+olp+datetree ,file "Diary")
-               "* %?")
+               "* %<%H:%S> %?")
               ("t" "add a new task entry"
                entry (file+olp ,file "Tasks")
                "* TODO %?\n"))))
