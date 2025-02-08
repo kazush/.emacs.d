@@ -4065,6 +4065,8 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
   :bind (("C-c n f" . org-roam-node-find)
          ("C-c n i" . org-roam-node-insert)
          ("C-c n l" . org-roam-buffer-toggle)
+         ("C-c n t a" . org-roam-tag-add)
+         ("C-c n t r" . org-roam-tag-remove)
          ("C-c o d" . my/org-roam-capture-diary)
          ("C-c o p" . my/org-roam-capture-project)
          :map org-mode-map
