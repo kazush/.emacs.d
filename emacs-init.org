@@ -3102,6 +3102,7 @@ Eldoc-box displays eldoc contents in a child frame but is currently diabled.
          ("[" . puni-wrap-square)
          ("{" . puni-wrap-curly)
          ("<" . puni-wrap-angle))
+  :hook (emacs-lisp-mode . puni-mode)
   :custom
   (puni-confirm-when-delete-unbalanced-active-region nil)
   :config
