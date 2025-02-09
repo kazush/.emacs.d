@@ -4581,15 +4581,14 @@ Citar provides a rich UI frontend for org-cite. citar-org-roam provides more int
 (use-package citar
   :no-require
   :bind ("C-c n n" . citar-create-note)
-  :hook
-  (org-mode . citar-capf-setup)
+  :hook (org-mode . citar-capf-setup)
   :custom
   (require 'bibtex)
   (org-cite-global-bibliography '("~/lib/bib/references.bib"))
   (org-cite-insert-processor 'citar)
   (org-cite-follow-processor 'citar)
   (org-cite-activate-processor 'citar)
-  (citar-notes-paths '("~/org/roam/literature"))
+  (citar-notes-paths '((concat org-roam-directory "/literature")))
   (citar-bibliography org-cite-global-bibliography))
 
 (use-package citar-embark
@@ -4599,7 +4598,7 @@ Citar provides a rich UI frontend for org-cite. citar-org-roam provides more int
 
 (use-package citar-org-roam
   :diminish
-  :after citar
+  :after (citar org-roam)
   :custom
   (citar-org-roam-subdir "literature")
   (citar-org-roam-note-title-template "[${author}] ${title}")
@@ -4607,7 +4606,7 @@ Citar provides a rich UI frontend for org-cite. citar-org-roam provides more int
   :config
   (add-to-list
    'org-roam-capture-templates
-   '("n" "literature note" plain
+   '("n" "add literature note through Citar" plain
      "%?"
      :target
      (file+head
