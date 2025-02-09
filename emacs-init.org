@@ -2379,16 +2379,25 @@ the two windows.
 (setq split-width-threshold 80)
 
 (defvar my/dba-min-windows 3)
+(defvar my/split-window-horizontally-min-width 72)
 (defun my/display-buffer-fallback-action (buf alist)
   "Return a window to display buffer BUF.  ALIST is not used.
 
 If the nunber of windows in the frame is less than
 my/dba-min-windows, create a new window holizontally.  Otherwise,
 return the same window."
-  (let ((win (get-buffer-window buf)))
+  (let* ((num-windows (count-windows))
+         (min-frame-width
+          (* (+ num-windows 1)
+                     my/split-window-horizontally-min-width))
+         (win (get-buffer-window buf))
+         (split-width-threshold
+          (if (>= (frame-width) min-frame-width) 0 nil))
+        (split-height-threshold
+         (if (< (frame-width) min-frame-width) 0 nil)))
     (cond
      (win win)
-     ((or (< (count-windows) my/dba-min-windows))
+     ((or (< num-windows my/dba-min-windows))
       (display-buffer--maybe-pop-up-frame-or-window buf alist))
      ((not (buffer-file-name buf))
       (display-buffer-use-some-window buf alist))
