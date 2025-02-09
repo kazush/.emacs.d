@@ -3104,6 +3104,10 @@ Eldoc-box displays eldoc contents in a child frame but is currently diabled.
          ("C-c [" . puni-wrap-square)
          ("C-c {" . puni-wrap-curly)
          ("C-c <" . puni-wrap-angle)
+         ("M-SPC" . puni-mark-sexp-at-point)
+         :map puni-mode-map
+         ("C-<" . puni-raise)
+         ("C->" . puni-splice)
          :map my/edit-map
          ("'" . my/puni-wrap-single-quote)
          ("\"" . my/puni-wrap-double-quote)
