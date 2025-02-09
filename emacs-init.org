@@ -1126,7 +1126,7 @@ vertico and related packages are used for completion framework.
   (savehist-mode))
 #+end_src
 
-*** Consult
+** Consult
 
 #+begin_src emacs-lisp
 (use-package consult
@@ -1347,7 +1347,7 @@ vertico and related packages are used for completion framework.
   )
 #+end_src
 
-*** Marginalia
+** Marginalia
 
 #+begin_src emacs-lisp
 ;; Enable richer annotations using the Marginalia package
@@ -1365,7 +1365,7 @@ vertico and related packages are used for completion framework.
   (marginalia-mode))
 #+end_src
  
-*** Embark
+** Embark
 
 Disabling embark-prefix-help-command for now as I prefer which-key's compact layout.
 
