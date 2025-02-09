@@ -4087,6 +4087,8 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
          ("C-c o t" . my/org-roam-personal-capture-task)
          :map org-mode-map
          ("C-M-i" . completion-at-point))
+  :hook (after-init . (lambda ()
+                        (require 'org-roam-protocol)))
   :custom
   (org-roam-node-display-template (concat "${title:*} " (propertize "${tags:30}" 'face 'org-tag)))
   (org-roam-capture-templates
@@ -4104,6 +4106,11 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
       :unnarrowed t)
      ("S" "add a secure note" plain "%?" :target
       (file+head "secure/${slug}.org.gpg" "#+title: ${title}\n")
+      :unnarrowed t)))
+  (org-roam-capture-ref-templates
+   '(("r" "add a note through org-protocol://roam-ref" plain "%?"
+      :target (file+head "fleeting/${slug}.org"
+                         "#+title: ${title}")
       :unnarrowed t)))
   :init
   ;; Add project files to org-agenda.
