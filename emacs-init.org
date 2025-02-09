@@ -4081,102 +4081,107 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
          ("C-c n l" . org-roam-buffer-toggle)
          ("C-c n t a" . org-roam-tag-add)
          ("C-c n t r" . org-roam-tag-remove)
-         ("C-c o d" . my/org-roam-capture-diary)
-         ("C-c o p" . my/org-roam-capture-project)
+         ("C-c o p j" . my/org-roam-project-capture-journal)
+         ("C-c o p t" . my/org-roam-project-capture-task)
+         ("C-c o j" . my/org-roam-personal-capture-journal)
+         ("C-c o t" . my/org-roam-personal-capture-task)
          :map org-mode-map
          ("C-M-i" . completion-at-point))
   :custom
-  (org-roam-directory "~/org/roam")
   (org-roam-node-display-template (concat "${title:*} " (propertize "${tags:30}" 'face 'org-tag)))
   (org-roam-capture-templates
-   '(("d" "default" plain "%?" :target
+   '(("c" "add a contact note" entry "* ${title}\n%?" :target
+      (file+head "resources/contacts.org" "#+title: Personal Contacts\n")
+      :unnarrowed t)
+     ("f" "add a fleeting note" plain "%?" :target
       (file+head "fleeting/${slug}.org" "#+title: ${title}\n")
       :unnarrowed t)
-     ("c" "contact" entry "* ${title}\n%?" :target
-      (file+head "contacts.org" "#+title: Personal Contacts\n")
+     ("l" "add a literature note" plain "%?" :target
+      (file+head "literature/${slug}.org" "#+title: ${title}\n")
       :unnarrowed t)
-     ("e" "encrypted" plain "%?" :target
+     ("r" "add a resource note" plain "%?" :target
+      (file+head "resources/${slug}.org" "#+title: ${title}\n")
+      :unnarrowed t)
+     ("S" "add a secure note" plain "%?" :target
       (file+head "secure/${slug}.org.gpg" "#+title: ${title}\n")
       :unnarrowed t)))
   :init
-  ;; Add diary and project files to org-agenda.
+  ;; Add project files to org-agenda.
+  (setq org-roam-directory "~/org/roam")
   (setq org-agenda-files
-        (append org-agenda-files '("~/org/roam/diary/"
-                                   "~/org/roam/projects/")))
+        (append org-agenda-files
+                (directory-files
+                 (format "%s/projects/" org-roam-directory)
+                 t "\\`[^.]")))
 
   :config
-  (unless (f-dir-p "~/org/roam")
-    (mkdir "~/org/roam" t))
+  (unless (f-dir-p org-roam-directory)
+    (mkdir org-roam-directory t))
   (org-roam-db-autosync-enable)
 
   ;; Helper functions for journaling and task management with Org Roam.
+  ;; - "project" related org files are stored under projects/ directory.
+  ;; - "personal" project is special one for personal daily matters.
 
-  (defun my/org-roam-create-new-project-file (prj file)
-    "Create a new file node at FILE with property project=PRJ."
-    (let* ((org-roam-capture-templates
-            `(("d" "default - create a new node"
-               plain "\n* Tasks\n\n* Journal\n%?"
-               :target (file+head ,file "#+title: ${title}\n")
-               :immediate-finish t)))
-           (node (org-roam-node-create
-                  :file file :title (concat "Project: " prj)
-                  :properties `(("project" .  ,prj))))
-           (hook (lambda () (org-entry-put (point) "project" prj))))
-      (add-hook 'org-roam-capture-new-node-hook hook)
-      (org-roam-capture- :node node)
-      (remove-hook 'org-roam-capture-new-node-hook hook)))
+  (defun my/org-roam-project-create-new-file (prj basename)
+    "Set up a new file node for the project.
+     - create a project directory under projects/ if needed.
+     - setup a new file node."
+    (let ((prj-dir (concat org-roam-directory "/projects/" prj)))
+      (let* ((file (format "%s/%s.org" prj-dir basename))
+             (title (format "projects/%s/%s" prj basename))
+             (org-roam-capture-templates
+              `(("d" "default - create a new node"
+                 plain "%?"
+                 :target (file+head ,file "#+title: ${title}\n")
+                 :immediate-finish t)))
+             (node (org-roam-node-create :file file :title title))
+             (hook (lambda () (org-entry-put (point) "project" prj))))
+        (unless (f-dir-p prj-dir)
+          (mkdir prj-dir t))
+        (add-hook 'org-roam-capture-new-node-hook hook)
+        (org-roam-capture- :node node)
+        (remove-hook 'org-roam-capture-new-node-hook hook))))
 
-  (defun my/org-roam-capture-project (prj &optional key)
-    "Capture journal or task for a selected project."
-    (interactive
-     (list
-      (completing-read
-       "Project: "
-       (mapcar (lambda (str) (string-replace ".org" "" (file-name-base str)))
-               (file-expand-wildcards
-                (format "%s/projects/*.org" org-roam-directory)))
-       nil 'confirm)))
-    (let* ((prj-file (format "%s/projects/%s.org" org-roam-directory prj))
-           (org-capture-templates
-            `(("j" "add a new journal entry to the selected project"
-               entry (file+olp+datetree ,prj-file "Journal")
-               "* %<%H:%S> %?")
-              ("t" "add a new task entry to the selected project"
-               entry (file+olp ,prj-file "Tasks")
-               "* TODO %?\n"))))
-      (unless (file-exists-p prj-file)
-        (my/org-roam-create-new-project-file prj prj-file))
-      (org-capture nil key)))
-
-  ;; Helper functions for diary
-
-  (defun my/org-roam-create-new-diary-file (file)
-    "Create a new file node at FILE."
-    (let* ((org-roam-capture-templates
-            `(("d" "default - create a new node"
-               plain "\n* Tasks\n\n* Diary\n%?"
-               :target (file+head ,file "#+title: ${title}\n")
-               :immediate-finish t)))
-           (node (org-roam-node-create
-                  :file file :title (format-time-string "Diary %Y"))))
-      (org-roam-capture- :node node)))
-
-  (defun my/org-roam-capture-diary (&optional key)
-    "Capture diary."
+  (defun my/org-roam-project-read ()
     (interactive)
-    (let* ((file (format "%s/diary/%s"
-                         org-roam-directory
-                         (format-time-string "diary-%Y.org")))
+    (completing-read
+     "Project: "
+     (directory-files
+      (format "%s/projects/" org-roam-directory)
+      nil "\\`[^.]")
+     (lambda (f) (file-directory-p (format "%s/projects/%s" org-roam-directory f))) 'confirm))
+
+  (defun my/org-roam-project-capture (prj basename entry-str)
+    "Capture new task for the selected project."
+    (let* ((file (format "%s/projects/%s/%s.org"
+                         org-roam-directory prj basename))
            (org-capture-templates
-            `(("d" "add a new diary entry"
-               entry (file+olp+datetree ,file "Diary")
-               "* %<%H:%S> %?")
-              ("t" "add a new task entry"
-               entry (file+olp ,file "Tasks")
-               "* TODO %?\n"))))
+            `(("d" "capture a new entry to the selected project"
+               entry (file+datetree ,file) ,entry-str))))
       (unless (file-exists-p file)
-        (my/org-roam-create-new-diary-file file))
-      (org-capture nil key)))
+        (my/org-roam-project-create-new-file prj basename))
+      (org-capture nil "d")))
+
+  (defun my/org-roam-project-capture-journal (prj)
+    "Capture new journal for the selected project."
+    (interactive (list (my/org-roam-project-read)))
+    (my/org-roam-project-capture prj "journal" "* %<%H:%S> %?"))
+
+  (defun my/org-roam-project-capture-task (prj)
+    "Capture new task for the selected project."
+    (interactive (list (my/org-roam-project-read)))
+    (my/org-roam-project-capture prj "tasks" "* TODO %?"))
+
+  (defun my/org-roam-personal-capture-journal ()
+    "Capture new journal for personal project."
+    (interactive)
+    (my/org-roam-project-capture-journal "personal"))
+
+  (defun my/org-roam-personal-capture-task ()
+    "Capture new task for personal project."
+    (interactive)
+    (my/org-roam-project-capture-task "personal"))
 
   ;; add org-roam-directory to consult-omni-notes's source list
   (with-eval-after-load 'consult-omni-notes
