@@ -474,7 +474,6 @@ called in hooks.
   (set-face-foreground 'font-lock-variable-name-face "khaki")
   (set-face-foreground 'font-lock-function-name-face "dodger blue")
 
-
   (set-face-attribute 'outline-1 nil :height 1.2)
   (set-face-attribute 'outline-2 nil :height 1.05)
 
@@ -482,51 +481,45 @@ called in hooks.
     (set-face-attribute 'mode-line-inactive nil
                         :foreground "darkgray"
                         :background "gray10"
-                        :inherit 'mode-line)
-    )
-  )
+                        :inherit 'mode-line)))
 
-(defun my/set-default-font (maybe-family size)
-  "Set family and size for default font."
-  (interactive "sFamily: \nnFont size: ")
-  (let ((family (or (not (string= maybe-family ""))
-                    my/default-font-family)))
-    (set-face-attribute 'default nil
-                        :family family
-                        :height (* size 10))
-    (setq my/default-font-family family)
-    (setq my/default-font-size size)))
+(defun my/set-default-font (font)
+  "Set font for default face."
+  (interactive "sFont: ")
+  (let ((font (if (string= font "")
+                    my/default-font font)))
+    (set-face-attribute 'default nil :font (my/make-font-str font))
+    (setq my/default-font font)))
 
-(defun my/create-custom-fontsets  ()
-  "Create custom fontsets for mixed fonts."
-  (create-fontset-from-ascii-font "Noto Serif:weight=regular" nil "latex")
-  (set-fontset-font "fontset-latex" 'unicode
-                    (font-spec :family "Harano Aji Mincho"
-                               :weight 'regular))
-  (create-fontset-from-ascii-font "Noto Serif:weight=regular" nil "serif")
-  (set-fontset-font "fontset-serif" 'unicode
-                    (font-spec :family "Noto Serif CJK JP"
-                               :weight 'regular))
-  (create-fontset-from-ascii-font "Noto Sans:weight=regular" nil "sans")
-  (set-fontset-font "fontset-sans" 'unicode
-                    (font-spec :family "Noto Sans CJK JP"
-                               :weight 'regular)))
+(defun my/set-fontset-emoji-font (&optional fset)
+  "Set up color emoji font to the given FONTSET or fontset for default face."
+  (let ((emoji-font (font-spec :family "Noto Color Emoji"))
+        (fontset (or fset (face-attribute 'default :fontset))))
+    (dolist (charset '((#x3200 . #x32ff) symbol emoji))
+      (set-fontset-font fontset charset emoji-font nil 'prepend))))
+
+(defun my/set-fontset-jp-font (family &optional fset)
+  "Set up japanse font to the given FONTSET or fontset for default face."
+  (let ((fontset (or fset (face-attribute 'default :fontset))))
+    (dolist (charset '((#x3000 . #x30ff)
+                       (#x31f0 . #x31ff)
+                       (#x3400 . #x4dbf)
+                       (#x4e00 . #x9fff)
+                       (#xff65 . #xff9f)
+                       (#x20000 . #x2ebef)))
+      (set-fontset-font fontset charset
+                        `(,family . "iso10646-1") nil `prepend))))
 
 (defun my/setup-fonts ()
   "Set up fontsets for my preference."
   (interactive)
-  (my/create-custom-fontsets)
-  (my/set-default-font my/default-font-family my/default-font-size)
   (setq use-default-font-for-symbols nil)
-  (set-fontset-font t 'symbol (font-spec :family "Noto Color Emoji"))
-  (set-fontset-font t 'emoji (font-spec :family "Noto Color Emoji"))
+  (my/set-fontset-emoji-font))
 
-  ;; Set up variable-pictch and fixed-pitch for mixed font environments.
-  (custom-theme-set-faces
-   'user
-   '(variable-pitch ((t (:family "Noto Serif"))))
-   `(fixed-pitch ((t (:family ,my/default-font-family)))))
-  )
+;; Set up variable-pictch and fixed-pitch for mixed font environments.
+(custom-theme-set-faces
+ 'user
+ `(variable-pitch ((t (:font ,(my/make-font-str "Noto Serif CJK JP"))))))
 #+end_src
 
 ** Misc display tweaks

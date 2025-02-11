@@ -1,18 +1,24 @@
 ;; Initial GUI configuration
 
-(defvar my/default-font-family "Monospace")
+(defvar my/default-font "Monospace")
 (defvar my/default-font-size (cond
-                              ((string= system-name "em780") 11)
-                              (t 13)))
+                              ((string= system-name "em780") 14)
+                              (t 17)))
+
+(defun my/make-font-str (&optional font size)
+  "Make font string which can be used for :font in set-face-attribute."
+  (format "%s:size=%d:weight=regular:slant=normal:width=normal"
+          (or font my/default-font) (or size my/default-font-size)))
 
 (set-face-attribute 'default nil
                     :foreground "#abb2bf"
                     :background "#282c34"
-                    :family my/default-font-family
-                    :height (* my/default-font-size 10))
+                    :font (my/make-font-str my/default-font))
+
 (set-face-attribute 'mode-line nil
                     :foreground "#d3d3d3"
                     :background "#000000")
+
 (when window-system
   (scroll-bar-mode -1)
   (tool-bar-mode -1)
