@@ -680,16 +680,17 @@ prefix. This way which-key will be more useful.
 ;; To be used along with scroll-other-window-up (M-C-v).
 (global-set-key (kbd "M-V") #'scroll-other-window-down)
 
+;; Comment out in favor of org-mode key bindings.
 ;; Move to another window with S-<arrow>.
-(when (fboundp 'windmove-default-keybindings)
-  (windmove-default-keybindings))
+;; (when (fboundp 'windmove-default-keybindings)
+;;   (windmove-default-keybindings))
 
 ;; Move to another window with C-<arrow>.
 (when window-system
-  (global-set-key (kbd "C-<left>") #'windmove-left)
-  (global-set-key (kbd "C-<down>") #'windmove-down)
-  (global-set-key (kbd "C-<up>") #'windmove-up)
-  (global-set-key (kbd "C-<right>") #'windmove-right)
+  ;; (global-set-key (kbd "C-<left>") #'windmove-left)
+  ;; (global-set-key (kbd "C-<down>") #'windmove-down)
+  ;; (global-set-key (kbd "C-<up>") #'windmove-up)
+  ;; (global-set-key (kbd "C-<right>") #'windmove-right)
   (global-set-key (kbd "s-h") #'windmove-left)
   (global-set-key (kbd "s-j") #'windmove-down)
   (global-set-key (kbd "s-k") #'windmove-up)
@@ -817,7 +818,7 @@ I'm trying out which-key to see how useful key guidance is for me.
 
 Hydra provides modal feature with key guidance, which is sometimes very useful
 as you don't have to keep holding ctrl key.
-    
+
 #+begin_src emacs-lisp
 (use-package hydra
   :bind (("C-c v" . my/hydra-move/body)
@@ -1357,7 +1358,7 @@ vertico and related packages are used for completion framework.
   ;; enabled right away. Note that this forces loading the package.
   (marginalia-mode))
 #+end_src
- 
+
 ** Embark
 
 Disabling embark-prefix-help-command for now as I prefer which-key's compact layout.
@@ -2363,7 +2364,7 @@ the two windows.
     ("q" nil)))
 #+end_src
 
-** Custom display buffer alist 
+** Custom display buffer alist
 
 #+begin_src emacs-lisp
 (setq fit-window-to-buffer-horizontally t)
@@ -3048,7 +3049,7 @@ Currently eglot is disabled to try lsp-mode out again.
 ** Eldoc
 
 Eldoc-box displays eldoc contents in a child frame but is currently diabled.
-   
+
 #+begin_src emacs-lisp
 (use-package eldoc-box
   :disabled
@@ -3907,50 +3908,104 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
   (org-agenda-current-time-string
    "⭠ now ─────────────────────────────────────────────────")
   (org-ellipsis "⇣")
+  (org-agenda-prefix-format
+   '((agenda . " %-2i  %11t  %-10(my/org-agenda-property \"project\" 10)  ")
+     (todo . " %i %-12c")
+     (tags . " %i %-12:c")
+     (search . " %i %-12:c")))
   :config
+
   ;; Faces
-  (set-face-attribute 'org-document-title nil
-                      :height 1.5)
-  (set-face-attribute 'org-level-1 nil
-                      :height 1.3
-                      :weight 'bold
-                      :foreground "lightgray")
-  (set-face-attribute 'org-level-2 nil
-                      :height 1.2
-                      :weight 'bold
-                      :foreground "steelblue3")
-  (set-face-attribute 'org-level-3 nil
-                      :height 1.1
-                      :weight 'bold
-                      :foreground "honeydew4")
-  (set-face-attribute 'org-level-4 nil
-                      :foreground "tan3")
-  (set-face-attribute 'org-level-5 nil
-                      :foreground "DarkSlateGray4")
-  (set-face-attribute 'org-level-6 nil
-                      :foreground "IndianRed")
-  (set-face-attribute 'org-level-7 nil
-                      :foreground "DarkOrchid3")
-  (set-face-attribute 'org-level-8 nil
-                      :foreground "OliveDrab4")
-  (set-face-attribute 'org-block-begin-line nil
-                      :background "#2e3652")
-  (set-face-attribute 'org-block-end-line nil
-                      :background 'unspecified
-                      :inherit 'org-block-begin-line)
-  (set-face-attribute 'org-block nil
-                      :background (if window-system "#252938" "color-236"))
-  (set-face-attribute 'org-code nil
-                      :foreground "sea green"
-                      :family "Inconsolata Nerd Font")
-  (set-face-attribute 'org-ellipsis nil :inherit 'default :box nil)
+
+  (custom-set-faces
+   '(org-document-title ((t :height 1.5)))
+   '(org-level-1 ((t :height 1.3
+                     :weight bold
+                     :foreground "lightgray")))
+   '(org-level-2 ((t :height 1.2
+                     :weight bold
+                     :foreground "steelblue3")))
+   '(org-level-3 ((t :height 1.1
+                     :weight bold
+                     :foreground "honeydew4")))
+   '(org-level-4 ((t :foreground "tan3")))
+   '(org-level-5 ((t :foreground "DarkSlateGray4")))
+   '(org-level-6 ((t :foreground "IndianRed")))
+   '(org-level-7 ((t :foreground "DarkOrchid3")))
+   '(org-level-8 ((t :foreground "OliveDrab4")))
+   '(org-block-begin-line ((t :background "#2e3652")))
+   '(org-block-end-line ((t :background unspecified
+                            :inherit 'org-block-begin-line)))
+   `(org-block ((t :background ,(if window-system "#252938" "color-236"))))
+   '(org-code ((t :foreground "sea green"
+                  :family "Inconsolata Nerd Font")))
+   '(org-ellipsis ((t  :inherit default :box nil)))
+   '(org-scheduled ((t :foreground "#88cc88" :inherit default)))
+   '(org-agenda-calendar-event ((t :inherit default)))
+   '(org-agenda-date ((t :foreground "#3366aa" :weight bold :height 1.1)))
+   '(org-agenda-date-today ((t :foreground "#6699cc" :weight bold :slant italic :inherit org-agenda-date)))
+   '(org-agenda-date-weekend ((t :foreground "#aa6633" :inherit org-agenda-date)))
+   '(org-agenda-date-weekend-today ((t :foreground "#cc9966" :inherit org-agenda-date-today)))
+   '(org-agenda-structure ((t :foreground "#888888" :weight bold :height 1.2))))
 
   (defun my/org-setup-variable-font ()
     "Override default face with variable fonts."
     (interactive)
-    (set-face-attribute 'org-default nil
-                        :font "fontset-serif")
-    (face-remap-add-relative 'default 'org-default))
+    ;; Create a new fontset called "fontset-serif".
+    (create-fontset-from-ascii-font
+     (my/make-font-str "Noto Serif") nil "serif")
+    (let ((fontset "fontset-serif"))
+      ;; Set Japanese font to the fontset.
+      (set-fontset-font fontset 'kana
+                        (my/make-font-str "Noto Serif CJK JP")
+                        nil 'prepend)
+      (set-fontset-font fontset 'han
+                        (my/make-font-str "Noto Serif CJK JP")
+                        nil 'prepend)
+      ;; Set the fontset to org-default face.
+      (set-face-attribute 'org-default nil
+                          :font (my/make-font-str "Noto Serif")
+                          :fontset fontset)
+      (my/set-fontset-emoji-font fontset)
+      (face-remap-add-relative 'default 'org-default)))
+
+  (defun my/org-agenda-property (property &optional width)
+    "Helper function to return a string representing values of the given property."
+    (let ((value (string-join (org-property-values property) ",")))
+      (if (and width (> (length value) width))
+          (concat (substring value 0 (- width 2)) "..")
+        value)))
+
+  ;; Set up category icons using Noto Color Emoji.
+
+  (defvar my/org-agenda-category-emoji-icon-alist
+    '(("gcal" . "🗓")
+      ("task" . "✅")
+      ("journal" . "📃")
+      ("Holiday" . "🎌")
+      ("us-market-holidays" . "⛔")
+      ("economic-calendar" . "📈")))
+
+  (defun my/emoji-icon (emoji &rest props)
+    "propertize EMOJI suitable for org-agenda-category-icon-alist."
+    (let ((face `(:family "Noto Color Emoji" ,@props)))
+      (propertize emoji
+                  'face face
+                  'font-lock-face face
+                  'rear-nonsticky t)))
+
+  (defun my/org-agenda-set-category-emoji-icon ()
+    "Set up category icon as per my/org-agenda-category-emoji-icon-alist."
+    (dolist (entry my/org-agenda-category-emoji-icon-alist)
+      (let ((category (car entry))
+            (emoji (cdr entry)))
+        (add-to-list 'org-agenda-category-icon-alist
+                     (list category
+                           (list (my/emoji-icon emoji))
+                           nil nil :ascent 'center)))))
+
+  (with-eval-after-load 'org-agenda
+    (my/org-agenda-set-category-emoji-icon))
 
   ;; Patched org-do-emphasis-faces to allow nested emphasis markers.
 
