@@ -3842,7 +3842,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
   (org-agenda-format-date "%b %e (%a)")
   (org-agenda-file-regexp "\\`[^.].*\\.org\\\(\\.gpg\\\)?\\'")
   (org-agenda-start-on-weekday calendar-week-start-day)
-  (org-agenda-window-setup 'other-window)
+  (org-agenda-window-setup 'other-tab)
   (org-log-into-drawer t)
   (org-list-allow-alphabetical t)
   (org-startup-indented t)
@@ -3857,7 +3857,8 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
   (org-confirm-babel-evaluate nil)
   (org-hide-emphasis-markers t)
   (org-todo-keywords
-   '((sequence "TODO(t)" "IN-PROGRESS(i)" "WAIT(w)" "|" "DONE(d)" "CANCELLED(c)" "SOMEDAY(s)")))
+   '((sequence "SHOPPING(s)" "TODO(t!)" "NEXT(n!)" "ACTIVE(a!)"
+               "WAITING(w@/!)" "BLOCKED(b@/!)" "|" "DONE(d!)" "CANCELLED(c@)")))
   (org-log-done 'time)
   (org-capture-templates nil) ;; Migrated to org-roam-capture.
   (org-agenda-files '("agenda.org"))
@@ -3889,7 +3890,19 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
      ("youtube")
      ))
   (org-agenda-custom-commands
-   '(("x" "Unscheduled TODO" tags-todo "-SCHEDULED>=\"<now>\"" nil)))
+   '(("d" "Today"
+      ((todo "NEXT"
+                  ((org-agenda-overriding-header "Next")
+                   ))
+       (todo "TODO"
+                  ((org-agenda-overriding-header "Inbox")))
+       (agenda ""
+               ((org-agenda-overriding-header (format-time-string "🗓 %a, %b %e %Y"))
+                (org-agenda-format-date "")
+                (org-agenda-span 'day)))
+       (todo "SHOPPING"
+                  ((org-agenda-overriding-header "Shopping List")))
+       ))))
   (org-stuck-projects
    '("+PROJECT/-DONE-SOMEDAY" ("TODO" "WAIT")))
 
@@ -3904,15 +3917,18 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
   (org-pretty-entities t)
   ;; Agenda styling
   (org-agenda-block-separator ?─)
-  (org-agenda-time-grid nil)
+  (org-agenda-time-grid
+   '((daily today require-timed remove-match)
+     (800 1200 1800 2200)
+     " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄"))
   (org-agenda-current-time-string
    "⭠ now ─────────────────────────────────────────────────")
   (org-ellipsis "⇣")
   (org-agenda-prefix-format
    '((agenda . " %-2i  %11t  %-10(my/org-agenda-property \"project\" 10)  ")
-     (todo . " %i %-12c")
-     (tags . " %i %-12:c")
-     (search . " %i %-12:c")))
+     (todo . " %-2i  %-10(my/org-agenda-property \"project\" 10)  ")
+     (tags . " %-2i  %-10(my/org-agenda-property \"project\" 10)  ")
+     (search . " %-2i  %-10(my/org-agenda-property \"project\" 10)  ")))
   :config
 
   ;; Faces
@@ -3946,7 +3962,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
    '(org-agenda-date-today ((t :foreground "#6699cc" :weight bold :slant italic :inherit org-agenda-date)))
    '(org-agenda-date-weekend ((t :foreground "#aa6633" :inherit org-agenda-date)))
    '(org-agenda-date-weekend-today ((t :foreground "#cc9966" :inherit org-agenda-date-today)))
-   '(org-agenda-structure ((t :foreground "#888888" :weight bold :height 1.2))))
+   '(org-agenda-structure ((t :family "Noto Serif" :foreground "#cccc88" :weight bold :height 1.2))))
 
   (defun my/org-setup-variable-font ()
     "Override default face with variable fonts."
@@ -3970,7 +3986,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
       (face-remap-add-relative 'default 'org-default)))
 
   (defun my/org-agenda-property (property &optional width)
-    "Helper function to return a string representing values of the given property."
+    "Helper function to return a string representing vaflues of the given property."
     (let ((value (string-join (org-property-values property) ",")))
       (if (and width (> (length value) width))
           (concat (substring value 0 (- width 2)) "..")
@@ -4708,6 +4724,18 @@ Citar provides a rich UI frontend for org-cite. citar-org-roam provides more int
       (org-gcal-reload-client-id-secret))))
 #+end_src
 
+** org-super-agenda
+
+#+begin_src emacs-lisp
+(use-package org-super-agenda
+  :after org-agenda
+  :config
+  ;; Faces
+  (custom-set-faces
+   '(org-super-agenda-header ((t :foreground "#cc8888" :box (:line-width 1 :color "#000000")) :weight bold)))
+
+  (org-super-agenda-mode))
+#+end_src
 * Docker / Containers
 
 ** Docker Tramp
