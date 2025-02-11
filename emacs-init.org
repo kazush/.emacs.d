@@ -4177,7 +4177,16 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
   ;; - "project" related org files are stored under projects/ directory.
   ;; - "personal" project is special one for personal daily matters.
 
-  (defun my/org-roam-project-create-new-file (prj basename)
+  (defun my/org-roam-project-add-properties (prj &optional props)
+    "A hook for org-roam-capture-new-node-hook to add project
+ property and additional properties to the new file."
+    (let ((pos (point)))
+      (org-entry-put (point) "project" prj)
+      (when props
+        (dolist (entry props)
+          (org-entry-put pos (car entry) (cdr entry))))))
+
+  (defun my/org-roam-project-create-new-file (prj basename &optional props)
     "Set up a new file node for the project.
      - create a project directory under projects/ if needed.
      - setup a new file node."
@@ -4190,7 +4199,8 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
                  :target (file+head ,file "#+title: ${title}\n")
                  :immediate-finish t)))
              (node (org-roam-node-create :file file :title title))
-             (hook (lambda () (org-entry-put (point) "project" prj))))
+             (hook (lambda ()
+                     (my/org-roam-project-add-properties prj props))))
         (unless (f-dir-p prj-dir)
           (mkdir prj-dir t))
         (add-hook 'org-roam-capture-new-node-hook hook)
@@ -4206,7 +4216,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
       nil "\\`[^.]")
      (lambda (f) (file-directory-p (format "%s/projects/%s" org-roam-directory f))) 'confirm))
 
-  (defun my/org-roam-project-capture (prj basename entry-str)
+  (defun my/org-roam-project-capture (prj basename entry-str &optional props)
     "Capture new task for the selected project."
     (let* ((file (format "%s/projects/%s/%s.org"
                          org-roam-directory prj basename))
@@ -4214,7 +4224,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
             `(("d" "capture a new entry to the selected project"
                entry (file+datetree ,file) ,entry-str))))
       (unless (file-exists-p file)
-        (my/org-roam-project-create-new-file prj basename))
+        (my/org-roam-project-create-new-file prj basename props))
       (org-capture nil "d")))
 
   (defun my/org-roam-project-capture-journal (prj)
@@ -4225,7 +4235,8 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
   (defun my/org-roam-project-capture-task (prj)
     "Capture new task for the selected project."
     (interactive (list (my/org-roam-project-read)))
-    (my/org-roam-project-capture prj "tasks" "* TODO %?"))
+    (my/org-roam-project-capture prj "tasks" "* TODO %?"
+                                 '(("category" . "task"))))
 
   (defun my/org-roam-personal-capture-journal ()
     "Capture new journal for personal project."
