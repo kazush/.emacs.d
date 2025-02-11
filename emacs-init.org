@@ -3839,6 +3839,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
          (org-agenda-mode . (lambda () (hl-line-mode 1)))
          (org-babel-after-execute . org-redisplay-inline-images))
   :custom
+  (org-agenda-format-date "%b %e (%a)")
   (org-agenda-file-regexp "\\`[^.].*\\.org\\\(\\.gpg\\\)?\\'")
   (org-agenda-start-on-weekday calendar-week-start-day)
   (org-agenda-window-setup 'other-window)
@@ -3859,7 +3860,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
    '((sequence "TODO(t)" "IN-PROGRESS(i)" "WAIT(w)" "|" "DONE(d)" "CANCELLED(c)" "SOMEDAY(s)")))
   (org-log-done 'time)
   (org-capture-templates nil) ;; Migrated to org-roam-capture.
-  (org-agenda-files nil)  ;; will be configured in org-roam package config.
+  (org-agenda-files '("agenda.org"))
   (org-tag-alist
    '(("ai")
      ("algo")
@@ -4104,8 +4105,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
   (setq org-tags-exclude-from-inheritance (quote ("crypt")))
   ;; GPG key to use for encryption
   ;; Either the Key ID or set to nil to use symmetric encryption.
-  (setq org-crypt-key (getenv "ORG_CRYPT_KEY"))
-  )
+  (setq org-crypt-key (getenv "ORG_CRYPT_KEY")))
 #+end_src
 
 ** org-bebel extensions
@@ -4135,7 +4135,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
          :map org-mode-map
          ("C-M-i" . completion-at-point))
   :hook (after-init . (lambda ()
-                        (require 'org-roam-protocol)))
+                       (require 'org-roam-protocol)))
   :custom
   (org-roam-node-display-template (concat "${title:*} " (propertize "${tags:30}" 'face 'org-tag)))
   (org-roam-capture-templates
@@ -4162,11 +4162,17 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
   :init
   ;; Add project files to org-agenda.
   (setq org-roam-directory "~/org/roam")
-  (setq org-agenda-files
-        (append org-agenda-files
-                (directory-files
-                 (format "%s/projects/" org-roam-directory)
-                 t "\\`[^.]")))
+
+  ;; Helper function to update org-agenda-files
+  (defun my/org-agenda-update-agenda-files ()
+    (interactive)
+    (setq org-agenda-files
+          (append org-agenda-files
+                  (directory-files
+                   (format "%s/projects/" org-roam-directory)
+                   t "\\`[^.]"))))
+
+  (my/org-agenda-update-agenda-files)
 
   :config
   (unless (f-dir-p org-roam-directory)
