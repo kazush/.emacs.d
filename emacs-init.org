@@ -3730,12 +3730,11 @@ TBH this is not maintaned these days.
 TBH this is not maintaned these days.
 
 #+begin_src emacs-lisp
-;; style
-(setq-default js-indent-level 2)
-(setq-default tab-width 2)
-
 (use-package rjsx-mode
-  :mode ("\\.js\\'" "\\.jsx\\'"))
+  :mode ("\\.js\\'" "\\.jsx\\'")
+  :hook (rjsx-mode . (lambda ()
+                       (setq-local js-indent-level 2)
+                       (setq-local tab-width 2))))
 #+end_src
 
 ** Typescript
@@ -3804,11 +3803,11 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
 
 #+begin_src emacs-lisp
 (use-package sh-script
-  :custom
-  (sh-basic-offset 2)
-  (tab-width 2)
-  (indent-tabs-mode nil)
-  (sh-shellcheck-arguments "-x"))
+  :hook (sh-mode . (lambda ()
+                     (setq-local sh-basic-offset 2)
+                     (setq-local tab-width 2)
+                     (setq-local indent-tabs-mode nil)
+                     (setq-local sh-shellcheck-arguments "-x"))))
 #+end_src
 
 ** Pine Script
