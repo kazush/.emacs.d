@@ -4121,7 +4121,11 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
   (setq org-tags-exclude-from-inheritance (quote ("crypt")))
   ;; GPG key to use for encryption
   ;; Either the Key ID or set to nil to use symmetric encryption.
-  (setq org-crypt-key (getenv "ORG_CRYPT_KEY")))
+  (setq org-crypt-key (getenv "ORG_CRYPT_KEY"))
+
+  ;; Open custom agenda view on startup.
+  (add-hook 'emacs-startup-hook (lambda ()
+                                  (org-agenda nil "d"))))
 #+end_src
 
 ** org-bebel extensions
