@@ -2828,6 +2828,8 @@ Yet another terminal emulator. Trying out now.
                           ("terminfo/65" "terminfo/65/*")
                           ("integration" "integration/*")
                           (:exclude ".dir-locals.el" "*-tests.el")))
+  :custom
+  (eat-enable-auto-line-mode t)
   :config
   (defun my/neweat ()
     "Create a new eat session."
@@ -2836,9 +2838,7 @@ Yet another terminal emulator. Trying out now.
 
   (defun my/get-eat (arg)
     (interactive "p")
-    (my/get-shellish arg 'my/neweat "eat"))
-
-  )
+    (my/get-shellish arg 'my/neweat "eat")))
 #+end_src
 
 * Software Development
