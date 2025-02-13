@@ -5190,7 +5190,7 @@ Macros to retrive API keys for LLM servce providers.
   :custom
   (llm-warn-on-nonfree nil)
   (ellama-fill-paragraphs nil)
-  (ellama-long-lines-length -1)
+  (ellama-long-lines-length 1024)
   :config
   ;; setup key bindings
   (setopt ellama-keymap-prefix "C-c L")
