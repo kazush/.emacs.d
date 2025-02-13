@@ -3896,6 +3896,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
          ("C-c o h" . org-insert-heading)
          ("C-c o H" . org-insert-subheading)
          ("C-c o l" . org-store-link)
+         ("C-c o A" . my/org-agenda-custom-view)
          :map org-mode-map
          ("M-p" . org-babel-previous-src-block)
          ("M-n" . org-babel-next-src-block))
@@ -3957,17 +3958,15 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
   (org-agenda-custom-commands
    '(("d" "Today"
       ((todo "NEXT"
-                  ((org-agenda-overriding-header "Next")
-                   ))
+             ((org-agenda-overriding-header "Next")))
        (todo "TODO"
-                  ((org-agenda-overriding-header "Inbox")))
+             ((org-agenda-overriding-header "Inbox")))
        (agenda ""
                ((org-agenda-overriding-header (format-time-string "🗓 %a, %b %e %Y"))
                 (org-agenda-format-date "")
                 (org-agenda-span 'day)))
        (todo "SHOPPING"
-                  ((org-agenda-overriding-header "Shopping List")))
-       ))))
+             ((org-agenda-overriding-header "Shopping List")))))))
   (org-stuck-projects
    '("+PROJECT/-DONE-SOMEDAY" ("TODO" "WAIT")))
 
@@ -4189,8 +4188,11 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
   (setq org-crypt-key (getenv "ORG_CRYPT_KEY"))
 
   ;; Open custom agenda view on startup.
-  (add-hook 'emacs-startup-hook (lambda ()
-                                  (org-agenda nil "d"))))
+  (defun my/org-agenda-custom-view ()
+    (interactive)
+    (org-agenda nil "d"))
+
+  (add-hook 'emacs-startup-hook 'my/org-agenda-custom-view))
 #+end_src
 
 ** org-bebel extensions
