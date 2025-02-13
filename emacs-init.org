@@ -425,6 +425,21 @@ Add small wrappers so that I can launch intended browser as needed.
   :config
   (recentf-mode))
 #+end_src
+
+** project and xref
+
+If eglot is used, project and xref need to be loaded from built-in packages.
+
+#+begin_src emacs-lisp
+(use-package project
+  :disabled
+  :straight (:type built-in))
+
+(use-package xref
+  :disabled
+  :straight (:type built-in))
+#+end_src
+
 * User Interface
 
 Configure different features and settings that are related to user interface.
@@ -3027,25 +3042,23 @@ Currently eglot is disabled to try lsp-mode out again.
 #+begin_src emacs-lisp
 (use-package eglot
   :disabled
-  :after (projectile)
-  :hook (eglot--managed-mode . (lambda () (flycheck-mode -1)))
-  :config
-  (with-eval-after-load 'project
-    (add-to-list 'project-find-functions
-                 #'(lambda (dir)
-                     (let ((root (projectile-project-root dir)))
-                       (and root (cons 'transient root)))))))
-
-;; For c/c++-mode
-(with-eval-after-load 'eglot
-  (add-to-list 'eglot-server-programs
-               '((c++-ts-mode c-ts-mode) "clangd"))
-  (add-hook 'c-mode-common-hook 'eglot-ensure))
+  :requires projectile
+  :hook ((eglot--managed-mode . (lambda () (flycheck-mode -1)))
+         ((c++-ts-mode python-ts-mode) . eglot-ensure))
+  :commands (eglot eglot-ensure)
+  ;; :config
+  ;; Disabled as I don't remember what this is.
+  ;; (with-eval-after-load 'project
+  ;;   (add-to-list 'project-find-functions
+  ;;                #'(lambda (dir)
+  ;;                    (let ((root (projectile-project-root dir)))
+  ;;                      (and root (cons 'transient root))))))
+  )
 #+end_src
 
 ** Eldoc
 
-Eldoc-box displays eldoc contents in a child frame but is currently diabled.
+Eldoc-box displays eldoc contents in a child frame but is currently disabled.
 
 #+begin_src emacs-lisp
 (use-package eldoc-box
