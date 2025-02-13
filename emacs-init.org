@@ -3963,9 +3963,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
        (todo "TODO"
              ((org-agenda-overriding-header "Inbox")))
        (agenda ""
-               ((org-agenda-overriding-header (format-time-string "🗓 %a, %b %e %Y"))
-                (org-agenda-format-date "")
-                (org-agenda-span 'day)))
+               ((org-agenda-span 'day)))
        (todo "SHOPPING"
              ((org-agenda-overriding-header "Shopping List")))))))
   (org-stuck-projects
@@ -4086,6 +4084,8 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
                            nil nil :ascent 'center)))))
 
   (with-eval-after-load 'org-agenda
+    (define-key org-agenda-mode-map (kbd "C-c C-p") #'org-agenda-backward-block)
+    (define-key org-agenda-mode-map (kbd "C-c C-n") #'org-agenda-forward-block)
     (my/org-agenda-set-category-emoji-icon))
 
   ;; Patched org-do-emphasis-faces to allow nested emphasis markers.
