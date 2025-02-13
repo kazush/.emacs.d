@@ -1082,7 +1082,25 @@ More visual feedback on some operations such as undo, yank, kill-region, etc.
 
 #+begin_src emacs-lisp
 (use-package tab-bar
-  :bind (("C-z w" . tab-bar-move-window-to-tab)))
+  :bind (("C-z w" . tab-bar-move-window-to-tab)
+         ("C-z !" . tab-close-other)
+         ("C-z 1" . my/tab-bar-switch-to-1)
+         ("C-z 2" . my/tab-bar-switch-to-2)
+         ("C-z 3" . my/tab-bar-switch-to-3)
+         ("C-z 4" . my/tab-bar-switch-to-4)
+         ("C-z 5" . my/tab-bar-switch-to-5)
+         ("C-z 6" . my/tab-bar-switch-to-6)
+         ("C-z 7" . my/tab-bar-switch-to-7)
+         ("C-z 8" . my/tab-bar-switch-to-8)
+         ("C-z 9" . my/tab-bar-switch-to-9))
+  :config
+
+  ;; Create shortcuts for switching to a specified tab.
+  (dotimes (num 9 t)
+    (fset (intern (format "my/tab-bar-switch-to-%d" (1+ num)))
+          `(lambda () (interactive)
+             (ignore-errors
+               (tab-bar-select-tab ,(1+ num)))))))
 #+end_src
 
 * Completion
@@ -2295,8 +2313,6 @@ the two windows.
 ;; ace-window
 (use-package ace-window
   :init
-  (define-prefix-command 'my/aw-map)
-  (global-set-key (kbd "C-c W") 'my/aw-map)
   :bind (("C-c 1" . aw-switch-to-window-1)
          ("C-c 2" . aw-switch-to-window-2)
          ("C-c 3" . aw-switch-to-window-3)
@@ -2317,17 +2333,15 @@ the two windows.
          ("7" . aw-move-window-to-7)
          ("8" . aw-move-window-to-8)
          ("9" . aw-move-window-to-9)
-         :map my/aw-map
-         ("w" . ace-window)
-         ("1" . aw-swap-window-to-1)
-         ("2" . aw-swap-window-to-2)
-         ("3" . aw-swap-window-to-3)
-         ("4" . aw-swap-window-to-4)
-         ("5" . aw-swap-window-to-5)
-         ("6" . aw-swap-window-to-6)
-         ("7" . aw-swap-window-to-7)
-         ("8" . aw-swap-window-to-8)
-         ("9" . aw-swap-window-to-9))
+         ("s 1" . aw-swap-window-to-1)
+         ("s 2" . aw-swap-window-to-2)
+         ("s 3" . aw-swap-window-to-3)
+         ("s 4" . aw-swap-window-to-4)
+         ("s 5" . aw-swap-window-to-5)
+         ("s 6" . aw-swap-window-to-6)
+         ("s 7" . aw-swap-window-to-7)
+         ("s 8" . aw-swap-window-to-8)
+         ("s 9" . aw-swap-window-to-9))
   :config
   ;; generate aw-switch-to-window-N
   (require 'cl)
