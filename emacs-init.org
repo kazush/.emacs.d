@@ -5190,6 +5190,7 @@ Macros to retrive API keys for LLM servce providers.
   :custom
   (llm-warn-on-nonfree nil)
   (ellama-fill-paragraphs nil)
+  (ellama-long-lines-length -1)
   :config
   ;; setup key bindings
   (setopt ellama-keymap-prefix "C-c L")
@@ -5250,8 +5251,8 @@ Macros to retrive API keys for LLM servce providers.
                                :chat-model "gemini-2.0-flash-exp"))
             ("gemini-flash-thinking" . (my/make-llm-gemini
                                         :chat-model "gemini-2.0-flash-thinking-exp"))
-            ("gemini-exp" . (my/make-llm-gemini
-                             :chat-model "gemini-exp-1206"))
+            ("gemini-pro" . (my/make-llm-gemini
+                               :chat-model "gemini-2.0-pro-exp"))
             ("groq-llama-3.3-specdec" . (my/make-llm-groq
                                          :chat-model "llama-3.3-70b-specdec"))
             ("groq-llama-3.3-versatile" . (my/make-llm-groq
@@ -5321,7 +5322,7 @@ Macros to retrive API keys for LLM servce providers.
     :key #'my/get-gemini-apikey
     :models '(gemini-2.0-flash-exp
               gemini-2.0-flash-thinking-exp
-              gemini-exp-1206)
+              gemini-2.0-pro-exp)
     :stream t)
 
   (gptel-make-openai "Groq"
