@@ -414,6 +414,17 @@ Add small wrappers so that I can launch intended browser as needed.
   (apply orig (list image (or (and (eq format t) 'image/avif) format))))
 (advice-add 'image-convert :around #'my/image-convert)
 #+end_src
+
+** recentf
+
+#+begin_src emacs-lisp
+(use-package recentf
+  :custom
+  (recentf-max-saved-items 100)
+  (recentf-exclude '("/org/roam/"))
+  :config
+  (recentf-mode))
+#+end_src
 * User Interface
 
 Configure different features and settings that are related to user interface.
@@ -1809,20 +1820,6 @@ Trim spaces from EOL. Only lines touched get trimmed.
 (use-package ws-butler
   :diminish ws-butler-mode
   :hook (prog-mode . ws-butler-mode))
-#+end_src
-
-** recentf enhancement
-
-A little enhancement to recentf.
-
-- dired buffers can be handled.
-- Switching to file buffer considers it as most recent file.
-
-#+begin_src emacs-lisp
-(use-package recentf-ext
-  :init
-  (require 'recentf)
-  (setq recentf-max-saved-items 100))
 #+end_src
 
 ** yasnippet
