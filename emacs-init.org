@@ -4012,6 +4012,8 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
    '(org-level-6 ((t :foreground "IndianRed")))
    '(org-level-7 ((t :foreground "DarkOrchid3")))
    '(org-level-8 ((t :foreground "OliveDrab4")))
+   '(org-time-grid ((t :foreground "#666633")))
+   '(org-agenda-current-time ((t :foreground "#cccc99" :weight bold)))
    '(org-block-begin-line ((t :background "#2e3652")))
    '(org-block-end-line ((t :background unspecified
                             :inherit 'org-block-begin-line)))
