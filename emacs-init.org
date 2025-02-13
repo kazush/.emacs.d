@@ -2830,6 +2830,7 @@ Yet another terminal emulator. Trying out now.
                           (:exclude ".dir-locals.el" "*-tests.el")))
   :custom
   (eat-enable-auto-line-mode t)
+  :hook ((eshell-mode . eat-eshell-mode))
   :config
   (defun my/neweat ()
     "Create a new eat session."
