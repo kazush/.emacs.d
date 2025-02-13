@@ -1381,6 +1381,7 @@ vertico and related packages are used for completion framework.
       :history 'file-name-history)))
 
   (consult-customize
+   my/consult-recent-file my/consult-recent-file-new-window
    my/consult-recent-file-other-window my/consult-recent-file-other-tab
    :preview-key "M-.")
   )
