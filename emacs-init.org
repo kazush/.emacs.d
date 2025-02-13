@@ -1190,7 +1190,8 @@ vertico and related packages are used for completion framework.
          ("M-y" . consult-yank-pop)                ;; orig. yank-pop
          ;; M-g bindings (goto-map)
          ("M-g e" . consult-compile-error)
-         ("M-g f" . consult-flymake)               ;; Alternative: consult-flycheck
+         ("M-g f" . consult-flycheck)
+         ("M-g F" . consult-flymake)
          ("M-g g" . consult-goto-line)             ;; orig. goto-line
          ("M-g M-g" . consult-goto-line)           ;; orig. goto-line
          ("M-g o" . consult-outline)               ;; Alternative: consult-org-heading
@@ -3091,11 +3092,13 @@ Eldoc-box displays eldoc contents in a child frame but is currently disabled.
 #+begin_src emacs-lisp
 (use-package flycheck
   :diminish
-  :custom (flycheck-indication-mode nil)
-  :hook (prog-mode . flycheck-mode))
+  :custom (flycheck-indication-mode nil))
 
 (use-package flycheck-popup-tip
   :hook (flycheck-mode . flycheck-popup-tip-mode))
+
+(use-package consult-flycheck
+  :diminish)
 #+end_src
 
 *** flymake
