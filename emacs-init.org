@@ -2933,6 +2933,10 @@ Yet another terminal emulator. Trying out now.
                  (define-key lsp-mode-map (kbd "C-c l") lsp-command-map))))
   :commands (lsp lsp-register-client)
   :init
+  ;; Use plists for emacs-lsp-booster
+  (setenv "LSP_USE_PLISTS" "true")
+  (setq lsp-use-plists t)
+
   (setq lsp-keymap-prefix (kbd "C-c l"))
   ;; (setq lsp-signature-auto-activate nil)
   (setq lsp-signature-render-documentation nil)
@@ -2951,7 +2955,40 @@ Yet another terminal emulator. Trying out now.
                     tangle))))
   ;; Use advice as org-babel-edit-prep:jupyter-<lang> will be defined ob-jupyter.el.
   (advice-add #'org-babel-edit-prep:jupyter-python :after
-              #'org-babel-edit-prep:python))
+              #'org-babel-edit-prep:python)
+
+  ;; Enable config for emacs-lsp-booster
+  (when (file-exists-p "/usr/bin/emacs-lsp-booster")
+    (defun lsp-booster--advice-json-parse (old-fn &rest args)
+      "Try to parse bytecode instead of json."
+      (or
+       (when (equal (following-char) ?#)
+         (let ((bytecode (read (current-buffer))))
+           (when (byte-code-function-p bytecode)
+             (funcall bytecode))))
+       (apply old-fn args)))
+    (advice-add (if (progn (require 'json)
+                           (fboundp 'json-parse-buffer))
+                    'json-parse-buffer
+                  'json-read)
+                :around
+                #'lsp-booster--advice-json-parse)
+
+    (defun lsp-booster--advice-final-command (old-fn cmd &optional test?)
+      "Prepend emacs-lsp-booster command to lsp CMD."
+      (let ((orig-result (funcall old-fn cmd test?)))
+        (if (and (not test?)                             ;; for check lsp-server-present?
+                 (not (file-remote-p default-directory)) ;; see lsp-resolve-final-command, it would add extra shell wrapper
+                 lsp-use-plists
+                 (not (functionp 'json-rpc-connection))  ;; native json-rpc
+                 (executable-find "emacs-lsp-booster"))
+            (progn
+              (when-let ((command-from-exec-path (executable-find (car orig-result))))  ;; resolve command from exec-path (in case not found in $PATH)
+                (setcar orig-result command-from-exec-path))
+              (message "Using emacs-lsp-booster for %s!" orig-result)
+              (cons "emacs-lsp-booster" orig-result))
+          orig-result)))
+    (advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command)))
 
 (use-package lsp-ui
   :after lsp-mode
