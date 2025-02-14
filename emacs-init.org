@@ -4229,7 +4229,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
          :map org-mode-map
          ("C-M-i" . completion-at-point))
   :hook (after-init . (lambda ()
-                       (require 'org-roam-protocol)))
+                        (require 'org-roam-protocol)))
   :custom
   (org-roam-node-display-template (concat "${title:*} " (propertize "${tags:30}" 'face 'org-tag)))
   (org-roam-capture-templates
@@ -4322,7 +4322,8 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
                          org-roam-directory prj basename))
            (org-capture-templates
             `(("d" "capture a new entry to the selected project"
-               entry (file+datetree ,file) ,entry-str))))
+               entry (file+datetree ,file) ,entry-str
+               :unnarrowed t :kill-buffer t))))
       (unless (file-exists-p file)
         (my/org-roam-project-create-new-file prj basename props))
       (org-capture nil "d")))
