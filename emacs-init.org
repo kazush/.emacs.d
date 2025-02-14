@@ -2937,11 +2937,12 @@ Yet another terminal emulator. Trying out now.
                  (lsp-enable-which-key-integration)
                  (define-key lsp-mode-map (kbd "C-c l") lsp-command-map))))
   :commands (lsp lsp-register-client)
-  :init
+  :preface
   ;; Use plists for emacs-lsp-booster
   (setenv "LSP_USE_PLISTS" "true")
   (setq lsp-use-plists t)
 
+  :init
   (setq lsp-keymap-prefix (kbd "C-c l"))
   ;; (setq lsp-signature-auto-activate nil)
   (setq lsp-signature-render-documentation nil)
