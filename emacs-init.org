@@ -3932,7 +3932,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
                "WAITING(w@/!)" "BLOCKED(b@/!)" "|" "DONE(d!)" "CANCELLED(c@)")))
   (org-log-done 'time)
   (org-capture-templates nil) ;; Migrated to org-roam-capture.
-  (org-agenda-files '("agenda.org"))
+  (org-agenda-files '("agenda.org" "economic-calendar.org"))
   (org-tag-alist
    '(("ai")
      ("algo")
@@ -4786,8 +4786,7 @@ Citar provides a rich UI frontend for org-cite. citar-org-roam provides more int
   (setq org-agenda-files (append
                           org-agenda-files
                           '("~/org/gcal.org"
-                            "~/org/us-market-holidays.org"
-                            "~/org/economic-calendar.org")))
+                            "~/org/us-market-holidays.org")))
   (defun my/org-gcal-setup ()
     (interactive)
     (let* ((authinfo (car (auth-source-search :host "org-gcal")))
@@ -4798,8 +4797,7 @@ Citar provides a rich UI frontend for org-cite. citar-org-roam provides more int
       (setq org-gcal-client-secret secret)
       (setq org-gcal-fetch-file-alist
             `((,calendar . "~/org/gcal.org")
-              ("monex.co.jp_hkslb9v1kj95se5r8ag2mms4k8@group.calendar.google.com" . "~/org/us-market-holidays.org")
-              ("monex.co.jp_vm8hs3tiu5cp7gdlk04bla79o0@group.calendar.google.com" . "~/org/economic-calendar.org")))
+              ("monex.co.jp_hkslb9v1kj95se5r8ag2mms4k8@group.calendar.google.com" . "~/org/us-market-holidays.org")))
       (org-gcal-reload-client-id-secret))))
 #+end_src
 
