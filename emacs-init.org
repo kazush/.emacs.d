@@ -3075,10 +3075,9 @@ Yet another terminal emulator. Trying out now.
   )
 
 (use-package lsp-pyright
-  :defer t
-  :init
-  (with-eval-after-load 'lsp-mode
-                   (require 'lsp-pyright)))
+  :after lsp-mode
+  :custom
+  (lsp-pyright-langserver-command "basedpyright"))
 
 (use-package lsp-treemacs
   :requires lsp-mode)
