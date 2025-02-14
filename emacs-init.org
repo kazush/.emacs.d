@@ -3071,9 +3071,10 @@ Yet another terminal emulator. Trying out now.
   )
 
 (use-package lsp-pyright
-  :hook (python-base-mode . (lambda ()
-                              (require 'lsp-pyright)
-                              (lsp))))
+  :defer t
+  :init
+  (with-eval-after-load 'lsp-mode
+                   (require 'lsp-pyright)))
 
 (use-package lsp-treemacs
   :requires lsp-mode)
