@@ -1813,18 +1813,49 @@ Dabbrev settings copied from the GitHub Corfu page.
   :bind ("C-q t" . consult-tramp))
 #+end_src
 
-** Multiple-Cursors
+** Multiple Cursors
 
-Activate multiple-cursor vai Hydra.
+*** multiple-cursors
+
+Being disabled for now in favor of macursors.
 
 #+begin_src emacs-lisp
 (use-package multiple-cursors
+  :disabled
   :diminish
   :bind (:map my/edit-map
               ("a" . mc/mark-all-dwim)
               ("e" . mc/edit-lines)
               ("r" . mc/mark-in-region-regexp))
   :commands (mc/mark-all-dwim mc/edit-lines))
+#+end_src
+
+*** macrursors
+
+Trying this out as multiple-cursors is heavy.
+
+#+begin_src emacs-lisp
+(use-package macrursors
+  :after (corfu goggles)
+  :straight ( :type git :host github :repo "corytertel/macrursors")
+  :custom (macrursors-apply-keys "RET")
+  :bind ( :map my/edit-map
+          ("SPC" . my/macrursors-mark-all-at-point)
+          ("RET" . macrursors-end)
+          ("C-g" . macrursors-select-clear)
+          ("C-SPC" . macrursors-select)
+          ("m" . macrursors-mark-all-lines-or-instances)
+          ("C-n" . macrursors-mark-next-instance-of)
+          ("C-p" . macrursors-mark-previous-instance-of))
+  :config
+  (dolist (mode '(corfu-mode goggles-mode))
+    (add-hook 'macrursors-pre-finish-hook mode)
+    (add-hook 'macrursors-post-finish-hook mode))
+  (defun my/macrursors-mark-all-at-point ()
+    "Mark all instances of the thing at point."
+    (interactive)
+    (let ((symbol (thing-at-point 'symbol)))
+      (macrursors--mark-all-instances-of symbol (point)))))
 #+end_src
 
 ** Wgrep
