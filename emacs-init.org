@@ -2796,6 +2796,8 @@ fi
          ("C-c C-z" . my/vterm-send-ctrl-z))
   :commands (vterm)
   :config
+  (define-key vterm-mode-map (kbd "C-z") tab-prefix-map)
+
   (defun my/newvterm ()
     "Create a new vterm with specified buffer name."
     (interactive)
@@ -2894,10 +2896,10 @@ Yet another terminal emulator. Trying out now.
                           ("terminfo/65" "terminfo/65/*")
                           ("integration" "integration/*")
                           (:exclude ".dir-locals.el" "*-tests.el")))
-  :custom
-  (eat-enable-auto-line-mode t)
   :hook ((eshell-mode . eat-eshell-mode))
   :config
+  (define-key eat-semi-char-mode-map (kbd "C-z") tab-prefix-map)
+
   (defun my/neweat ()
     "Create a new eat session."
     (interactive)
