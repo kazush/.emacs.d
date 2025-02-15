@@ -1084,17 +1084,21 @@ goggles is now used instead of volatile-highlights.
 
 #+begin_src emacs-lisp
 (use-package tab-bar
-  :bind (("C-z w" . tab-bar-move-window-to-tab)
-         ("C-z !" . tab-close-other)
-         ("C-z 1" . my/tab-bar-switch-to-1)
-         ("C-z 2" . my/tab-bar-switch-to-2)
-         ("C-z 3" . my/tab-bar-switch-to-3)
-         ("C-z 4" . my/tab-bar-switch-to-4)
-         ("C-z 5" . my/tab-bar-switch-to-5)
-         ("C-z 6" . my/tab-bar-switch-to-6)
-         ("C-z 7" . my/tab-bar-switch-to-7)
-         ("C-z 8" . my/tab-bar-switch-to-8)
-         ("C-z 9" . my/tab-bar-switch-to-9))
+  :bind ( :map tab-prefix-map
+          ("C-n" . tab-next)
+          ("C-p" . tab-previous)
+          ("o" . tab-bar-switch-to-recent-tab)
+          ("w" . tab-bar-move-window-to-tab)
+          ("!" . tab-close-other)
+          ("1" . my/tab-bar-switch-to-1)
+          ("2" . my/tab-bar-switch-to-2)
+          ("3" . my/tab-bar-switch-to-3)
+          ("4" . my/tab-bar-switch-to-4)
+          ("5" . my/tab-bar-switch-to-5)
+          ("6" . my/tab-bar-switch-to-6)
+          ("7" . my/tab-bar-switch-to-7)
+          ("8" . my/tab-bar-switch-to-8)
+          ("9" . my/tab-bar-switch-to-9))
   :config
 
   ;; Create shortcuts for switching to a specified tab.
