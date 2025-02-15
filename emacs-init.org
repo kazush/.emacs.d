@@ -3628,26 +3628,91 @@ Manually enable ~copilot-mode~ when needed.
 #+end_src
 
 ** AI Agents
+
+*** Helper functions for aider
+
+#+begin_src emacs-lisp
+(defun my/aider-call-function (func)
+  "Set known API keys for aider and call the given function."
+  (interactive)
+  (setenv "GEMINI_API_KEY" (my/get-gemini-api-key))
+  (setenv "GROQ_API_KEY" (my/get-groq-api-key))
+  (setenv "ANTHROPIC_API_KEY" (my/get-anthropic-api-key))
+  (setenv "DEEPSEEK_API_KEY" (my/get-deepseek-api-key))
+  (setenv "OPENROUTER_API_KEY" (my/get-deepseek-api-key))
+  (funcall func))
+
+(defun my/aider-select-project-root ()
+  "Select and return project root to be used with aider."
+  (interactive)
+  (completing-read "Select project: " (project-known-project-roots) nil 'confirm))
+
+(defun my/aider-in-vterm ()
+  "Run aider in vterm."
+  (interactive)
+  (let ((buf (get-buffer "*aider*")))
+    (if buf (progn
+              (tab-bar-switch-to-tab "*aider*")
+              (select-window (display-buffer buf)))
+      (let ((display-buffer-overriding-action '(display-buffer-in-tab))
+            (dir (my/aider-select-project-root)))
+        (my/aider-call-function (lambda ()
+                                  (vterm "*aider*")
+                                  (vterm-insert (format "cd %s" dir))
+                                  (vterm-send-return)
+                                  (vterm-insert "aider")
+                                  (vterm-send-return)))))))
+#+end_src
+
 *** Aider
 #+begin_src emacs-lisp
 (use-package aider
   :straight (:host github :repo "tninja/aider.el" :files ("aider.el"))
   :commands (aider-transient-menu)
   :bind ( :map my/ai-map
-          ("a" . aider-transient-menu))
+          ("A" . my/aider-transient-menu))
   :config
   ;; Use claude-3-5-sonnet cause it is best in aider benchmark
   ;; (setq aider-args '("--model" "anthropic/claude-3-5-sonnet-20241022"))
-  ;; (setenv "ANTHROPIC_API_KEY" (my/get-anthropic-apikey))
+  ;; (setenv "ANTHROPIC_API_KEY" (my/get-anthropic-api-key))
   ;; Or use chatgpt model since it is most well known
   ;; (setq aider-args '("--model" "gpt-4o-mini"))
   ;; (setenv "OPENAI_API_KEY" <your-openai-api-key>)
   ;; Or use gemini v2 model since it is very good and free
-  (setq aider-args '("--model" "gemini/gemini-2.0-flash-exp"))
-  (setenv "GEMINI_API_KEY" (my/get-gemini-apikey))
+
+  ;; (setq aider-args '("--model" "gemini/gemini-2.0-flash-exp"))
+  ;; (setenv "GEMINI_API_KEY" (my/get-gemini-api-key))
+
+  (defun my/aider-transient-menu ()
+    "Set known API keys before launching aider."
+    (interactive)
+    (my/aider-call-function 'aider-transient-menu))
+
+  (setq aider-args '("--model" "anthropic/claude-3-5-sonnet-20241022"))
+
   ;; Or use your personal config file
   ;; (setq aider-args `("--config" ,(expand-file-name "~/.aider.conf.yml")))
   )
+#+end_src
+*** aidermacs
+
+A fork of aider.el that seems to have better integration with Emacs.
+
+#+begin_src emacs-lisp
+(use-package aidermacs
+  :straight (:host github :repo "MatthewZMD/aidermacs" :files ("*.el"))
+  :commands (aidermacs-transient-menu)
+  :bind ( :map my/ai-map
+          ("a" . my/aidermacs))
+  :custom
+  (aidermacs-default-model "anthropic/claude-3-5-sonnet-20241022")
+  (aidermacs-backend 'vterm)
+  (aidermacs-auto-commits t)
+  :config
+  (defun my/aidermacs ()
+    "Set known API keys before launching aidermacs."
+    (interactive)
+    (my/aider-call-function 'aidermacs-transient-menu)))
 #+end_src
 
 *** Copilot Chat
@@ -3663,6 +3728,7 @@ Manually enable ~copilot-mode~ when needed.
   (copilot-chat-model "claude-3.5-sonnet") ;; "gpt-4o", "o1-preview"
   )
 #+end_src
+
 ** Jupyter
 
 #+begin_src emacs-lisp
@@ -5235,29 +5301,29 @@ Disabled atm as new distro is adopting pipewire.
 Macros to retrive API keys for LLM servce providers.
 
 #+begin_src emacs-lisp
-(defun my/get-gemini-apikey ()
-  (auth-source-pick-first-password :host "gemini-apikey"))
+(defun my/get-gemini-api-key ()
+  (auth-source-pick-first-password :host "gemini-api-key"))
 
-(defun my/get-groq-apikey ()
-  (auth-source-pick-first-password :host "groq-apikey"))
+(defun my/get-groq-api-key ()
+  (auth-source-pick-first-password :host "groq-api-key"))
 
-(defun my/get-sambanova-apikey ()
-  (auth-source-pick-first-password :host "sambanova-apikey"))
+(defun my/get-sambanova-api-key ()
+  (auth-source-pick-first-password :host "sambanova-api-key"))
 
-(defun my/get-cohere-apikey ()
-  (auth-source-pick-first-password :host "cohere-apikey"))
+(defun my/get-cohere-api-key ()
+  (auth-source-pick-first-password :host "cohere-api-key"))
 
-(defun my/get-hf-apikey ()
-  (auth-source-pick-first-password :host "huggingface-apikey"))
+(defun my/get-hf-api-key ()
+  (auth-source-pick-first-password :host "huggingface-api-key"))
 
-(defun my/get-anthropic-apikey ()
+(defun my/get-anthropic-api-key ()
   (auth-source-pick-first-password :host "api.anthropic.com"))
 
-(defun my/get-openrouter-apikey ()
-  (auth-source-pick-first-password :host "openrouter-apikey"))
+(defun my/get-openrouter-api-key ()
+  (auth-source-pick-first-password :host "openrouter-api-key"))
 
-(defun my/get-deepseek-apikey ()
-  (auth-source-pick-first-password :host "deepseek-apikey"))
+(defun my/get-deepseek-api-key ()
+  (auth-source-pick-first-password :host "deepseek-api-key"))
 #+end_src
 
 ** Ellama - Emacs client for ollama
@@ -5290,31 +5356,31 @@ Macros to retrive API keys for LLM servce providers.
   (defmacro my/make-llm-groq (&rest args)
     `(make-llm-openai-compatible
       :url "https://api.groq.com/openai/v1/"
-      :key (my/get-groq-apikey)
+      :key (my/get-groq-api-key)
       ,@args))
 
   (defmacro my/make-llm-sambanova (&rest args)
     `(make-llm-openai-compatible
       :url "https://api.sambanova.ai/v1/"
-      :key (my/get-sambanova-apikey)
+      :key (my/get-sambanova-api-key)
       ,@args))
 
   (defmacro my/make-llm-cohere (&rest args)
     `(make-llm-openai-compatible
       :url "http://localhost:6600/v1/"
-      :key (my/get-cohere-apikey)
+      :key (my/get-cohere-api-key)
       ,@args))
 
   (defmacro my/make-llm-hf (&rest args)
     `(make-llm-openai-compatible
       :url "https://api-inference.huggingface.co/v1/"
-      :key (my/get-hf-apikey)
+      :key (my/get-hf-api-key)
       ,@args))
 
   (require 'llm-gemini)
   (defmacro my/make-llm-gemini (&rest args)
     `(make-llm-gemini
-      :key (my/get-gemini-apikey)
+      :key (my/get-gemini-api-key)
       ,@args))
 
   ;; (setopt ellama-provider
@@ -5399,7 +5465,7 @@ Macros to retrive API keys for LLM servce providers.
   ;; Define backends.
 
   (gptel-make-gemini "Gemini"
-    :key #'my/get-gemini-apikey
+    :key #'my/get-gemini-api-key
     :models '(gemini-2.0-flash-exp
               gemini-2.0-flash-thinking-exp
               gemini-2.0-pro-exp)
@@ -5409,7 +5475,7 @@ Macros to retrive API keys for LLM servce providers.
     :host "api.groq.com"
     :endpoint "/openai/v1/chat/completions"
     :stream t
-    :key #'my/get-groq-apikey
+    :key #'my/get-groq-api-key
     :models '(llama-3.3-70b-specdec
               llama-3.3-70b-versatile))
 
@@ -5426,7 +5492,7 @@ Macros to retrive API keys for LLM servce providers.
     :host "api.sambanova.ai"
     :endpoint "/v1/chat/completions"
     :stream t
-    :key #'my/get-sambanova-apikey
+    :key #'my/get-sambanova-api-key
     :models '(Meta-Llama-3.1-405B-Instruct
               Qwen2.5-72B-Instruct))
 
@@ -5434,7 +5500,7 @@ Macros to retrive API keys for LLM servce providers.
     :host "localhost:6600"
     :endpoint "/v1/chat/completions"
     :stream t
-    :key #'my/get-cohere-apikey
+    :key #'my/get-cohere-api-key
     :models '(command-r-plus
               command-r-plus-08-2024))
 
@@ -5442,20 +5508,20 @@ Macros to retrive API keys for LLM servce providers.
     :host "api-inference.huggingface.co"
     :endpoint "/v1/chat/completions"
     :stream t
-    :key #'my/get-hf-apikey
+    :key #'my/get-hf-api-key
     :models '(Qwen/Qwen2.5-Coder-32B-Instruct
               Qwen/Qwen2.5-72B-Instruct))
 
   (gptel-make-anthropic "Anthropic"
     :stream t
-    :key #'my/get-anthropic-apikey
+    :key #'my/get-anthropic-api-key
     :models '(claude-3.5-sonnet-20241022))
 
   (gptel-make-openai "DeepSeek"
     :host "api.deepseek.com"
     :endpoint "/v1/chat/completions"
     :stream t
-    :key #'my/get-deepseek-apikey
+    :key #'my/get-deepseek-api-key
     :models '(deepseek-chat
               deepseek-reasoner))
 
@@ -5463,7 +5529,7 @@ Macros to retrive API keys for LLM servce providers.
     :host "openrouter.ai"
     :endpoint "/api/v1/chat/completions"
     :stream t
-    :key #'my/get-openrouter-apikey
+    :key #'my/get-openrouter-api-key
     :models '(openai/o1-preview))
 
   (defun my/gptel-get-backend (key)
@@ -5683,7 +5749,7 @@ Use groq as the LLM service.
             (mapcar (lambda (s) (string-replace "\n" " " s)) text))
       ))
 
-  (setq gt-chatgpt-key (my/get-groq-apikey))
+  (setq gt-chatgpt-key (my/get-groq-api-key))
   (setq my/gt-google-translate
         (gt-translator :taker (gt-taker
                                :langs '(en ja)
@@ -5808,11 +5874,11 @@ Use groq as the LLM service.
 
   ;;; Set API KEYs. It is recommended to use a function that returns the string for better security.
   (setq consult-omni-google-customsearch-key
-        (auth-source-pick-first-password :host "google-cse-apikey"))
+        (auth-source-pick-first-password :host "google-cse-api-key"))
   (setq consult-omni-google-customsearch-cx
         (auth-source-pick-first-password :host "google-cse-id"))
   (setq consult-omni-youtube-search-key
-        (auth-source-pick-first-password :host "google-youtube-apikey"))
+        (auth-source-pick-first-password :host "google-youtube-api-key"))
 
   ;; (setq consult-omni-brave-api-key "YOUR-BRAVE-API-KEY-OR-FUNCTION")
   ;; (setq consult-omni-stackexchange-api-key "YOUR-STACKEXCHANGE-API-KEY-OR-FUNCTION")
