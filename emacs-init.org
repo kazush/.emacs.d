@@ -1087,6 +1087,7 @@ goggles is now used instead of volatile-highlights.
   :bind ( :map tab-prefix-map
           ("C-n" . tab-next)
           ("C-p" . tab-previous)
+          ("k" . my/tab-bar-kill-buffer-and-tab)
           ("o" . tab-bar-switch-to-recent-tab)
           ("w" . tab-bar-move-window-to-tab)
           ("!" . tab-close-other)
@@ -1100,6 +1101,12 @@ goggles is now used instead of volatile-highlights.
           ("8" . my/tab-bar-switch-to-8)
           ("9" . my/tab-bar-switch-to-9))
   :config
+
+  (defun my/tab-bar-kill-buffer-and-tab ()
+    "Kill current buffer and its tab."
+    (interactive)
+    (kill-buffer)
+    (tab-close))
 
   ;; Create shortcuts for switching to a specified tab.
   (dotimes (num 9 t)
