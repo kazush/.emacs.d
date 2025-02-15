@@ -1942,7 +1942,7 @@ Trim spaces from EOL. Only lines touched get trimmed.
 
 ** spellcheck
 
-jinx is being tried out.
+jit-spell is being tried out as jinx does not handle English words right before/after Japanese character.
 
 *** ispell
 The configuration below is borrowed from https://home.hirosaki-u.ac.jp/heroic-2020/1575/.
@@ -1950,7 +1950,6 @@ Do not forget to install aspell.
 
 #+begin_src emacs-lisp
 (use-package ispell
-  :disabled
   :commands (ispell ispell-region)
   :custom
   (ispell-program-name "aspell")
@@ -1962,16 +1961,39 @@ Do not forget to install aspell.
 *** jinx
 #+begin_src emacs-lisp
 (use-package jinx
+  :disabled
   :diminish
   :bind (("M-$" . jinx-correct)
          ("C-M-$" . jinx-languages))
   :hook (((text-mode conf-mode markdown-mode) . jinx-mode))
   :config
-  (add-to-list 'jinx-exclude-regexps '(t "[^\000-\377]+"))
+  ;; (add-to-list 'jinx-exclude-regexps '(t "[^\000-\377]+"))
+  (setq jinx-exclude-regexps
+        '((emacs-lisp-mode "Package-Requires:.*$")
+          (t "[A-Z]+\\>"         ;; Uppercase words
+             "-+\\>"             ;; Hyphens used as lines or bullet points
+             "\\w*?[0-9]\\w*\\>" ;; Words with numbers, hex codes
+             "[a-z]+://\\S-+"    ;; URI
+             "[^\000-\377]+"     ;; Non-Ascii characters
+             "<?[-+_.~a-zA-Z][-+_.~:a-zA-Z0-9]*@[-.a-zA-Z0-9]+>?" ;; Email
+             "\\(?:Local Variables\\|End\\):\\s-*$" ;; Local variable indicator
+             "jinx-\\(?:languages\\|local-words\\):\\s-+.*$"))) ;; Local variables
   (add-to-list 'vertico-multiform-categories
-             '(jinx grid (vertico-grid-annotate . 20)))
+               '(jinx grid (vertico-grid-annotate . 20)))
   (vertico-multiform-mode 1))
 #+end_src
+
+*** jit-spell
+
+Note that jit-spell only works well with aspell as aspell wisely ignores Japanese characters while hunspell tries to correct Japanese characters.
+
+#+begin_src emacs-lisp
+(use-package jit-spell
+  :hook ((text-mode conf-mode markdown-mode) . jit-spell-mode)
+  :config
+  (set-face-underline 'jit-spell-misspelling '(:style wave :color "#d2b580")))
+#+end_src
+
 ** File Template
 
 #+begin_src emacs-lisp
