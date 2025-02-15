@@ -1038,16 +1038,15 @@ as you don't have to keep holding ctrl key.
 
 ** Highlighting
 
-*** volatile-highlights
+*** goggles
 
-More visual feedback on some operations such as undo, yank, kill-region, etc.
+goggles is now used instead of volatile-highlights.
 
 #+begin_src emacs-lisp
-;; volatile-highlights
-(use-package volatile-highlights
-  :diminish
+(use-package goggles
+  :hook ((prog-mode text-mode) . goggles-mode)
   :config
-  (volatile-highlights-mode t))
+  (setq-default goggles-pulse t)) ;; set to nil to disable pulsing
 #+end_src
 
 ** Narrowing
