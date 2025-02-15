@@ -3351,11 +3351,16 @@ By default this is only enabled for yaml-mode for performance reasons.
 (use-package highlight-indent-guides
   :hook (yaml-mode . highlight-indent-guides-mode)
   :diminish highlight-indent-guides-mode
-  :custom (highlight-indent-guides-method 'bitmap)
+  :custom
+  (highlight-indent-guides-method 'character)
+  (highlight-indent-guides-auto-enabled nil)
   :config
-  (set-face-background 'highlight-indent-guides-odd-face "darkgray")
-  (set-face-background 'highlight-indent-guides-even-face "dimgray")
-  (set-face-foreground 'highlight-indent-guides-character-face "dimgray"))
+  (custom-set-faces
+   '(highlight-indent-guides-odd-face ((t :background "DarkGray")))
+   '(highlight-indent-guides-even-face ((t :background "DimGray")))
+   '(highlight-indent-guides-character-face ((t :foreground "DimGray")))
+   '(highlight-indent-guides-top-character-face ((t :foreground "DimGray")))
+   '(highlight-indent-guides-stack-character-face ((t :foreground "DimGray")))))
 #+end_src
 
 *** Diff HL mode
