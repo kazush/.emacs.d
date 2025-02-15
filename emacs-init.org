@@ -3322,7 +3322,7 @@ Eldoc-box displays eldoc contents in a child frame but is currently disabled.
 #+begin_src emacs-lisp
 (use-package whitespace
   :diminish whitespace-mode
-  :hook (prog-mode . whitespace-mode)
+  :hook ((prog-mode conf-mode yaml-mode) . whitespace-mode)
   :custom
   (whitespace-style '(face trailing tabs tab-mark))
   :config
