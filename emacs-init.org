@@ -3640,12 +3640,12 @@ Manually enable ~copilot-mode~ when needed.
 #+begin_src emacs-lisp
 (use-package copilot-chat
   :straight (:host github :repo "chep/copilot-chat.el" :files ("*.el"))
-  :commands (copilot-chat-display)
+  :commands (copilot-chat-transient copilot-chat-display)
   :bind ( :map my/ai-map
-          ("c" . copilot-chat-display))
+          ("c" . copilot-chat-transient))
   :custom
   (copilot-chat-backend 'curl)
-  (copilot-chat-frontend 'shell-maker)
+  (copilot-chat-frontend 'org)
   (copilot-chat-model "claude-3.5-sonnet") ;; "gpt-4o", "o1-preview"
   )
 #+end_src
