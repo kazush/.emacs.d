@@ -4469,8 +4469,9 @@ add ctime and mtime properties to org-roam nodes.
                                          ;; (list (* space-length
                                          ;;          (frame-char-width)))
                                          :height '(1))))))))))
-  (advice-add #'org-indent--compute-prefixes :after
-              #'my/org-indent--compute-prefixes-after))
+  ;; (advice-add #'org-indent--compute-prefixes :after
+  ;;             #'my/org-indent--compute-prefixes-after))
+)
 #+end_src
 
 
