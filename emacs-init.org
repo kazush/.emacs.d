@@ -4481,8 +4481,11 @@ add ctime and mtime properties to org-roam nodes.
 
 ** org-modern-indent
 
+Disabled for now as it's not working well with some Org buffers (e.g. copilot-chat).
+
 #+begin_src emacs-lisp
 (use-package org-modern-indent
+  :disabled
   :straight (org-modern-indent
              :type git
              :host github
