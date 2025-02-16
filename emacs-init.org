@@ -2734,45 +2734,57 @@ I don't use eshell often (I use shell instead) so there is a chance that this
 config does not perfectly work.
 
 #+begin_src emacs-lisp
-(setq eshell-buffer-shorthand t
-      eshell-scroll-to-bottom-on-input 'all
-      eshell-error-if-no-glob t
-      eshell-hist-ignoredups t
-      eshell-save-history-on-exit t
-      eshell-prefer-lisp-functions nil)
+(use-package eshell
+  :bind (("C-c e" . my/get-eshell))
+  :commands (eshell)
+  :hook (eshell-first-time-mode . my/eshell-setup-alias)
+  :custom
+  (eshell-destroy-buffer-when-process-dies t)
+  (eshell-buffer-shorthand t)
+  (eshell-scroll-to-bottom-on-input 'all)
+  (eshell-error-if-no-glob t)
+  (eshell-hist-ignoredups t)
+  (eshell-save-history-on-exit t)
+  (eshell-prefer-lisp-functions nil)
+  :config
+  ;; Extensions
+  (setq eshell-modules-list
+        (append eshell-modules-list
+                '(eshell-smart eshell-elecslash)))
 
-(add-hook 'eshell-mode-hook
-          #'(lambda ()
-              ;; aliases
-              (eshell/alias "ls" "ls -A $*")
-              (eshell/alias "l" "ls -lA $*")
-              (eshell/alias "ff" "find-file-other-tab $1")
-              (eshell/alias "ffsu" "find-file-other-tab /sudo::$PWD/$1")
-              (eshell/alias "e" "find-file-other-tab $1")
-              (eshell/alias "ms" "magit-status")
-              (eshell/alias "gc" "git checkout $*")
-              (eshell/alias "gb" "git branch $*")
-              (eshell/alias "gs" "git status $*")
-              (eshell/alias "gd" "git diff $*")
-              ;; visual commands
-              (add-to-list 'eshell-visual-commands "ssh")
-              (add-to-list 'eshell-visual-commands "tail")
-              (add-to-list 'eshell-visual-commands "top")))
+  (defun my/eshell-setup-alias ()
+    "add local alias config for eshell."
+    ;; aliases
+    (eshell/alias "ls" "ls -A $*")
+    (eshell/alias "l" "ls -lA $*")
+    (eshell/alias "ff" "find-file-other-tab $1")
+    (eshell/alias "sb" "switch-to-buffer-other-tab $1")
+    (eshell/alias "ffsu" "find-file-other-tab /sudo::$PWD/$1")
+    (eshell/alias "e" "find-file-other-tab $1")
+    (eshell/alias "ms" "magit-status")
+    (eshell/alias "gc" "git checkout $*")
+    (eshell/alias "gb" "git branch $*")
+    (eshell/alias "gs" "git status $*")
+    (eshell/alias "gd" "git diff $*"))
 
-;; Faces
-(with-eval-after-load 'em-ls
-  (set-face-attribute 'eshell-ls-directory nil
-                      :foreground "DodgerBlue"))
+  ;; Faces
+  (use-package em-ls
+    :straight (:type built-in)
+    :config
+    (set-face-attribute 'eshell-ls-directory nil
+                        :foreground "DodgerBlue"))
+  (use-package esh-mode
+    :straight (:type built-in)
+    :bind (( :map eshell-mode-map
+             ("C-x C-b" . eshell-insert-buffer-name))))
 
-(defun my/neweshell ()
-  (interactive)
-  (eshell "new"))
+  (defun my/neweshell ()
+    (interactive)
+    (eshell "new"))
 
-(defun my/get-eshell (arg)
-  (interactive "p")
-  (my/get-shellish arg 'my/neweshell "eshell"))
-
-(global-set-key (kbd "C-c e") #'my/get-eshell)
+  (defun my/get-eshell (arg)
+    (interactive "p")
+    (my/get-shellish arg 'my/neweshell "eshell")))
 
 (use-package eshell-git-prompt
   :config
@@ -2899,7 +2911,8 @@ Yet another terminal emulator. Trying out now.
                           ("terminfo/65" "terminfo/65/*")
                           ("integration" "integration/*")
                           (:exclude ".dir-locals.el" "*-tests.el")))
-  :hook ((eshell-mode . eat-eshell-mode))
+  :hook ((eshell-first-time-mode . eat-eshell-mode)
+         (eshell-first-time-mode . eat-eshell-visual-command-mode))
   :config
   (define-key eat-semi-char-mode-map (kbd "C-z") tab-prefix-map)
 
@@ -3837,11 +3850,14 @@ Use pyvenv package to simply support virtualenv.
 
 #+begin_src emacs-lisp
 (use-package pyvenv
+  :hook (after-init . my/pyvenv-setup)
   :config
-  (pyvenv-mode 1)
-  ;; Enable default python environment.
-  (when (f-dir-p "~/.venv")
-    (pyvenv-activate "~/.venv")))
+  (defun my/pyvenv-setup ()
+    (require 'esh-mode)  ;; for eshell-mode-map
+    (pyvenv-mode 1)
+    ;; Enable default python environment.
+    (when (f-dir-p "~/.venv")
+      (pyvenv-activate "~/.venv"))))
 #+end_src
 
 ** Go
