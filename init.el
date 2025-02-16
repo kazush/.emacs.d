@@ -1,19 +1,47 @@
 ;; Initial GUI configuration
 
 (defvar my/default-font "Monospace")
-(defvar my/default-font-size (cond
-                              ((string= system-name "em780") 14)
-                              (t 17)))
+(defvar my/default-font-size 14)
+(defvar my/default-jp-font "Harano Aji Mincho")
+(defvar my/default-jp-font-size 16)
+(defvar my/default-emoji-font "Noto Color Emoji")
+(defvar my/default-emoji-font-size 13)
+
+(defun my/set-default-font-size ()
+  "Set default font size for each font as per the current monitor environment."
+  (interactive)
+  (pcase (format "%s:%s"
+                 (alist-get 'name (frame-monitor-attributes))
+                 system-name )
+    ((rx "DELL S2722")
+     (setq my/default-font-size 14)
+     (setq my/default-jp-font-size 16)
+     (setq my/default-emoji-font-size 13))
+    ((rx (: (1+ anychar) ":minibookx" eos))
+     (setq my/default-font-size 16)
+     (setq my/default-jp-font-size 20)
+     (setq my/default-emoji-font-size 16))
+    (_
+     (setq my/default-font-size 14)
+     (setq my/default-jp-font-size 16)
+     (setq my/default-emoji-font-size 13))))
+
+(my/set-default-font-size)
 
 (defun my/make-font-str (&optional font size)
   "Make font string which can be used for :font in set-face-attribute."
-  (format "%s:size=%d:weight=regular:slant=normal:width=normal"
-          (or font my/default-font) (or size my/default-font-size)))
+  (x-resolve-font-name
+   (format "%s:size=%d:weight=regular:slant=normal"
+           (or font my/default-font) (or size my/default-font-size))))
 
+;; A new fontset named "fontset-auto1" is created and set to the default face.
+;; The same fontset should be used in the subsequent font settings of default
+;; face, otherwise another new auto fontset will be created in each call.
+;; To get the fontset for default face, use (face-attribute 'default :fontset).
 (set-face-attribute 'default nil
                     :foreground "#abb2bf"
                     :background "#282c34"
-                    :font (my/make-font-str my/default-font))
+                    :font (my/make-font-str))
 
 (set-face-attribute 'mode-line nil
                     :foreground "#d3d3d3"

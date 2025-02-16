@@ -509,37 +509,40 @@ called in hooks.
                         :background "gray10"
                         :inherit 'mode-line)))
 
-(defun my/set-default-font (font)
+(defun my/set-fontset-font (&optional font size fset)
   "Set font for default face."
-  (interactive "sFont: ")
-  (let ((font (if (string= font "")
-                    my/default-font font)))
-    (set-face-attribute 'default nil :font (my/make-font-str font))
-    (setq my/default-font font)))
+  (interactive "sFont: \nnSize: \ni")
+  (let ((newfont (my/make-font-str (or font my/defaultfont)
+                                   (or size my/default-font-size)))
+        (fontset (or fset (face-attribute 'default :fontset))))
+    (set-fontset-font fontset 'latin newfont nil)))
 
-(defun my/set-fontset-emoji-font (&optional fset)
+(defun my/set-fontset-emoji-font (&optional font size fset)
   "Set up color emoji font to the given FONTSET or fontset for default face."
-  (let ((emoji-font (font-spec :family "Noto Color Emoji"))
+  (let ((emoji-font (my/make-font-str (or font my/default-emoji-font)
+                                      (or size my/default-emoji-font-size)))
         (fontset (or fset (face-attribute 'default :fontset))))
     (dolist (charset '((#x3200 . #x32ff) symbol emoji))
       (set-fontset-font fontset charset emoji-font nil 'prepend))))
 
-(defun my/set-fontset-jp-font (family &optional fset)
-  "Set up japanse font to the given FONTSET or fontset for default face."
-  (let ((fontset (or fset (face-attribute 'default :fontset))))
+(defun my/set-fontset-jp-font (&optional font size fset)
+  "Set the given japanese FONT to the given fontset FSET or fontset for default face."
+  (let ((font-xlfd (my/make-font-str (or font my/default-jp-font)
+                                     (or size my/default-jp-font-size)))
+        (fontset (or fset (face-attribute 'default :fontset))))
     (dolist (charset '((#x3000 . #x30ff)
                        (#x31f0 . #x31ff)
                        (#x3400 . #x4dbf)
                        (#x4e00 . #x9fff)
                        (#xff65 . #xff9f)
                        (#x20000 . #x2ebef)))
-      (set-fontset-font fontset charset
-                        `(,family . "iso10646-1") nil `prepend))))
+      (set-fontset-font fontset charset font-xlfd nil))))
 
 (defun my/setup-fonts ()
   "Set up fontsets for my preference."
   (interactive)
   (setq use-default-font-for-symbols nil)
+  (my/set-fontset-jp-font)
   (my/set-fontset-emoji-font))
 
 ;; Set up variable-pictch and fixed-pitch for mixed font environments.
