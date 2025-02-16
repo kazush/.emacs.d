@@ -25,9 +25,9 @@ Configure font. Comment out settings on Noto Sans Mono CJK JP as I'm using HackG
 ;;   (add-to-list 'face-font-rescale-alist '("Noto Sans Mono.*" . 1.1))
 ;; )
 
-(when window-system
-  (set-fontset-font t 'emoji (font-spec :family "Noto Color Emoji"))
-  (add-to-list 'face-font-rescale-alist '("Noto Color Emoji.*" . 0.9)))
+;; (when window-system
+;;   (set-fontset-font t 'emoji (font-spec :family "Noto Color Emoji"))
+;;   (add-to-list 'face-font-rescale-alist '("Noto Color Emoji.*" . 0.9)))
 #+end_src
 
 * Workspace
