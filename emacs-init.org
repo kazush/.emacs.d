@@ -180,8 +180,9 @@ Customization for miscellaneous built-in features.
 ;; Display function name in mode line.
 ;; (which-function-mode 1)
 
-;; Set UTF-8 as the language environment.
-(set-language-environment "UTF-8")
+;; Set Japanese as the language environment for fcitx5.
+(set-language-environment "Japanese")
+(prefer-coding-system 'japanese-shift-jis)
 (prefer-coding-system 'utf-8)
 
 ;; Enable winner-mode which does undo/redo of window configuration with C-c
