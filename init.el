@@ -1,8 +1,8 @@
 ;; Initial GUI configuration
 
 (defvar my/default-font "Monospace")
-(defvar my/default-font-size 14)
-(defvar my/default-jp-font "Harano Aji Mincho")
+(defvar my/default-font-size 16)
+(defvar my/default-jp-font "Noto Serif CJK JP")
 (defvar my/default-jp-font-size 16)
 (defvar my/default-emoji-font "Noto Color Emoji")
 (defvar my/default-emoji-font-size 13)
@@ -14,15 +14,15 @@
                  (alist-get 'name (frame-monitor-attributes))
                  system-name )
     ((rx "DELL S2722")
-     (setq my/default-font-size 14)
+     (setq my/default-font-size 16)
      (setq my/default-jp-font-size 16)
      (setq my/default-emoji-font-size 13))
     ((rx (: (1+ anychar) ":minibookx" eos))
-     (setq my/default-font-size 16)
+     (setq my/default-font-size 19)
      (setq my/default-jp-font-size 20)
      (setq my/default-emoji-font-size 16))
     (_
-     (setq my/default-font-size 14)
+     (setq my/default-font-size 16)
      (setq my/default-jp-font-size 16)
      (setq my/default-emoji-font-size 13))))
 

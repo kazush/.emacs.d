@@ -180,10 +180,13 @@ Customization for miscellaneous built-in features.
 ;; Display function name in mode line.
 ;; (which-function-mode 1)
 
-;; Set Japanese as the language environment for fcitx5.
-(set-language-environment "Japanese")
+;; Set language environment suitable for UTF-8 and Japanese.
+(set-language-environment "UTF-8")
 (prefer-coding-system 'japanese-shift-jis)
 (prefer-coding-system 'utf-8)
+
+;; Set Japanese to default input method for fcitx5.
+(setopt default-input-method "japanese")
 
 ;; Enable winner-mode which does undo/redo of window configuration with C-c
 ;; left/right.
@@ -523,21 +526,16 @@ called in hooks.
   (let ((emoji-font (my/make-font-str (or font my/default-emoji-font)
                                       (or size my/default-emoji-font-size)))
         (fontset (or fset (face-attribute 'default :fontset))))
-    (dolist (charset '((#x3200 . #x32ff) symbol emoji))
-      (set-fontset-font fontset charset emoji-font nil 'prepend))))
+    (dolist (script '(symbol emoji))
+      (set-fontset-font fontset script emoji-font nil 'prepend))))
 
 (defun my/set-fontset-jp-font (&optional font size fset)
   "Set the given japanese FONT to the given fontset FSET or fontset for default face."
   (let ((font-xlfd (my/make-font-str (or font my/default-jp-font)
                                      (or size my/default-jp-font-size)))
         (fontset (or fset (face-attribute 'default :fontset))))
-    (dolist (charset '((#x3000 . #x30ff)
-                       (#x31f0 . #x31ff)
-                       (#x3400 . #x4dbf)
-                       (#x4e00 . #x9fff)
-                       (#xff65 . #xff9f)
-                       (#x20000 . #x2ebef)))
-      (set-fontset-font fontset charset font-xlfd nil))))
+    (dolist (script '(han kana cjk-misc cyrillic))
+      (set-fontset-font fontset script font-xlfd nil))))
 
 (defun my/setup-fonts ()
   "Set up fontsets for my preference."
