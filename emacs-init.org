@@ -5638,22 +5638,30 @@ Use groq as the LLM service.
 #+begin_src emacs-lisp
 (use-package elfeed
   :bind (("C-c F" . elfeed)
-         ("<f12>" . elfeed))
-  :bind ( :map elfeed-search-mode-map
-          ("<mouse-1>" . elfeed-search-show-entry)
-          ("b" . my/elfeed-search-browse-url-with-eww)
-          ("B" . elfeed-search-browse-url)
-          :map elfeed-show-mode-map
-          ("j" . scroll-up-command)
-          ("k" . scroll-down-command)
-          ("v" . elfeed-show-visit)
-          ("b" . my/elfeed-show-visit-with-eww)
-          ("B" . elfeed-show-visit)
-          ("RET" . my/elfeed-show-visit-with-eww))
+         ("<f12>" . elfeed)
+         :map elfeed-search-mode-map
+         ("<mouse-1>" . elfeed-search-show-entry)
+         ("b" . my/elfeed-search-browse-url-with-eww)
+         ("B" . elfeed-search-browse-url)
+         ("m" . elfeed-search-untag-all-unread)
+         ("SPC" . elfeed-search-show-entry)
+         :map elfeed-show-mode-map
+         ("j" . scroll-up-command)
+         ("k" . scroll-down-command)
+         ("v" . elfeed-show-visit)
+         ("b" . my/elfeed-show-visit-with-eww)
+         ("B" . elfeed-show-visit)
+         ("SPC" . my/elfeed-show-scroll-up-then-quit)
+         ("RET" . my/elfeed-show-visit-with-eww))
   :hook (elfeed-show-mode . visual-line-mode)
-  :custom
-  (elfeed-search-remain-on-entry t)  ;; for navigation from split entry pane.
+  ;; :custom
+  ;; (elfeed-search-remain-on-entry t)  ;; for navigation from split entry pane.
   :config
+  ;; Faces
+  (custom-set-faces
+   '(elfeed-search-title-face ((t :foreground "#aaaaaa")))
+   '(elfeed-search-unread-title-face ((t :foreground "#eeeeee"))))
+
   ;; Set external program to retrieve a URL.
   (setq my/eww-retrieve-command '("curl" "--http2" "-L" "--user-agent" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"))
   ;; (setq my/eww-retrieve-command
@@ -5674,16 +5682,41 @@ Use groq as the LLM service.
   (advice-add #'elfeed-search-show-entry :before
               (lambda (entry) (delete-other-windows)))
 
+  (defun my/elfeed-eww-scroll-up-then-quit (&optional arg)
+    "Scroll up then kill eww buffer and window if at the bottom."
+    (interactive "^P")
+    (let ((old-point (point))
+          (scroll-error-top-bottom t))
+      (scroll-up-command arg)
+      (when (eobp)
+        (kill-buffer-and-window))))
+
+  (defun my/elfeed-eww-browse-url (url &optional new-window)
+    "My elfeed specific eww-browse-url."
+    (eww-browse-url url new-window)
+    (local-set-key (kbd "SPC") #'my/elfeed-eww-scroll-up-then-quit)
+    (local-set-key (kbd "q") #'kill-buffer-and-window)
+    (local-set-key (kbd ";") #'kill-buffer-and-window))
+
   (defun my/elfeed-search-browse-url-with-eww (entry)
     (interactive (list (elfeed-search-selected :ignore-region)))
-    (let ((browse-url-browser-function #'eww-browse-url)
+    (let ((browse-url-browser-function #'my/elfeed-eww-browse-url)
           (eww-retrieve-command my/eww-retrieve-command))
       (elfeed-search-show-entry entry)
       (elfeed-show-visit)))
 
+  (defun my/elfeed-show-scroll-up-then-quit (&optional arg)
+    "Scroll up and kill the buffer if the position is at the bottom."
+    (interactive "^P")
+    (let ((old-point (point))
+          (scroll-error-top-bottom t))
+      (scroll-up-command arg)
+      (when (eobp)
+        (elfeed-kill-buffer))))
+
   (defun my/elfeed-show-visit-with-eww (&optional use-generic-p)
     (interactive "P")
-    (let ((browse-url-browser-function #'eww-browse-url)
+    (let ((browse-url-browser-function #'my/elfeed-eww-browse-url)
           (eww-retrieve-command my/eww-retrieve-command))
       (elfeed-show-visit use-generic-p)))
   )
