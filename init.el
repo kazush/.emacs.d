@@ -2,7 +2,7 @@
 
 (defvar my/default-font "Monospace")
 (defvar my/default-font-size 16)
-(defvar my/default-jp-font "Noto Serif CJK JP")
+(defvar my/default-jp-font "Noto Sans CJK JP")
 (defvar my/default-jp-font-size 16)
 (defvar my/default-emoji-font "Noto Color Emoji")
 (defvar my/default-emoji-font-size 13)
