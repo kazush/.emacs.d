@@ -5000,6 +5000,8 @@ Want monthly view.
 (use-package calfw-org
   :after (calfw org)
   :straight nil
+  :bind (("C-c o C" . cfw:open-org-calendar))
+  :commands (cfw:open-org-calendar)
   :init
   (setq cfw:org-overwrite-default-keybinding t)
   (setq cfw:org-face-agenda-item-foreground-color "#abb2bf"))
