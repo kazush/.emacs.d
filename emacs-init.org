@@ -444,6 +444,17 @@ If eglot is used, project and xref need to be loaded from built-in packages.
   :straight (:type built-in))
 #+end_src
 
+** Scratch Buffer
+
+Use pp for eval output.
+
+#+begin_src emacs-lisp
+(use-package elisp-mode
+  :straight (:type built-in)
+  :bind ( :map lisp-interaction-mode-map
+          ("C-x C-e" . pp-eval-last-sexp)))
+#+end_src
+
 * User Interface
 
 Configure different features and settings that are related to user interface.
