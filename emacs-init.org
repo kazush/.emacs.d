@@ -527,23 +527,21 @@ called in hooks.
 (defun my/set-fontset-font (&optional font size fset)
   "Set font for default face."
   (interactive "sFont: \nnSize: \ni")
-  (let ((newfont (my/make-font-str (or font my/defaultfont)
+  (let ((newfont (my/make-font-str (or font my/default-font)
                                    (or size my/default-font-size)))
         (fontset (or fset (face-attribute 'default :fontset))))
     (set-fontset-font fontset 'latin newfont nil)))
 
 (defun my/set-fontset-emoji-font (&optional font size fset)
   "Set up color emoji font to the given FONTSET or fontset for default face."
-  (let ((emoji-font (my/make-font-str (or font my/default-emoji-font)
-                                      (or size my/default-emoji-font-size)))
+  (let ((emoji-font (my/make-font-str (or font my/default-emoji-font) size))
         (fontset (or fset (face-attribute 'default :fontset))))
     (dolist (script '(symbol emoji))
       (set-fontset-font fontset script emoji-font nil 'prepend))))
 
 (defun my/set-fontset-jp-font (&optional font size fset)
   "Set the given japanese FONT to the given fontset FSET or fontset for default face."
-  (let ((font-xlfd (my/make-font-str (or font my/default-jp-font)
-                                     (or size my/default-jp-font-size)))
+  (let ((font-xlfd (my/make-font-str (or font my/default-jp-font) size))
         (fontset (or fset (face-attribute 'default :fontset))))
     (dolist (script '(han kana cjk-misc cyrillic))
       (set-fontset-font fontset script font-xlfd nil))))
@@ -5682,6 +5680,7 @@ Use groq as the LLM service.
          ("m" . elfeed-search-untag-all-unread)
          ("SPC" . elfeed-search-show-entry)
          :map elfeed-show-mode-map
+         (";" . elfeed-kill-buffer)
          ("j" . scroll-up-command)
          ("k" . scroll-down-command)
          ("v" . elfeed-show-visit)

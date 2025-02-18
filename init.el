@@ -1,51 +1,88 @@
 ;; Initial GUI configuration
 
 (defvar my/default-font "Monospace")
-(defvar my/default-font-size 16)
+(defvar my/default-font-size 16)  ;; pixel size not point
 (defvar my/default-jp-font "Noto Sans CJK JP")
-(defvar my/default-jp-font-size 16)
 (defvar my/default-emoji-font "Noto Color Emoji")
-(defvar my/default-emoji-font-size 13)
+(defvar my/font-rescale-alist
+  '(("Noto Color Emoji" . ((8 . 0.88)
+                           (9 . 0.92)
+                           (16 . 0.86)
+                           ;; (27 . 0.82)
+                           (32 . 0.84)))
+    ("Noto Sans CJK JP" . ((8 . 1.1)
+                           (9 . 1.2)
+                           (11 . 1.1)
+                           (16 . 1.053)))))
+
+(defun my/get-font-rescale-param (font font-size)
+  "Get font rescale params suitable for FONT-SIZE."
+  (require 'cl-lib)
+  (let ((rescale-param-alist
+         (cl-loop for ent in my/font-rescale-alist
+                  when (string-match (car ent) font) return (cdr ent))))
+    (when rescale-param-alist
+      (let ((scale
+            (cl-loop for pair in rescale-param-alist
+                     when (<= (car pair) font-size)
+                     maximize (car pair) into max-key
+                     finally return (cdr (assoc max-key rescale-param-alist)))))
+        ;; fallback to the first element.
+        (if scale scale (cdar rescale-param-alist))))))
+
+(defun my/update-font-rescale-params (inc)
+  "Adjust rescale parameters for JP and Emoji fonts."
+  (let ((new-font-size (if (zerop inc) my/default-font-size
+                         (round (* my/default-font-size (expt text-scale-mode-step
+                                                              text-scale-mode-amount)))
+                         ;; (font-get (face-attribute 'default ':font) ':size)
+                         )))
+    (dolist (font (list my/default-jp-font my/default-emoji-font))
+      (let ((scale (my/get-font-rescale-param font new-font-size)))
+        ;; for debugging only
+        ;; (message "font=%s newsize:%d scale:%s" font new-font-size scale)
+        (when scale
+          (setf (alist-get font face-font-rescale-alist nil nil 'equal)
+                scale))))))
+
+(advice-add 'text-scale-increase :after #'my/update-font-rescale-params)
+
+(defun my/make-font-str (font &optional size)
+  "Make font string which can be used for :font in set-face-attribute."
+  (let ((font-str (format "%s%s" font
+                          (if size (format ":size=%d" size) ""))))
+    (x-resolve-font-name
+     (format "%s:weight=regular:slant=normal" font-str))))
 
 (defun my/set-default-font-size ()
   "Set default font size for each font as per the current monitor environment."
   (interactive)
-  (pcase (format "%s:%s"
-                 (alist-get 'name (frame-monitor-attributes))
-                 system-name )
-    ((rx "DELL S2722")
-     (setq my/default-font-size 16)
-     (setq my/default-jp-font-size 16)
-     (setq my/default-emoji-font-size 13))
-    ((rx (: (1+ anychar) ":minibookx" eos))
-     (setq my/default-font-size 19)
-     (setq my/default-jp-font-size 20)
-     (setq my/default-emoji-font-size 16))
-    (_
-     (setq my/default-font-size 16)
-     (setq my/default-jp-font-size 16)
-     (setq my/default-emoji-font-size 13))))
+  (setq my/default-font-size
+        (pcase (format "%s:%s"
+                       (alist-get 'name (frame-monitor-attributes))
+                       system-name )
+          ((rx "DELL S2722") 16)
+          ((rx (: (1+ anychar) ":minibookx" eos)) 19)
+          (_ 16)))
 
-(my/set-default-font-size)
+  ;; Update face-font-rescale-alist with default font size.
+  (my/update-font-rescale-params 0)
 
-(defun my/make-font-str (&optional font size)
-  "Make font string which can be used for :font in set-face-attribute."
-  (x-resolve-font-name
-   (format "%s:size=%d:weight=regular:slant=normal"
-           (or font my/default-font) (or size my/default-font-size))))
+  ;; A new fontset named "fontset-auto1" is created and set to the default face.
+  ;; The same fontset should be used in the subsequent font settings of default
+  ;; face, otherwise another new auto fontset will be created in each call.
+  ;; To get the fontset for default face, use (face-attribute 'default :fontset).
+  (set-face-attribute 'default nil
+                      :foreground "#abb2bf"
+                      :background "#282c34"
+                      :font (my/make-font-str my/default-font
+                                              my/default-font-size)))
 
-;; A new fontset named "fontset-auto1" is created and set to the default face.
-;; The same fontset should be used in the subsequent font settings of default
-;; face, otherwise another new auto fontset will be created in each call.
-;; To get the fontset for default face, use (face-attribute 'default :fontset).
-(set-face-attribute 'default nil
-                    :foreground "#abb2bf"
-                    :background "#282c34"
-                    :font (my/make-font-str))
-
+;; Initialzie default font config and modeline.
 (set-face-attribute 'mode-line nil
                     :foreground "#d3d3d3"
                     :background "#000000")
+(my/set-default-font-size)
 
 (when window-system
   (scroll-bar-mode -1)
