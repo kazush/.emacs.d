@@ -4085,6 +4085,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
      ("cloud")
      ("crypto")
      ("device")
+     ("emacs")
      ("favorite")
      ("fx")
      ("finance")
@@ -4097,6 +4098,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
      ("net")
      ("news")
      ("options")
+     ("org")
      ("project")
      ("reddit")
      ("security")
@@ -4108,8 +4110,8 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
    '(("d" "Today"
       ((todo "NEXT"
              ((org-agenda-overriding-header "Next")))
-       (todo "TODO"
-             ((org-agenda-overriding-header "Inbox")))
+       (tags-todo "+TODO=\"TODO\"-SCHEDULED>=\"<now>\""
+                  ((org-agenda-overriding-header "Inbox")))
        (agenda ""
                ((org-agenda-span 'day)))
        (todo "SHOPPING"
@@ -4131,15 +4133,16 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
   (org-agenda-time-grid
    '((daily today require-timed remove-match)
      (800 1200 1800 2200)
-     " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄"))
+     " ┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄"))
   (org-agenda-current-time-string
    "⭠ now ─────────────────────────────────────────────────")
   (org-ellipsis "⇣")
   (org-agenda-prefix-format
-   '((agenda . " %-2i  %11t  %-10(my/org-agenda-property \"project\" 10)  ")
-     (todo . " %-2i  %-10(my/org-agenda-property \"project\" 10)  ")
-     (tags . " %-2i  %-10(my/org-agenda-property \"project\" 10)  ")
-     (search . " %-2i  %-10(my/org-agenda-property \"project\" 10)  ")))
+      '((agenda . " %-2i %21t%-10(my/org-agenda-property \"project\" 10)  ")
+        (todo . " %-2i %-18(my/org-get-todo-date-str)   %-10(my/org-agenda-property \"project\" 10)  ")
+        (tags . " %-2i %-18(my/org-get-todo-date-str)   %-10(my/org-agenda-property \"project\" 10)  ")
+        (search . " %-2i %-18(my/org-get-todo-date-str)   %-10(my/org-agenda-property \"project\" 10)  ")))
+  (org-deadline-warning-days 3)
   :config
 
   ;; Faces
@@ -4162,6 +4165,8 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
    '(org-level-8 ((t :foreground "OliveDrab4")))
    '(org-time-grid ((t :foreground "#666633")))
    '(org-agenda-current-time ((t :foreground "#cccc99" :weight bold)))
+   '(org-upcoming-deadline ((t :foreground "#ff8800")))
+   '(org-imminent-deadline ((t :foreground "#dd0000" :weight bold)))
    '(org-block-begin-line ((t :background "#2e3652")))
    '(org-block-end-line ((t :background unspecified
                             :inherit 'org-block-begin-line)))
@@ -4197,6 +4202,99 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
                           :fontset fontset)
       (my/set-fontset-emoji-font fontset)
       (face-remap-add-relative 'default 'org-default)))
+
+  (defun my/org-get-entry-date-str ()
+    "Get formatted date string from current org entry.
+If TIMESTAMP exists, returns its formatted date.
+Otherwise returns scheduled and deadline dates connected with '~'.
+Format: '<scheduled>~<deadline>', '<scheduled>', or '~<deadline>'"
+    (let* ((timestamp (org-entry-get nil "TIMESTAMP"))
+           (scheduled (org-entry-get nil "SCHEDULED"))
+           (deadline (org-entry-get nil "DEADLINE"))
+           (todo  (org-entry-get nil "TODO"))
+           (format-date
+            (lambda (date-str)
+              (when date-str
+                (let* ((time (org-time-string-to-time date-str))
+                       (has-time (nth 1 (org-parse-time-string date-str t)))
+                       (format-str (if (and todo (not (equal org-agenda-type 'agenda)))
+                                       (if has-time "%Y-%m-%d %H:%M" "%Y-%m-%d")
+                                     (if has-time "%H:%M" ""))))
+                  (format-time-string format-str time)))))
+           (format-date-relative
+            (lambda (date-str &optional empty-time start-date)
+              (when date-str
+                (let* ((time (org-time-string-to-time date-str))
+                       (date-ymd (format-time-string "%Y-%m-%d" time))
+                       (start-ymd (if start-date
+                                      (format-time-string "%Y-%m-%d" start-date)
+                                    (format "%04d-%02d-%02d"
+                                            (nth 2 org-agenda-current-date)
+                                            (nth 0 org-agenda-current-date)
+                                            (nth 1 org-agenda-current-date))))
+                       (has-time (nth 1 (org-parse-time-string date-str t)))
+                       (format-str (if (string= date-ymd start-ymd)
+                                       (if has-time "%H:%M" (if empty-time "" "23:59"))
+                                     (message "%s <> %s" date-ymd start-ymd)
+                                     (if has-time "%Y-%m-%d %H:%M" "%Y-%m-%d"))))
+                  (format-time-string format-str time))))))
+      (cond
+       ;; Return timestamp if exists
+       (timestamp
+        (funcall format-date timestamp))
+       ;; Return combined scheduled and deadline if both exist
+       ((and scheduled deadline)
+        (format "%s〜%s"
+                (funcall format-date-relative scheduled)
+                (funcall format-date-relative deadline nil
+                         (org-time-string-to-time scheduled))))
+       ;; Return only scheduled if it exists
+       (scheduled
+        (funcall format-date-relative scheduled t))
+       ;; Return deadline with ~ prefix if only deadline exists
+       (deadline
+        (let ((date-str (funcall format-date-relative deadline t)))
+          (if (string= date-str "") date-str (format "〜%s" date-str))))
+       ;; Return empty string if no date information exists
+       (t ""))))
+
+  (defun my/org-agenda-property (property &optional width)
+    "Helper function to return a string representing vaflues of the given property."
+    (let ((value (string-join (org-property-values property) ",")))
+      (if (and width (> (length value) width))
+          (concat (substring value 0 (- width 2)) "..")
+        value)))
+
+  (defun my/org-get-todo-date-str ()
+    "Get formatted date string from current org todo entry."
+    (let* ((timestamp (org-entry-get nil "TIMESTAMP"))
+           (scheduled (org-entry-get nil "SCHEDULED"))
+           (deadline (org-entry-get nil "DEADLINE"))
+           (todo  (org-entry-get nil "TODO"))
+           (format-date
+            (lambda (date-str)
+              (when date-str
+                (let* ((time (org-time-string-to-time date-str))
+                       (has-time (nth 1 (org-parse-time-string date-str t)))
+                       (format-str (if has-time "%Y-%m-%d %k:%M" "%Y-%m-%d")))
+                  (format-time-string format-str time))))))
+      (cond
+       ;; Return timestamp if exists
+       (timestamp
+        (format "🗓%s" (funcall format-date timestamp)))
+       ;; Return combined scheduled and deadline if both exist
+       ((and scheduled deadline) 
+        (format "🕛%s⏰%s"
+                (funcall format-date scheduled)
+                (funcall format-date deadline)))
+       ;; Return only scheduled if it exists
+       (scheduled
+        (format "🕛%s" (funcall format-date scheduled)))
+       ;; Return deadline with ~ prefix if only deadline exists
+       (deadline
+        (format "⏰%s" (funcall format-date deadline)))
+       ;; Return empty string if no date information exists
+       (t ""))))
 
   (defun my/org-agenda-property (property &optional width)
     "Helper function to return a string representing vaflues of the given property."
