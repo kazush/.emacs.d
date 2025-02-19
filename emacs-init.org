@@ -4364,6 +4364,9 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
   (require 'ob-js)
   (require 'ob-css)
 
+  ;; Additional languages through lang-modes.
+  (add-to-list 'org-src-lang-modes '("conf" . conf))
+
   ;; For Encrypting contents.
   (require 'org-crypt)
   (org-crypt-use-before-save-magic)
