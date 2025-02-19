@@ -4136,10 +4136,10 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
    "⭠ now ─────────────────────────────────────────────────")
   (org-ellipsis "⇣")
   (org-agenda-prefix-format
-      '((agenda . " %-2i %21t%-10(my/org-agenda-property \"project\" 10)  ")
-        (todo . " %-2i %-18(my/org-get-todo-date-str)   %-10(my/org-agenda-property \"project\" 10)  ")
-        (tags . " %-2i %-18(my/org-get-todo-date-str)   %-10(my/org-agenda-property \"project\" 10)  ")
-        (search . " %-2i %-18(my/org-get-todo-date-str)   %-10(my/org-agenda-property \"project\" 10)  ")))
+   '((agenda . " %-2i %21t%-10(my/org-agenda-property \"project\" 10)  ")
+     (todo . " %-2i %-18(my/org-get-todo-date-str)   %-10(my/org-agenda-property \"project\" 10)  ")
+     (tags . " %-2i %-18(my/org-get-todo-date-str)   %-10(my/org-agenda-property \"project\" 10)  ")
+     (search . " %-2i %-18(my/org-get-todo-date-str)   %-10(my/org-agenda-property \"project\" 10)  ")))
   (org-deadline-warning-days 3)
   :config
 
@@ -4365,7 +4365,10 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
   (require 'ob-css)
 
   ;; Additional languages through lang-modes.
-  (add-to-list 'org-src-lang-modes '("conf" . conf))
+  (setq org-src-lang-modes
+        (append org-src-lang-modes
+                '(("conf" . conf)
+                  ("bash" . bash-ts))))
 
   ;; For Encrypting contents.
   (require 'org-crypt)
