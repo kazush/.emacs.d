@@ -553,10 +553,23 @@ called in hooks.
   (my/set-fontset-jp-font)
   (my/set-fontset-emoji-font))
 
-;; Set up variable-pictch and fixed-pitch for mixed font environments.
-(custom-theme-set-faces
- 'user
- `(variable-pitch ((t (:font ,(my/make-font-str "Noto Serif CJK JP"))))))
+(defun my/setup-variable-font ()
+  "Set up variable-pictch face for mixed font environments."
+  (interactive)
+  (let* ((base-font (my/make-font-str "Noto Serif" my/default-font-size))
+         (suffix "serif")
+         (fontset (format "fontset-%s" suffix)))
+    ;; Create a new fontset called "fontset-serif".
+    (create-fontset-from-ascii-font base-font nil suffix)
+    ;; Set Japanese and emoji font to the fontset.
+    (my/set-fontset-jp-font  "Noto Serif CJK JP" nil fontset)
+    (my/set-fontset-emoji-font "Noto Color Emoji" nil fontset)
+    ;; Set the fontset to variable-pitch
+    (set-face-attribute 'variable-pitch nil
+                        :font base-font
+                        :fontset fontset)))
+
+(my/setup-variable-font)
 #+end_src
 
 ** Misc display tweaks
