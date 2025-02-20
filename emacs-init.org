@@ -1542,7 +1542,6 @@ Corfu is used for in-buffer/minibuffer completion.
   :straight (corfu :files (:defaults "extensions/*"))
   :custom
   (corfu-cycle t)
-  ;; (completion-cycle-threshold 1)
   (tab-always-indent 'complete)
   (corfu-preselect 'prompt)
   :bind (("C-q <tab>" . completion-at-point)
@@ -1584,7 +1583,9 @@ Corfu is used for in-buffer/minibuffer completion.
     "Do corfu-expand when only one candidate exists otherwise move to next candidate."
     (interactive "p")
     (if (= corfu--total 1)
-        (corfu-expand)
+        (progn
+          (corfu-next)
+          (corfu-expand))
       (corfu-next n)))
   (add-to-list 'corfu-continue-commands 'my/corfu-next-or-expand)
 
