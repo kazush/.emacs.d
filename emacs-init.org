@@ -4104,12 +4104,18 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
      ))
   (org-agenda-custom-commands
    '(("d" "Today"
-      ((todo "NEXT"
+      ((agenda ""
+               ((org-agenda-span 'day)))
+       (todo "NEXT"
              ((org-agenda-overriding-header "Next")))
+       (todo "BLOCKED|WAITING"
+             ((org-agenda-overriding-header "Blocked / Waiting")))
        (tags-todo "+TODO=\"TODO\"-SCHEDULED>=\"<now>\""
                   ((org-agenda-overriding-header "Inbox")))
-       (agenda ""
-               ((org-agenda-span 'day)))
+       (todo ""
+             ((org-super-agenda-groups
+               '((:auto-property "project")))
+              (org-agenda-overriding-header "By Project")))
        (todo "SHOPPING"
              ((org-agenda-overriding-header "Shopping List")))))))
   (org-stuck-projects
