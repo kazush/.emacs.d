@@ -3511,7 +3511,7 @@ Currentl disabled as I'm trying out diff-hl.
       (setq decoded
             (concat decoded (substring str 0 pos)
                     (format "%c"
-                            (string-to-int (substring str (+ pos 1) (+ pos 3)) 16)))
+                            (string-to-number (substring str (+ pos 1) (+ pos 3)) 16)))
             str (substring str (+ pos 3))))
     (decode-coding-string (concat decoded str)
                           (or coding-system urlencode-default-coding-system))))
