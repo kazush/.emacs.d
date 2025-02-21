@@ -557,13 +557,6 @@ called in hooks.
     (dolist (script '(han kana cjk-misc cyrillic))
       (set-fontset-font fontset script font-xlfd nil))))
 
-(defun my/setup-fonts ()
-  "Set up fontsets for my preference."
-  (interactive)
-  (setq use-default-font-for-symbols nil)
-  (my/set-fontset-jp-font)
-  (my/set-fontset-emoji-font))
-
 (defun my/setup-variable-font ()
   "Set up variable-pictch face for mixed font environments."
   (interactive)
@@ -580,7 +573,13 @@ called in hooks.
                         :font base-font
                         :fontset fontset)))
 
-(my/setup-variable-font)
+(defun my/setup-fonts ()
+  "Set up fontsets for my preference."
+  (interactive)
+  (setq use-default-font-for-symbols nil)
+  (my/set-fontset-jp-font)
+  (my/set-fontset-emoji-font)
+  (my/setup-variable-font))
 #+end_src
 
 ** Misc display tweaks
@@ -846,11 +845,11 @@ Otherwise the same UI setup functions are called via ~emacs-startup-hook~.
   (interactive)
   (menu-bar-mode -1)
   (tool-bar-mode -1)
+  (my/setup-faces)
   (when window-system
     (scroll-bar-mode -1)
-    (fringe-mode 10))
-  (my/setup-faces)
-  (my/setup-fonts))
+    (fringe-mode 10)
+    (my/setup-fonts)))
 
 ;; Hooks to forcibly reset UI for new frames by emacsclient.
 (add-hook 'server-after-make-frame-hook 'my/setup-ui)
