@@ -348,7 +348,8 @@ environment.
   ;; alist of (<URL pattern> . <text pattern>).
   (defvar my/eww-set-initial-position-alist
     '(("reddit.com/" . "submitted .+ ago \\(\\* \\)?by ")
-      ("news.yahoo.co.jp" . "JavaScriptの設定を変更する方法はこちら")))
+      ("news.yahoo.co.jp" . "JavaScriptの設定を変更する方法はこちら")
+      ("www.bloomberg.co.jp" . "検索")))
 
   ;; Set initial position to directly get to the text of interest for the sites
   ;; specified above. (e.g. a site with many skippable lines at the top)
