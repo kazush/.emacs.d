@@ -3817,6 +3817,13 @@ formatting commands.
   (python-indent-guess-indent-offset-verbose nil))
 #+end_src
 
+#+begin_src emacs-lisp
+(use-package lazy-ruff
+  :bind (("C-c i f" . lazy-ruff-lint-format-dwim))
+  :config
+  (lazy-ruff-global-mode t))
+#+end_src
+
 Use Black for formatter.
 
 #+begin_src emacs-lisp
