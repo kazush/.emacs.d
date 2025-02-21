@@ -4072,6 +4072,11 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
   :custom
   (org-agenda-format-date "%b %e (%a)")
   (org-agenda-file-regexp "\\`[^.].*\\.org\\\(\\.gpg\\\)?\\'")
+  (org-agenda-sorting-strategy
+   '((agenda habit-down time-up priority-down category-keep)
+     (todo priority-down todo-state-up category-keep)
+     (tags priority-down category-keep)
+     (search category-keep)))
   (org-agenda-start-on-weekday calendar-week-start-day)
   (org-agenda-window-setup 'other-tab)
   (org-log-into-drawer t)
