@@ -5462,7 +5462,9 @@ Macros to retrive API keys for LLM servce providers.
 
 #+begin_src emacs-lisp
 (use-package ellama
-  :bind ("C-c m" . ellama-chat)
+  :bind (("C-x m" . ellama-chat)
+         :map my/ai-map
+         ("e" . my/ellama-transient-menu))
   :bind-keymap
   ("C-c L" . ellama-command-map)
   :custom
@@ -5470,6 +5472,40 @@ Macros to retrive API keys for LLM servce providers.
   (ellama-fill-paragraphs nil)
   (ellama-long-lines-length 1024)
   :config
+  (transient-define-prefix my/ellama-transient-menu ()
+    "Transient menu for Ellama."
+    [["Ask"
+      ("c" "Chat" ellama-chat)
+      ("r" "Ask about region/buffer" ellama-ask-about)
+      ("d" "Add definition" ellama-define-word)]
+     ["Text"
+      ("s" "Summarize" ellama-summarize)
+      ("t" "Translate" ellama-translate)
+      ("w" "Improve wording" ellama-improve-wording)
+      ("g" "Improve grammar" ellama-improve-grammar)]
+     ["Misc"
+      ("m" "Change model" ellama-provider-select)
+      ("x" "Context" ellama-transient-context-menu)
+      ("S" "Session" ellama-transient-session-menu)]
+     ["Quit" ("q" "Quit" transient-quit-one)]])
+
+  ;; (defhydra my/hydra-ellama (:hint nil)
+  ;;   "
+  ;; Ask:      _c_: chat _r_: ask with region _d_: definition
+  ;; Text:     _s_: summarize  _t_: translate _w_: improve wording _g_: improve grammar
+  ;; Other:    _m_: change model _x_: context menu _S_: session "
+  ;;   ("c" ellama-chat)
+  ;;   ("d" ellama-define-word)
+  ;;   ("g" ellama-improve-grammar)
+  ;;   ("m" ellama-provider-select)
+  ;;   ("r" ellama-ask-about)
+  ;;   ("s" ellama-summarize)
+  ;;   ("S" ellama-transient-session-menu)
+  ;;   ("t" ellama-translate)
+  ;;   ("w" ellama-improve-wording)
+  ;;   ("x" ellama-transient-context-menu)
+  ;;   ("q" nil))
+
   ;; setup key bindings
   (setopt ellama-keymap-prefix "C-c L")
   ;; language you want ellama to translate to
