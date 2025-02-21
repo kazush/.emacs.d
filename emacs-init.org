@@ -1208,7 +1208,7 @@ vertico and related packages are used for completion framework.
          ("C-c r" . my/consult-recent-file)
          ("C-c R" . consult-recent-file)
          ("C-c h" . consult-history)
-         ("C-c m" . consult-mode-command)
+         ("C-c M" . consult-mode-command)
          ("C-c k" . consult-kmacro)
          ;; C-x bindings (ctl-x-map)
          ("C-x M-:" . consult-complex-command)     ;; orig. repeat-complex-command
@@ -3397,8 +3397,8 @@ By default this is only enabled for yaml-mode for performance reasons.
 #+begin_src emacs-lisp
 (use-package magit
   :commands (magit-status)
-  :bind (("C-c M s" . magit-status)
-         ("C-c M f" . magit-file-dispatch))
+  :bind (("C-c m s" . magit-status)
+         ("C-c m f" . magit-file-dispatch))
   :config
   (add-hook 'magit-process-find-password-functions 'magit-process-password-auth-source))
 #+end_src
