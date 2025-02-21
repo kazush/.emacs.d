@@ -5637,6 +5637,7 @@ Macros to retrive API keys for LLM servce providers.
           ("g" . my/gptel-new)
           ("G" . gptel-send))
   :commands (gptel gptel-send gptel-menu my/gptel-new)
+  :hook (gptel-mode . (lambda () (goggles-mode -1)))
   :init
   ;; Change default system prompt.
   (defvar my/gptel-system-prompt-file "~/.gptel-system-prompt")
