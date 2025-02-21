@@ -23,7 +23,7 @@ Load preinit.org if exists.
     (org-babel-load-file preinit-file)))
 #+end_src
 
-* Macros
+* Helper Macros and Functions
 
 Some tiny macros to increase code readability and take care of the issue with
 :if keyword not working with straight.el.
@@ -54,6 +54,16 @@ Some tiny macros to increase code readability and take care of the issue with
   (defmacro use-package-if-gui (name &rest args)
     `(when window-system
        (use-package ,name ,@args)))
+#+end_src
+
+Tiny helper function to return file contents as string.
+
+#+begin_src emacs-lisp
+(defun my/get-file-contents (path)
+  "return the contents of the file at PATH as string."
+  (with-temp-buffer
+    (insert-file-contents path)
+    (buffer-string)))
 #+end_src
 
 * Basic config
@@ -5620,12 +5630,53 @@ Macros to retrive API keys for LLM servce providers.
 
 #+begin_src emacs-lisp
 (use-package gptel
-  :commands (gptel gptel-send gptel-menu)
+  :bind ( :map my/ai-map
+          ("g" . my/gptel-new)
+          ("G" . gptel-send))
+  :commands (gptel gptel-send gptel-menu my/gptel-new)
+  :init
+  ;; Change default system prompt.
+  (defvar my/gptel-system-prompt-file "~/.gptel-system-prompt")
+  (defun my/gptel-system-prompt ()
+    "Return system prompt."
+    (if (file-exists-p my/gptel-system-prompt-file)
+        (my/get-file-contents my/gptel-system-prompt-file)
+      "You are a helpful assistant. Always respond in Japanese."))
+
+  (setq gptel-directives
+   `((default . ,(my/gptel-system-prompt))))
+
   :custom
   (gptel-default-mode #'org-mode)
   :config
+
+  ;; Enable branching to limit context (requires >= Org 9.7).
   (when (fboundp 'org-element-lineage-map)
-    (setq gptel-org-branching-context t))
+    (setq gptel-org-branching-context t)
+    (setf (alist-get 'org-mode gptel-prompt-prefix-alist) "@user\n")
+    (setf (alist-get 'org-mode gptel-response-prefix-alist) "@assistant\n"))
+
+  (defvar my/gptel-save-directory "~/org/gptel")
+  (unless (f-dir-p my/gptel-save-directory)
+      (mkdir my/gptel-save-directory t))
+
+  (defun my/gptel-new ()
+    "Create a new buffer backed by a file and start gptel there.."
+    (interactive)
+    (let ((buf (find-file-noselect
+                (format-time-string
+                 (concat my/gptel-save-directory      "/gptel-%Y%m%d%H%M%S.org")) t)))
+      (pop-to-buffer buf)
+      (local-set-key (kbd "S-<return>") #'gptel-send)
+      (org-mode)
+      (gptel-mode)
+      (face-remap-set-base 'org-level-1 :height 1.0)
+      (face-remap-set-base 'org-level-2 :height 1.0)
+      (face-remap-set-base 'org-level-3 :height 1.0)
+      (face-remap-set-base 'org-level-4 :height 1.0)
+      (face-remap-set-base 'org-level-5 :height 1.0)
+      (insert (gptel-prompt-prefix-string))
+      (not-modified)))
 
   (add-hook 'gptel-post-stream-hook 'gptel-auto-scroll)
   (add-hook 'gptel-post-response-functions 'gptel-end-of-response)
@@ -5634,9 +5685,10 @@ Macros to retrive API keys for LLM servce providers.
 
   (gptel-make-gemini "Gemini"
     :key #'my/get-gemini-api-key
-    :models '(gemini-2.0-flash-exp
-              gemini-2.0-flash-thinking-exp
-              gemini-2.0-pro-exp)
+    :models '(gemini-2.0-flash
+              gemini-2.0-flash-lite-preview-02-05
+              gemini-2.0-flash-thinking-exp-01-21
+              gemini-2.0-pro-exp-02-05)
     :stream t)
 
   (gptel-make-openai "Groq"
@@ -5705,7 +5757,7 @@ Macros to retrive API keys for LLM servce providers.
 
   ;; Set default backend.
   (setq gptel-backend (my/gptel-get-backend "Gemini"))
-  (setq gptel-model 'gemini-2.0-flash-exp)
+  (setq gptel-model 'gemini-2.0-flash)
   )
 #+end_src
 
