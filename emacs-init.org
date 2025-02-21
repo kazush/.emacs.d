@@ -3866,7 +3866,7 @@ Use pyvenv package to simply support virtualenv.
 
 #+begin_src emacs-lisp
 (use-package pyvenv
-  :hook (after-init . my/pyvenv-setup)
+  ;; :hook (after-init . my/pyvenv-setup)
   :config
   (defun my/pyvenv-setup ()
     (require 'esh-mode)  ;; for eshell-mode-map
@@ -6149,6 +6149,33 @@ Use groq as the LLM service.
   ;;; Set your shorthand favorite interactive command
   (setq consult-omni-default-interactive-command #'consult-omni-multi)
   )
+#+end_src
+
+* Emacs Application Framework
+
+#+begin_src emacs-lisp
+(use-package eaf
+  :straight (eaf :type git :host github
+                 :repo "emacs-eaf/emacs-application-framework"
+                 :depth 1 :branch "master"
+                 :files (:defaults "*.el" "*.py" "*.json"
+                                   ("extension" "extension/*") ("core" "core/*")))
+  :preface
+  ;; Launch initial install script.
+  (unless (f-dir-p (format "%s/straight/%s/eaf/app" straight-base-dir straight-build-dir))
+    (eaf-install-and-update))
+  :custom ;; See https://github.com/emacs-eaf/emacs-application-framework/wiki/Customization
+  (eaf-browser-continue-where-left-off t)
+  (eaf-browser-enable-adblocker t)
+  (browse-url-browser-function 'eaf-open-browser)
+  :config
+  (require 'eaf-browser)
+  (require 'eaf-pdf-viewer)
+  (defalias 'browse-web #'eaf-open-browser)
+  (eaf-bind-key scroll_up "C-n" eaf-pdf-viewer-keybinding)
+  (eaf-bind-key scroll_down "C-p" eaf-pdf-viewer-keybinding)
+  ;; (eaf-bind-key take_photo "p" eaf-camera-keybinding)
+  (eaf-bind-key nil "M-q" eaf-browser-keybinding)) ;; unbind, see more in the Wiki
 #+end_src
 
 * Post Init Config
