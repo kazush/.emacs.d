@@ -1,7 +1,19 @@
-;; Initial GUI configuration
+;;
+;; Font related configuration
+;;
 
 (defvar my/default-font "Monospace")
-(defvar my/default-font-size 16)  ;; pixel size not point
+
+;; Default font size alist used by my/get-default-font-size:
+;; format: ((regexp . font-size) ...)
+;; - regexp is used to match with "<monitor name>:<system name>".
+;; - note that font-size is in pixel not point.
+;; - font-size can be a function.
+(defvar my/default-font-size-alist
+  `((".+:minibookx\\'" . (lambda ()
+                           (if (eq window-system 'x) 23 19)))
+    (".*" . 16)))
+
 (defvar my/default-jp-font "Noto Sans CJK JP")
 (defvar my/default-emoji-font "Noto Color Emoji")
 (defvar my/font-rescale-alist
@@ -15,18 +27,23 @@
                            (11 . 1.1)
                            (16 . 1.053)))))
 
+;;
+;; Helper functions for font rescale parameters for JP and Emoji fonts.
+;;
+
+(require 'cl-lib)
+
 (defun my/get-font-rescale-param (font font-size)
   "Get font rescale params suitable for FONT-SIZE."
-  (require 'cl-lib)
   (let ((rescale-param-alist
          (cl-loop for ent in my/font-rescale-alist
                   when (string-match (car ent) font) return (cdr ent))))
     (when rescale-param-alist
       (let ((scale
-            (cl-loop for pair in rescale-param-alist
-                     when (<= (car pair) font-size)
-                     maximize (car pair) into max-key
-                     finally return (cdr (assoc max-key rescale-param-alist)))))
+             (cl-loop for pair in rescale-param-alist
+                      when (<= (car pair) font-size)
+                      maximize (car pair) into max-key
+                      finally return (cdr (assoc max-key rescale-param-alist)))))
         ;; fallback to the first element.
         (if scale scale (cdar rescale-param-alist))))))
 
@@ -47,6 +64,12 @@
 
 (advice-add 'text-scale-increase :after #'my/update-font-rescale-params)
 
+;;
+;; Helper functions for default font and size.
+;;
+
+(defvar my/default-font-size 16) ;; re-initialized later.
+
 (defun my/make-font-str (font &optional size)
   "Make font string which can be used for :font in set-face-attribute."
   (let ((font-str (format "%s%s" font
@@ -54,17 +77,19 @@
     (x-resolve-font-name
      (format "%s:weight=regular:slant=normal" font-str))))
 
-(defun my/set-default-font-size ()
+(defun my/get-default-font-size ()
+  "Get default font size based on my/default-font-size-alist."
+  (let ((monitor-n-system (format "%s:%s"
+                                  (alist-get 'name (frame-monitor-attributes))
+                                  system-name)))
+    (cl-loop for pair in my/default-font-size-alist
+             until (string-match (car pair) monitor-n-system)
+             finally return (let ((value (cdr pair)))
+                              (if (functionp value) (funcall value) value)))))
+
+(defun my/set-default-font ()
   "Set default font size for each font as per the current monitor environment."
   (interactive)
-  (setq my/default-font-size
-        (pcase (format "%s:%s"
-                       (alist-get 'name (frame-monitor-attributes))
-                       system-name )
-          ((rx "DELL S2722") 16)
-          ((rx (: (1+ anychar) ":minibookx" eos)) 19)
-          (_ 16)))
-
   ;; Update face-font-rescale-alist with default font size.
   (my/update-font-rescale-params 0)
 
@@ -78,8 +103,9 @@
 
 
 ;; Initialize default font.
-(if (display-graphic-p)
-    (my/set-default-font-size))
+(when (display-graphic-p)
+  (setq my/default-font-size (my/get-default-font-size))
+  (my/set-default-font))
 
 ;; Use straight.el for package management.
 
