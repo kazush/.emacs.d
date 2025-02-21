@@ -536,11 +536,13 @@ called in hooks.
                         :background "gray10"
                         :inherit 'mode-line)))
 
+;; Use this function if you want to change font and/or size of the default font.
 (defun my/set-fontset-font (&optional font size fset)
   "Set font for default face."
-  (interactive "sFont: \nnSize: \ni")
-  (let ((newfont (my/make-font-str (or font my/default-font)
-                                   (or size my/default-font-size)))
+  (interactive "sFont: \nsSize: \ni")
+  (let ((newfont (my/make-font-str (if (string-empty-p font) my/default-font font)
+                                   (if (string-empty-p size) my/default-font-size
+                                     (string-to-number size))))
         (fontset (or fset (face-attribute 'default :fontset))))
     (set-fontset-font fontset 'latin newfont nil)))
 
