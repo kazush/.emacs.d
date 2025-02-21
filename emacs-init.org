@@ -2911,7 +2911,7 @@ Yet another terminal emulator. Trying out now.
 
 #+begin_src emacs-lisp
 (use-package eat
-  :bind (("C-c s" . my/get-eat))
+  ;; :bind (("C-c s" . my/get-eat))
   :straight '(eat :type git
                   :host codeberg
                   :repo "akib/emacs-eat"
