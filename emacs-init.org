@@ -6195,7 +6195,11 @@ Use groq as the LLM service.
   :config
   (defalias 'browse-web #'eaf-open-browser)
   (eaf-bind-key kill-buffer-and-window ";" eaf-browser-keybinding)
+  (eaf-bind-key insert_or_scroll_down_page "<backspace>" eaf-browser-keybinding)
   (eaf-bind-key nil "M-q" eaf-browser-keybinding) ;; unbind, see more in the Wiki
+  (eaf-bind-key insert_or_scroll_down_page "<backspace>" eaf-browser-keybinding)
+  (eaf-bind-key kill-buffer "q" eaf-browser-keybinding)
+  (eaf-bind-key insert_or_history_backward "b" eaf-browser-keybinding)
   )
 #+end_src
 
