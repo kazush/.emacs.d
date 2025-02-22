@@ -68,10 +68,3 @@
 (set-face-attribute 'mode-line nil
                     :foreground "#d3d3d3"
                     :background "#000000")
-
-(when window-system
-  (scroll-bar-mode -1)
-  (tool-bar-mode -1)
-  (menu-bar-mode -1)
-  (fringe-mode 10)
-  (set-frame-size nil 100 35))

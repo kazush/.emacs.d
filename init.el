@@ -77,19 +77,24 @@
     (x-resolve-font-name
      (format "%s:weight=regular:slant=normal" font-str))))
 
-(defun my/get-default-font-size ()
-  "Get default font size based on my/default-font-size-alist."
+(defun my/update-default-font-size ()
+  "Update default font size based on my/default-font-size-alist."
   (let ((monitor-n-system (format "%s:%s"
                                   (alist-get 'name (frame-monitor-attributes))
                                   system-name)))
-    (cl-loop for pair in my/default-font-size-alist
-             until (string-match (car pair) monitor-n-system)
-             finally return (let ((value (cdr pair)))
-                              (if (functionp value) (funcall value) value)))))
+    (setq my/default-font-size
+          (cl-loop for pair in my/default-font-size-alist
+                   until (string-match (car pair) monitor-n-system)
+                   finally return (let ((value (cdr pair)))
+                                    (if (functionp value) (funcall value) value))))))
 
 (defun my/set-default-font ()
   "Set default font size for each font as per the current monitor environment."
   (interactive)
+
+  ;; Update default font size.
+  (my/update-default-font-size)
+
   ;; Update face-font-rescale-alist with default font size.
   (my/update-font-rescale-params 0)
 
@@ -101,11 +106,17 @@
                       :font (my/make-font-str my/default-font
                                               my/default-font-size)))
 
-
 ;; Initialize default font.
 (when (display-graphic-p)
-  (setq my/default-font-size (my/get-default-font-size))
   (my/set-default-font))
+
+;; Initialize GUI frame parameters.
+(when window-system
+  (scroll-bar-mode -1)
+  (tool-bar-mode -1)
+  (menu-bar-mode -1)
+  (fringe-mode 10)
+  (set-frame-size nil 100 35))
 
 ;; Use straight.el for package management.
 
