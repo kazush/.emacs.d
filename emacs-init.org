@@ -6271,9 +6271,11 @@ Also, add measurement of GC time with the code borrowed by https://akrl.sdf.org/
      ,@body
      (float-time (time-since time))))
 
+(defvar my/show-gc-time nil)
 (defun my/gc ()
-  (message "Garbage Collector has run for %.06fsec"
-           (my/k-time (garbage-collect))))
+  (let ((gc-time (my/k-time (garbage-collect))))
+    (when my/show-gc-time
+      (message "Garbage Collector has run for %.06fsec" gc-time))))
 
 (defvar my/k-gc-timer (run-with-idle-timer 15 t #'my/gc))
 (add-function :after after-focus-change-function #'my/gc)
