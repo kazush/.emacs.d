@@ -4560,7 +4560,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
                          org-roam-directory prj basename))
            (org-capture-templates
             `(("d" "capture a new entry to the selected project"
-               entry (file+datetree ,file) ,entry-str
+               entry (file+olp+datetree ,file) ,entry-str
                :unnarrowed t :kill-buffer t))))
       (unless (file-exists-p file)
         (my/org-roam-project-create-new-file prj basename props))
