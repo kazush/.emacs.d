@@ -10,8 +10,8 @@
 ;; - note that font-size is in pixel not point.
 ;; - font-size can be a function.
 (defvar my/default-font-size-alist
-  `((".+:minibookx\\'" . (lambda ()
-                           (if (eq window-system 'x) 23 19)))
+  `(("DSI-1:minibookx\\'" . 23)   ;; X11
+    ("DSI-.+:minibookx\\'" . 19)  ;; Wayland
     (".*" . 16)))
 
 (defvar my/default-jp-font "Noto Sans CJK JP")
