@@ -1514,7 +1514,9 @@ Disabling embark-prefix-help-command for now as I prefer which-key's compact lay
                                orderless-regexp))
   (completion-styles '(orderless basic))
   (completion-category-overrides
-   '((file (styles basic partial-completion)))))
+   '((file (styles basic partial-completion))))
+  :config
+  (add-to-list 'orderless-affix-dispatch-alist '(?@ . orderless-regexp)))
 #+end_src
 
 ** Cape
