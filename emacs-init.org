@@ -6192,6 +6192,7 @@ Use groq as the LLM service.
   (browse-url-browser-function 'eaf-open-browser)
   :config
   (defalias 'browse-web #'eaf-open-browser)
+  (eaf-bind-key kill-buffer-and-window ";" eaf-browser-keybinding)
   (eaf-bind-key nil "M-q" eaf-browser-keybinding) ;; unbind, see more in the Wiki
   )
 #+end_src
