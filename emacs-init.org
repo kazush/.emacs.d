@@ -2196,6 +2196,12 @@ Align tables with variable pitch fonts.
   :hook ((org-mode markdown-mode) . valign-mode))
 #+end_src
 
+** htmlize
+
+#+begin_src emacs-lisp
+(use-package htmlize)
+#+end_src
+
 * Window and workspace management
 
 ** Persp-mode
@@ -6171,19 +6177,64 @@ Use groq as the LLM service.
   :preface
   ;; Launch initial install script.
   (unless (f-dir-p (format "%s/straight/%s/eaf/app" straight-base-dir straight-build-dir))
-    (eaf-install-and-update))
-  :custom ;; See https://github.com/emacs-eaf/emacs-application-framework/wiki/Customization
+    (eaf-install-and-update)))
+#+end_src
+
+** eaf-browser
+
+#+begin_src emacs-lisp
+(use-package eaf-browser
+  :after eaf
+  :straight nil
+  :custom
   (eaf-browser-continue-where-left-off t)
   (eaf-browser-enable-adblocker t)
   (browse-url-browser-function 'eaf-open-browser)
   :config
-  (require 'eaf-browser)
-  (require 'eaf-pdf-viewer)
   (defalias 'browse-web #'eaf-open-browser)
+  (eaf-bind-key nil "M-q" eaf-browser-keybinding) ;; unbind, see more in the Wiki
+  )
+#+end_src
+
+** eaf-pdf-viewer
+
+#+begin_src emacs-lisp
+(use-package eaf-pdf-viewer
+  :after eaf
+  :straight nil
+  :config
   (eaf-bind-key scroll_up "C-n" eaf-pdf-viewer-keybinding)
   (eaf-bind-key scroll_down "C-p" eaf-pdf-viewer-keybinding)
-  ;; (eaf-bind-key take_photo "p" eaf-camera-keybinding)
-  (eaf-bind-key nil "M-q" eaf-browser-keybinding)) ;; unbind, see more in the Wiki
+
+  (with-eval-after-load 'tex
+    (add-to-list 'TeX-command-list '("XeLaTeX" "%`xelatex --synctex=1%(mode)%' %t" TeX-run-TeX nil t))
+    (add-to-list 'TeX-view-program-list '("eaf" eaf-pdf-synctex-forward-view))
+    (add-to-list 'TeX-view-program-selection '(output-pdf "eaf"))))
+#+end_src
+
+
+** eaf-pyqterminal
+
+#+begin_src emacs-lisp
+(use-package eaf-pyqterminal
+  :after eaf
+  :straight nil)
+#+end_src
+
+** eaf-markdown-previewer
+
+#+begin_src emacs-lisp
+(use-package eaf-markdown-previewer
+  :after eaf
+  :straight nil)
+#+end_src
+
+** eaf-org-previewer
+
+#+begin_src emacs-lisp
+(use-package eaf-org-previewer
+  :after (eaf htmlize)
+  :straight nil)
 #+end_src
 
 * Post Init Config
