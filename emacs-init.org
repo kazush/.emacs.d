@@ -3806,7 +3806,8 @@ A fork of aider.el that seems to have better integration with Emacs.
   (defun my/setup-jupyter ()
     (interactive)
     (require 'ob-jupyter)
-    (pyvenv-activate "~/.venv")
+    (let ((venv-dir (concat default-directory "/.venv")))
+      (pyvenv-activate (if (f-dir-p venv-dir) venv-dir "~/.venv")))
     ;; use jupyter-python for python src block
     ;; (org-babel-jupyter-override-src-block "python")
     ;; (add-to-list 'ob-async-no-async-languages-alist "python")
@@ -3815,7 +3816,8 @@ A fork of aider.el that seems to have better integration with Emacs.
     ;; For handling ANSI colors in error messages.
     (defun my/display-ansi-colors ()
       (ansi-color-apply-on-region (point-min) (point-max)))
-    (add-hook 'org-babel-after-execute-hook #'my/display-ansi-colors)))
+    ;; (add-hook 'org-babel-after-execute-hook #'my/display-ansi-colors)
+  ))
 #+end_src
 
 * Programming language modes
