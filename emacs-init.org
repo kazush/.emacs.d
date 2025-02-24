@@ -3825,8 +3825,6 @@ A fork of aider.el that seems to have better integration with Emacs.
   (defun my/setup-jupyter ()
     (interactive)
     (require 'ob-jupyter)
-    (let ((venv-dir (concat default-directory "/.venv")))
-      (pyvenv-activate (if (f-dir-p venv-dir) venv-dir "~/.venv")))
     ;; use jupyter-python for python src block
     ;; (org-babel-jupyter-override-src-block "python")
     ;; (add-to-list 'ob-async-no-async-languages-alist "python")
@@ -3835,7 +3833,7 @@ A fork of aider.el that seems to have better integration with Emacs.
     ;; For handling ANSI colors in error messages.
     (defun my/display-ansi-colors ()
       (ansi-color-apply-on-region (point-min) (point-max)))
-    ;; (add-hook 'org-babel-after-execute-hook #'my/display-ansi-colors)
+    (add-hook 'org-babel-after-execute-hook #'my/display-ansi-colors)
   ))
 #+end_src
 
@@ -3921,14 +3919,17 @@ Use pyvenv package to simply support virtualenv.
 
 #+begin_src emacs-lisp
 (use-package pyvenv
-  ;; :hook (after-init . my/pyvenv-setup)
+  :hook (after-init . my/pyvenv-setup)
   :config
+  (defun my/pyvenv-activate ()
+    "Activate venv at buffer's default directory or home directory."
+    (interactive)
+    (let ((venv-dir (concat default-directory "/.venv")))
+      (pyvenv-activate (if (f-dir-p venv-dir) venv-dir "~/.venv"))))
+
   (defun my/pyvenv-setup ()
     (require 'esh-mode)  ;; for eshell-mode-map
-    (pyvenv-mode 1)
-    ;; Enable default python environment.
-    (when (f-dir-p "~/.venv")
-      (pyvenv-activate "~/.venv"))))
+    (pyvenv-tracking-mode 1)))
 #+end_src
 
 ** Go
