@@ -536,6 +536,25 @@ called in hooks.
   (set-face-attribute 'outline-1 nil :height 1.2)
   (set-face-attribute 'outline-2 nil :height 1.05)
 
+  ;; ANSI colors
+  (custom-set-faces
+   '(ansi-color-black ((t :foreground "#2e3440" :background "#2e3440")))
+   '(ansi-color-red ((t :foreground "#ff616a" :background "#ff616a")))
+   '(ansi-color-green ((t :foreground "#a3be8c" :background "#a3be8c")))
+   '(ansi-color-yellow ((t :foreground "#ebcb8b" :background "#4b2b1b")))
+   '(ansi-color-blue ((t :foreground "#81a1f1" :background "#81a1f1")))
+   '(ansi-color-magenta ((t :foreground "#b48ead" :background "#b48ead")))
+   '(ansi-color-cyan ((t :foreground "#88c0d0" :background "#88c0d0")))
+   '(ansi-color-white ((t :foreground "#e5e9f0" :background "#e5e9f0")))
+   '(ansi-color-bright-black ((t :foreground "#4c566a" :background "#4c566a")))
+   '(ansi-color-bright-red ((t :foreground "#ff616a" :background "#ff616a")))
+   '(ansi-color-bright-green ((t :foreground "#a3be8c" :background "#a3be8c")))
+   '(ansi-color-bright-yellow ((t :foreground "#ebcb8b" :background "#ebcb8b")))
+   '(ansi-color-bright-blue ((t :foreground "#81a1f1" :background "#81a1f1")))
+   '(ansi-color-bright-magenta ((t :foreground "#b48ead" :background "#b48ead")))
+   '(ansi-color-bright-cyan ((t :foreground "#8fbcbb" :background "#8fbcbb")))
+   '(ansi-color-bright-white ((t :foreground "#eceff4" :background "#eceff4"))))
+
   (unless (daemonp)
     (set-face-attribute 'mode-line-inactive nil
                         :foreground "darkgray"
