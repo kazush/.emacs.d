@@ -5525,14 +5525,13 @@ Macros to retrive API keys for LLM servce providers.
          (host (plist-get conf :auth-source)))
     (auth-source-pick-first-password :host host)))
 
-(defun my/llm-set-api-key (provider-list)
+(defun my/llm-set-api-key (provider)
   "Set the environment variable with the API key for each specified provider.
-   PROVIDER-LIST can be a symbol or a list of symbols.
+   PROVIDER can be a symbol or a list of symbols.
    'ALL represents all registered providers."
-  (let ((provider-conf-alist (if (null providers) '() my/llm-provider-alist))
-        (provider-list (if (eq providers t) nil
-                         (if (listp providers) providers (list providers)))))
-    (dolist (p provider-conf-alist)
+  (let ((provider-list (if (eq provider 'ALL) nil
+                         (if (listp provider) provider (list provider)))))
+    (dolist (p my/llm-provider-alist)
       (let ((name (car p))
             (envvar (plist-get (cdr p) :envvar)))
         (when (or (null provider-list)
