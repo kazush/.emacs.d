@@ -5500,29 +5500,46 @@ Disabled atm as new distro is adopting pipewire.
 Macros to retrive API keys for LLM servce providers.
 
 #+begin_src emacs-lisp
-(defun my/get-gemini-api-key ()
-  (auth-source-pick-first-password :host "gemini-api-key"))
+(defvar my/llm-provider-alist
+  '((gemini :auth-source "gemini-api-key" :envvar "GEMINI_API_KEY")
+    (openrouter :auth-source "openrouter-api-key" :envvar "OPENROUTER_API_KEY")
+    (anthropic :auth-source "api.anthropic.com" :envvar "ANTHROPIC_API_KEY")
+    (deepseek :auth-source "deepseek-api-key" :envvar "DEEPSEEK_API_KEY")
+    (xai :auth-source "xai-api-key" :envvar "XAI_API_KEY")
+    (groq :auth-source "groq-api-key" :envvar "GROQ_API_KEY")
+    (cohere :auth-source "cohere-api-key" :envvar "COHERE_API_KEY")
+    (sambanova :auth-source "sambanova-api-key")
+    (huggingface :auth-source "huggingface-api-key")))
 
-(defun my/get-groq-api-key ()
-  (auth-source-pick-first-password :host "groq-api-key"))
+;; Generate my/get-<provider>-api-key function
+(dolist (conf my/llm-provider-alist)
+  (let ((name (car conf))
+        (host (plist-get (cdr conf) :auth-source)))
+    (fset (intern (format "my/get-%s-api-key" name))
+          (lambda ()
+            (auth-source-pick-first-password :host host)))))
 
-(defun my/get-sambanova-api-key ()
-  (auth-source-pick-first-password :host "sambanova-api-key"))
+(defun my/llm-get-api-key (provider)
+  "Get the API KEY for the specified provider."
+  (let* ((conf (alist-get provider my/llm-provider-alist))
+         (host (plist-get conf :auth-source)))
+    (auth-source-pick-first-password :host host)))
 
-(defun my/get-cohere-api-key ()
-  (auth-source-pick-first-password :host "cohere-api-key"))
-
-(defun my/get-hf-api-key ()
-  (auth-source-pick-first-password :host "huggingface-api-key"))
-
-(defun my/get-anthropic-api-key ()
-  (auth-source-pick-first-password :host "api.anthropic.com"))
-
-(defun my/get-openrouter-api-key ()
-  (auth-source-pick-first-password :host "openrouter-api-key"))
-
-(defun my/get-deepseek-api-key ()
-  (auth-source-pick-first-password :host "deepseek-api-key"))
+(defun my/llm-set-api-key (provider-list)
+  "Set the environment variable with the API key for each specified provider.
+   PROVIDER-LIST can be a symbol or a list of symbols.
+   'ALL represents all registered providers."
+  (let ((provider-conf-alist (if (null providers) '() my/llm-provider-alist))
+        (provider-list (if (eq providers t) nil
+                         (if (listp providers) providers (list providers)))))
+    (dolist (p provider-conf-alist)
+      (let ((name (car p))
+            (envvar (plist-get (cdr p) :envvar)))
+        (when (or (null provider-list)
+                  (member name provider-list))
+          (if envvar
+              (setenv envvar (my/llm-get-api-key name))
+            (message "my/llm-set-api-key: could not get :envvar for %s" name)))))))
 #+end_src
 
 ** Ellama - Emacs client for ollama
@@ -5606,10 +5623,10 @@ Macros to retrive API keys for LLM servce providers.
       :key (my/get-cohere-api-key)
       ,@args))
 
-  (defmacro my/make-llm-hf (&rest args)
+  (defmacro my/make-llm-huggingface (&rest args)
     `(make-llm-openai-compatible
       :url "https://api-inference.huggingface.co/v1/"
-      :key (my/get-hf-api-key)
+      :key (my/get-huggingface-api-key)
       ,@args))
 
   (require 'llm-gemini)
@@ -5648,9 +5665,8 @@ Macros to retrive API keys for LLM servce providers.
                                      :chat-model "Qwen2.5-72B-Instruct"))
             ("cohere-command-r-plus" . (my/make-llm-cohere
                                         :chat-model "command-r-plus"))
-            ("hf-qwen2.5-coder" . (my/make-llm-hf
+            ("huggingface-qwen2.5-coder" . (my/make-llm-huggingface
                                    :chat-model "Qwen/Qwen2.5-Coder-32B-Instruct"))
-
             ("ezo-common" . (my/make-llm-local-server
                              :chat-model "ezo-common"))
             ("ezo-humanities" . (my/make-llm-local-server
@@ -5788,7 +5804,7 @@ Macros to retrive API keys for LLM servce providers.
     :host "api-inference.huggingface.co"
     :endpoint "/v1/chat/completions"
     :stream t
-    :key #'my/get-hf-api-key
+    :key #'my/get-huggingface-api-key
     :models '(Qwen/Qwen2.5-Coder-32B-Instruct
               Qwen/Qwen2.5-72B-Instruct))
 
