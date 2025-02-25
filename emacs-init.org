@@ -5516,8 +5516,8 @@ Macros to retrive API keys for LLM servce providers.
   (let ((name (car conf))
         (host (plist-get (cdr conf) :auth-source)))
     (fset (intern (format "my/get-%s-api-key" name))
-          (lambda ()
-            (auth-source-pick-first-password :host host)))))
+          `(lambda ()
+            (auth-source-pick-first-password :host ,host)))))
 
 (defun my/llm-get-api-key (provider)
   "Get the API KEY for the specified provider."
