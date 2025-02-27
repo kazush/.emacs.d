@@ -5817,7 +5817,10 @@ Macros to retrive API keys for LLM servce providers.
 (use-package gptel
   :bind ( :map my/ai-map
           ("g" . my/gptel-new)
-          ("G" . gptel-send))
+          ("G" . gptel-send)
+          :map gptel-mode-map
+          ("C-c i h" . my/gptel-insert-new-chat-heading)
+          ("C-c i p" . my/gptel-insert-prompt-prefix))
   :commands (gptel gptel-send gptel-menu my/gptel-new)
   :hook (gptel-mode . (lambda () (goggles-mode -1)))
   :init
@@ -5830,28 +5833,45 @@ Macros to retrive API keys for LLM servce providers.
       "You are a helpful assistant. Always respond in Japanese."))
 
   (setq gptel-directives
-   `((default . ,(my/gptel-system-prompt))))
+        `((default . ,(my/gptel-system-prompt))))
 
   :custom
   (gptel-default-mode #'org-mode)
+  (gptel-use-tools t)
   :config
 
   ;; Enable branching to limit context (requires >= Org 9.7).
   (when (fboundp 'org-element-lineage-map)
-    (setq gptel-org-branching-context t)
-    (setf (alist-get 'org-mode gptel-prompt-prefix-alist) "@user\n")
-    (setf (alist-get 'org-mode gptel-response-prefix-alist) "@assistant\n"))
+    (setq-default gptel-org-branching-context t)
+    (setf (alist-get 'org-mode gptel-prompt-prefix-alist) "- @me :: ")
+    (setf (alist-get 'org-mode gptel-response-prefix-alist) "- @ai :: "))
 
   (defvar my/gptel-save-directory "~/org/gptel")
   (unless (f-dir-p my/gptel-save-directory)
-      (mkdir my/gptel-save-directory t))
+    (mkdir my/gptel-save-directory t))
 
-  (defun my/gptel-new ()
-    "Create a new buffer backed by a file and start gptel there.."
+  (defun my/gptel-insert-new-chat-heading ()
+    "Insert new chat heading."
     (interactive)
+    (org-insert-heading-respect-content)
+    (insert (format-time-string "[%Y-%m-%d %H:%M] New Chat\n")))
+
+  (defun my/gptel-insert-prompt-prefix ()
+    "Insert prompt prefix."
+    (interactive)
+    (insert (concat "\n" (gptel-prompt-prefix-string))))
+
+  (defun my/gptel-new (&optional arg)
+    "Create a new buffer backed by a file and start gptel there.."
+    (interactive "P")
     (let ((buf (find-file-noselect
-                (format-time-string
-                 (concat my/gptel-save-directory      "/gptel-%Y%m%d%H%M%S.org")) t)))
+                (if arg
+                    (let ((default-directory (file-name-as-directory
+                                              my/gptel-save-directory)))
+                      (car (find-file-read-args "Select file: " t)))
+                  (file-name-concat
+                   my/gptel-save-directory
+                   (format-time-string "gptel-%Y%m%d.org"))) t)))
       (pop-to-buffer buf)
       (local-set-key (kbd "S-<return>") #'gptel-send)
       (org-mode)
@@ -5861,13 +5881,18 @@ Macros to retrive API keys for LLM servce providers.
       (face-remap-set-base 'org-level-3 :height 1.0)
       (face-remap-set-base 'org-level-4 :height 1.0)
       (face-remap-set-base 'org-level-5 :height 1.0)
-      (insert (gptel-prompt-prefix-string))
+      (goto-char (point-max))
+      (when gptel-org-branching-context
+        (my/gptel-insert-new-chat-heading))
+      (my/gptel-insert-prompt-prefix)
       (not-modified)))
 
   (add-hook 'gptel-post-stream-hook 'gptel-auto-scroll)
   (add-hook 'gptel-post-response-functions 'gptel-end-of-response)
 
+  ;;
   ;; Define backends.
+  ;;
 
   (gptel-make-gemini "Gemini"
     :key #'my/get-gemini-api-key
