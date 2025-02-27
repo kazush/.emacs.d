@@ -5104,6 +5104,29 @@ Here is a Workaround for latex preview scaling issues that I borrow from [[https
   )
 #+end_src
 
+Seeme like Xenops can replace slow latex preview. Trying it out now.
+
+#+begin_src emacs-lisp
+(use-package xenops
+  :after org
+  :custom
+  ;; TODO(me): move config for common tex/latex variables to a dedicated section.
+  (latex-run-command "xelatex")
+  (LaTeX-command "xelatex")
+  :config
+
+  ;; Override xenops specific latex processs alist with org-preview-latex one.
+  (setq xenops-math-latex-process-alist org-preview-latex-process-alist)
+
+  ;; Fix background color issues with fragment images.
+  (defun my/xenops-tweak-latex-document (orig-fn &rest args)
+    "Delete \\pagecolor and \\color directives from the output so latex fragment will have transparent background."
+    (let ((output (apply orig-fn args)))
+      (replace-regexp-in-string "\\\\\\(page\\)?color{\\w+}" "" output)))
+
+  (advice-add 'xenops-math-latex-make-latex-document :around #'my/xenops-tweak-latex-document))
+#+end_src
+
 ** Citation
 
 Citar provides a rich UI frontend for org-cite. citar-org-roam provides more integration with org-roam.
