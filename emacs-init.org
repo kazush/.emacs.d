@@ -4142,6 +4142,8 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
          (org-agenda-mode . (lambda () (hl-line-mode 1)))
          (org-babel-after-execute . org-redisplay-inline-images))
   :custom
+  (org-emphasis-regexp-components
+   '("-[:nonascii:][:space:]('\"{" "-[:space:][:nonascii:].,:!?;'\")}\\[" "[:space:][:nonascii:]" "." 1))
   (org-agenda-format-date "%b %e (%a)")
   (org-agenda-file-regexp "\\`[^.].*\\.org\\\(\\.gpg\\\)?\\'")
   (org-agenda-sorting-strategy
@@ -4372,6 +4374,10 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
     (define-key org-agenda-mode-map (kbd "p") #'org-agenda-backward-block)
     (define-key org-agenda-mode-map (kbd "n") #'org-agenda-forward-block)
     (my/org-agenda-set-category-emoji-icon))
+
+  ;; Reset org-emp-re and org-verbatim-re to take non ASCII characters into
+  ;; account for boundary of emphasis.
+  (setopt org-emphasis-alist org-emphasis-alist)  ;; trigger org-set-emph-re
 
   ;; Patched org-do-emphasis-faces to allow nested emphasis markers.
 
