@@ -3426,24 +3426,25 @@ Eldoc-box displays eldoc contents in a child frame but is currently disabled.
   :custom (symbol-overlay-idle-time 0.5))
 #+end_src
 
-*** Highlight indent guides
+*** Indent-bars
 
-By default this is only enabled for yaml-mode for performance reasons.
+Enable indentation guide bars for some modes.
 
 #+begin_src emacs-lisp
-(use-package highlight-indent-guides
-  :hook (yaml-mode . highlight-indent-guides-mode)
-  :diminish highlight-indent-guides-mode
+(use-package indent-bars
   :custom
-  (highlight-indent-guides-method 'character)
-  (highlight-indent-guides-auto-enabled nil)
-  :config
-  (custom-set-faces
-   '(highlight-indent-guides-odd-face ((t :background "DarkGray")))
-   '(highlight-indent-guides-even-face ((t :background "DimGray")))
-   '(highlight-indent-guides-character-face ((t :foreground "DimGray")))
-   '(highlight-indent-guides-top-character-face ((t :foreground "DimGray")))
-   '(highlight-indent-guides-stack-character-face ((t :foreground "DimGray")))))
+  (indent-bars-no-descend-lists t) ; no extra bars in continued func arg lists
+  (indent-bars-treesit-support t)
+  (indent-bars-treesit-ignore-blank-lines-types '("module"))
+  ;; Add other languages as needed
+  (indent-bars-treesit-scope '((python function_definition class_definition for_statement
+                                       if_statement with_statement while_statement)))
+  ;; Note: wrap may not be needed if no-descend-list is enough
+  ;;(indent-bars-treesit-wrap '((python argument_list parameters ; for python, as an example
+  ;;                                  list list_comprehension
+  ;;                                  dictionary dictionary_comprehension
+  ;;                                  parenthesized_expression subscript)))
+  :hook ((python-base-mode yaml-mode) . indent-bars-mode))
 #+end_src
 
 *** Diff HL mode
