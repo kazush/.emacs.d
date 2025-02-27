@@ -5008,11 +5008,14 @@ Display remote images specified by URLs inline in org-mode.
   (plist-put org-format-latex-options :background nil)
 
   ;; Header for xelatex supporting Japanese text.
-  (setq org-format-latex-header "\\documentclass[a4paper,xelatex,ja=standard]{bxjsarticle}
+  (setq org-format-latex-header "\\documentclass[a4paper,xelatex,12pt,ja=standard]{bxjsarticle}
 \\usepackage[usenames]{color}
 \[DEFAULT-PACKAGES]
 \[PACKAGES]
+\\usepackage{amsmath}
 \\usepackage{mathcomp}
+\\usepackage{newtxtext,newtxmath}
+\\usepackage{graphicx}
 \\pagestyle{empty}             % do not remove
 % The settings below are copied from fullpage.sty
 \\setlength{\\textwidth}{\\paperwidth}
@@ -5061,14 +5064,11 @@ Install cdlatex to enable some useful features. cdlatex depends on texmathp.el i
   :config
   (defun my/setup-cdlatex-mode ()
     "Setup config suitable for cdlatex-mode and org-cdlatex-mode."
+    (require 'auctex)
     (setq-local org-use-sub-superscripts t)
     (setq-local org-export-with-sub-superscripts t)
     (electric-pair-mode -1))
 )
-#+end_src
-
-#+begin_src emacs-lisp
-(use-package auctex)
 #+end_src
 
 Here is a Workaround for latex preview scaling issues that I borrow from [[https://karthinks.com/software/scaling-latex-previews-in-emacs/]].
