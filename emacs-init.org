@@ -6584,6 +6584,7 @@ Use groq as the LLM service.
 (use-package eaf-browser
   :after eaf
   :straight nil
+  :commands (eaf-open-browser)
   :custom
   (eaf-browser-continue-where-left-off t)
   (eaf-browser-enable-adblocker t)
@@ -6607,6 +6608,7 @@ Use groq as the LLM service.
 (use-package eaf-pdf-viewer
   :after eaf
   :straight nil
+  :commands (eaf-pdf-outline)
   :config
   (eaf-bind-key scroll_up "C-n" eaf-pdf-viewer-keybinding)
   (eaf-bind-key scroll_down "C-p" eaf-pdf-viewer-keybinding)
@@ -6623,7 +6625,8 @@ Use groq as the LLM service.
 #+begin_src emacs-lisp
 (use-package eaf-pyqterminal
   :after eaf
-  :straight nil)
+  :straight nil
+  :commands (eaf-open-pyqterminal))
 #+end_src
 
 ** eaf-markdown-previewer
@@ -6631,7 +6634,8 @@ Use groq as the LLM service.
 #+begin_src emacs-lisp
 (use-package eaf-markdown-previewer
   :after eaf
-  :straight nil)
+  :straight nil
+  :commands (eaf-markdown-previewer-open))
 #+end_src
 
 ** eaf-org-previewer
