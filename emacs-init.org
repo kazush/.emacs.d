@@ -5974,7 +5974,202 @@ Macros to retrive API keys for LLM servce providers.
   ;; Set default backend.
   (setq gptel-backend (my/gptel-get-backend "Gemini"))
   (setq gptel-model 'gemini-2.0-flash)
+
+  ;;
+  ;; Tools - mostly copied from https://github.com/karthink/gptel/issues/514
+  ;;
+
+  (gptel-make-tool
+   :function (lambda (location units lang)
+               (let ((url (format "https://api.openweathermap.org/data/2.5/forecast?q=%s%s%s&mode=json&appid=%s"
+                                  location
+                                  (if (member units '("metric" "imperial")) (format "&units=%s" units) "")
+                                  (if (= (length lang) 2) (format "&lang=%s" lang) "")
+                                  (auth-source-pick-first-password :host "weather-api-key"))))
+                 (message "get_weather_forecast: %s" url)
+                 (with-current-buffer (url-retrieve-synchronously url)
+                   (let ((data
+                          (save-excursion
+                            (goto-char (point-min))
+                            (forward-paragraph)
+                            (forward-char)
+                            (delete-region (point-min) (point))
+                            (buffer-string))))
+                     (run-at-time 0 nil #'kill-buffer (current-buffer))
+                     (json-parse-string data)))))
+   :name "get_weather_forecast"
+   :description "Get 5-day, 3-hour step weather forecast for a given location in JSON format"
+   :args (list '(:name "location"
+                       :type "string"
+                       :description "The location in the form of city,state,country. eg. Setagaya-ku,Tokyo,Japan")
+               '(:name "units"
+                       :type "string"
+                       :enum ("metric" "imperial")
+                       :description
+                       "Units of measurement, either 'metric' or 'imperial'. Use imperial for temperature in Fahrenheit. Use metric for temperature in Celsius"
+                       :optional t)
+               '(:name "lang"
+                       :type "string"
+                       :description
+                       "2-character language code. e.g. 'en' for English, 'ja' for Japanese"
+                       :optional t))
+   :category "web")
+
+  (gptel-make-tool
+   :function (lambda (url)
+               (message "read_url: %s" url)
+               (with-current-buffer (url-retrieve-synchronously url)
+                 (goto-char (point-min)) (forward-paragraph)
+                 (let ((dom (libxml-parse-html-region (point) (point-max))))
+                   (run-at-time 0 nil #'kill-buffer (current-buffer))
+                   (with-temp-buffer
+                     (shr-insert-document dom)
+                     (buffer-substring-no-properties (point-min) (point-max))))))
+   :name "read_url"
+   :description "Fetch and read the contents of a URL"
+   :args (list '(:name "url"
+                       :type "string"
+                       :description "The URL to read"))
+   :category "web")
+
+  (gptel-make-tool
+   :function (lambda (buffer text)
+               (with-current-buffer (get-buffer-create buffer)
+                 (save-excursion
+                   (goto-char (point-max))
+                   (insert text)))
+               (format "Appended text to buffer %s" buffer))
+   :name "append_to_buffer"
+   :description "Append text to the an Emacs buffer.  If the buffer does not exist, it will be created."
+   :args (list '(:name "buffer"
+                       :type "string"
+                       :description "The name of the buffer to append text to.")
+               '(:name "text"
+                       :type "string"
+                       :description "The text to append to the buffer."))
+   :category "emacs")
+
+  ;; Message buffer logging tool
+  (gptel-make-tool
+   :function (lambda (text)
+               (message "%s" text)
+               (format "Message sent: %s" text))
+   :name "echo_message"
+   :description "Send a message to the *Messages* buffer"
+   :args (list '(:name "text"
+                       :type "string"
+                       :description "The text to send to the messages buffer"))
+   :category "emacs")
+
+  ;; buffer retrieval tool
+  (gptel-make-tool
+   :function (lambda (buffer)
+               (unless (buffer-live-p (get-buffer buffer))
+                 (error "Error: buffer %s is not live." buffer))
+               (with-current-buffer  buffer
+                 (buffer-substring-no-properties (point-min) (point-max))))
+   :name "read_buffer"
+   :description "Return the contents of an Emacs buffer"
+   :args (list '(:name "buffer"
+                       :type "string"
+                       :description "The name of the buffer whose contents are to be retrieved"))
+   :category "emacs")
+
+
+  (gptel-make-tool
+   :function (lambda (directory)
+               (mapconcat #'identity
+                          (directory-files directory)
+                          "\n"))
+   :name "list_directory"
+   :description "List the contents of a given directory"
+   :args (list '(:name "directory"
+                       :type "string"
+                       :description "The path to the directory to list"))
+   :category "filesystem")
+
+  (gptel-make-tool
+   :function (lambda (parent name)
+               (condition-case nil
+                   (progn
+                     (make-directory (expand-file-name name parent) t)
+                     (format "Directory %s created/verified in %s" name parent))
+                 (error (format "Error creating directory %s in %s" name parent))))
+   :name "make_directory"
+   :description "Create a new directory with a given name in a specified parent directory"
+   :args (list '(:name "parent"
+                       :type "string"
+                       :description "The parent directory where the new directory should be created, e.g. /tmp")
+               '(:name "name"
+                       :type "string"
+                       :description "The name of the new directory to create, e.g. testdir"))
+   :category "filesystem")
+
+  (gptel-make-tool
+   :function (lambda (path filename content)
+               (let ((full-path (expand-file-name filename path)))
+                 (with-temp-buffer
+                   (insert content)
+                   (write-file full-path))
+                 (format "Created file %s in %s" filename path)))
+   :name "create_file"
+   :description "Create a new file with a specified content"
+   :args (list '(:name "path"
+                       :type "string"
+                       :description "The directory where to create the file")
+               '(:name "filename"
+                       :type "string"
+                       :description "The name of the file to create")
+               '(:name "content"
+                       :type "string"
+                       :description "The content to write to the file"))
+   :category "filesystem")
+
+  (gptel-make-tool
+   :function (lambda (filepath)
+               (with-temp-buffer
+                 (insert-file-contents (expand-file-name filepath))
+                 (buffer-string)))
+   :name "read_file"
+   :description "Read and display the contents of a file"
+   :args (list '(:name "filepath"
+                       :type "string"
+                       :description "Path to the file to read.  Supports relative paths and ~."))
+   :category "filesystem")
+
+  ;;
+  ;; Local Tools
+  ;;
+  (defun my/gptel-tool-web-search (callback keyword)
+    "Launch web search process and return results in JSON format."
+    (message "calling web_search with keyword %s" keyword)
+    (let* ((outbuf (get-buffer-create (concat (make-temp-name " *gptel-tool-web-search-") "*")))
+           (process
+            (make-process :name "curl"
+                          :command `("curl" "-X" "GET" "-L" "--no-progress-meter"
+                                     "http://localhost:8081"
+                                     "--data-urlencode" ,(concat "q=" keyword)
+                                     "--data" "format=json")
+                          :buffer outbuf
+                          :sentinel `(lambda (proc status)
+                                       (funcall ,callback
+                                                (with-current-buffer ,outbuf
+                                                  (buffer-string)))
+                                       (run-at-time 0 nil #'kill-buffer ,outbuf)))))
+      (message "web_search process created with buffer %s for keyword '%s'" outbuf keyword)))
+
+  (gptel-make-tool
+   :function #'my/gptel-tool-web-search
+   :name "web_search"
+   :description "Search the Web for a given keyword and return results in JSON format"
+   :args (list '(:name "keyword"
+                       :type "string"
+                       :description "The search keyword"))
+   :category "web"
+   :async t)
+
   )
+
 #+end_src
 
 ** org-ai
