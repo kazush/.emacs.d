@@ -1723,6 +1723,8 @@ Dabbrev settings copied from the GitHub Corfu page.
   :straight nil
   :after corfu
   :hook (corfu-mode . corfu-popupinfo-mode)
+  :custom
+  (corfu-popupinfo-delay '(1.0 . 0))
   :config
 
   ;; Scroll up/down by half frame-height by default.
@@ -3421,7 +3423,7 @@ Eldoc-box displays eldoc contents in a child frame but is currently disabled.
 (use-package symbol-overlay
   :diminish
   :hook (prog-mode . symbol-overlay-mode)
-  :custom (symbol-overlay-idle-time 1.0))
+  :custom (symbol-overlay-idle-time 0.5))
 #+end_src
 
 *** Highlight indent guides
