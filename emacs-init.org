@@ -4855,8 +4855,11 @@ Display remote images specified by URLs inline in org-mode.
 #+end_src
 ** org-fragtog
 
+Disabled at the moment in favor of xenops.
+
 #+begin_src emacs-lisp
 (use-package org-fragtog
+  :disabled
   :after org
   :straight (org-fragtog
              :type git
