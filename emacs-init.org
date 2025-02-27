@@ -4754,6 +4754,8 @@ add ctime and mtime properties to org-roam nodes.
 (use-package org-modern
   :hook ((org-mode . org-modern-mode)
          (org-agenda-finalize . org-modern-agenda))
+  :custom
+  (org-modern-table nil)
   :config
   ;; borrowed from https://misohena.jp/blog/2022-08-27-fix-org-table-lines-using-org-modern-and-org-indent.html
 
