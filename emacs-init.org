@@ -5109,11 +5109,15 @@ Seeme like Xenops can replace slow latex preview. Trying it out now.
 #+begin_src emacs-lisp
 (use-package xenops
   :after org
+  :hook ((cdlatex-mode org-cdlatex-mode) . xenops-mode)
   :custom
   ;; TODO(me): move config for common tex/latex variables to a dedicated section.
   (latex-run-command "xelatex")
   (LaTeX-command "xelatex")
   :config
+
+  (setq xenops-reveal-on-entry t)
+  (setq xenops-math-image-scale-factor 1.2)
 
   ;; Override xenops specific latex processs alist with org-preview-latex one.
   (setq xenops-math-latex-process-alist org-preview-latex-process-alist)
