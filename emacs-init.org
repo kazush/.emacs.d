@@ -4694,7 +4694,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
   (defun my/org-roam-project-capture-journal (prj)
     "Capture new journal for the selected project."
     (interactive (list (my/org-roam-project-read)))
-    (my/org-roam-project-capture prj "journal" "* %<%H:%S> %?"))
+    (my/org-roam-project-capture prj "journal" "* %<%H:%M> %?"))
 
   (defun my/org-roam-project-capture-task (prj)
     "Capture new task for the selected project."
