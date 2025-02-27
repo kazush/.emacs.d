@@ -1233,7 +1233,8 @@ vertico and related packages are used for completion framework.
 (use-package vertico-repeat
   :straight (:type built-in)
   :after vertico
-  :bind ("C-c -" . vertico-repeat)
+  :bind (("C-c z" . vertico-repeat)
+         ("C-c _" . vertico-repeat-select))
   :hook (minibuffer-setup . vertico-repeat-save))
 
 (use-package vertico-multiform
