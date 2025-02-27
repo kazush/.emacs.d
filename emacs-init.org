@@ -2225,6 +2225,8 @@ Align tables with variable pitch fonts.
 #+begin_src emacs-lisp
 (use-package valign
   :diminish
+  :custom
+  (valign-fancy-bar t)
   :hook ((org-mode markdown-mode) . valign-mode))
 #+end_src
 
