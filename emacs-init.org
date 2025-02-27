@@ -4444,7 +4444,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
                   (save-restriction
                     (let ((start (match-beginning 4))
                           (end (match-end 4)))
-                      (message "do recursive call with [%s]" (buffer-substring start end))
+                      ;; (message "do recursive call with [%s]" (buffer-substring start end))
                       (narrow-to-region start end)
                       (goto-char start)
                       (org-do-emphasis-faces end))))
