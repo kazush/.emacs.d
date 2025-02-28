@@ -383,6 +383,7 @@ This is a temporary measure. Set variables to try to avoid unwanted line breaks.
   :custom
   (shr-use-fonts nil)
   (shr-max-width 100000)
+  (shr-fill-text nil)
   :config
 
   ;; Forcibly use EWW to browse a URL.
