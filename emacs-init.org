@@ -1195,8 +1195,28 @@ goggles is now used instead of volatile-highlights.
 (use-package dimmer
   :straight (:type git :host github :repo "gonewest818/dimmer.el")
   :custom
-  (dimmer-fraction 0.3)
+  (dimmer-fraction 0.25)
   :config
+
+;; Prevent dimming when transient elements like child frames or posframes are active.
+(defun my/dimmer-process-all-predicates (orig-fn &rest args)
+    "Avoid invoking dimmer-process-all in certain situations."
+    (cond
+     ((and (fboundp 'lsp-ui-doc--get-frame)
+           (frame-visible-p (lsp-ui-doc--get-frame)))
+      nil)
+     ((and (boundp 'corfu--frame)
+           (not (null corfu--frame))
+           (frame-visible-p corfu--frame))
+      nil)
+     ((and (boundp 'posframe--frame)
+           (not (null posframe--frame))
+           (frame-visible-p posframe--frame))
+      nil)
+     (t
+      (apply orig-fn args))))
+  (advice-add #'dimmer-process-all :around #'my/dimmer-process-all-predicates)
+
   (dimmer-configure-which-key)
   (dimmer-configure-magit)
   (dimmer-configure-hydra)
