@@ -1187,6 +1187,22 @@ goggles is now used instead of volatile-highlights.
   :config
   (ultra-scroll-mode 1))
 #+end_src
+
+** Dimmer
+
+#+begin_src emacs-lisp
+(use-package dimmer
+  :straight (:type git :host github :repo "gonewest818/dimmer.el")
+  :custom
+  (dimmer-fraction 0.3)
+  :config
+  (dimmer-configure-which-key)
+  (dimmer-configure-magit)
+  (dimmer-configure-hydra)
+  (dimmer-configure-posframe)
+  (dimmer-mode 1))
+#+end_src
+
 * Completion
 
 vertico and related packages are used for completion framework.
