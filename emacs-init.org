@@ -3636,7 +3636,10 @@ Manually enable ~copilot-mode~ when needed.
 (use-package copilot
   :straight (:host github :repo "copilot-emacs/copilot.el" :files ("*.el"))
   :bind ( :map copilot-completion-map
-          ("C-<return>" . copilot-accept-completion)))  ;; tab conficts with others such as LSP.
+          ("C-<return>" . copilot-accept-completion)
+          ("C-c C-f" . copilot-accept-completion-by-word)
+          ("C-c C-n" . copilot-accept-completion-by-line)
+          ("C-c C-p" . copilot-accept-completion-by-paragraph)))
 #+end_src
 
 *** Tabnine
