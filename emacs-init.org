@@ -4152,7 +4152,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
          (org-babel-after-execute . org-redisplay-inline-images))
   :custom
   (org-emphasis-regexp-components
-   '("-[:nonascii:][:space:]('\"{" "-[:space:][:nonascii:].,:!?;'\")}\\[" "[:space:][:nonascii:]" "." 1))
+   '("-[:nonascii:][:space:]('\"{" "-[:space:][:nonascii:].,:!?;'\")}\\[" "[:space:]" "." 1))
   (org-agenda-format-date "%b %e (%a)")
   (org-agenda-file-regexp "\\`[^.].*\\.org\\\(\\.gpg\\\)?\\'")
   (org-agenda-sorting-strategy
