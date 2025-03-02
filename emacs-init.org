@@ -1161,6 +1161,10 @@ goggles is now used instead of volatile-highlights.
           ("7" . my/tab-bar-switch-to-7)
           ("8" . my/tab-bar-switch-to-8)
           ("9" . my/tab-bar-switch-to-9))
+  :custom
+  (tab-bar-close-button-show nil)
+  (tab-bar-new-button-show nil)
+  (tab-bar-auto-width-max '((150) 15))
   :config
 
   (defun my/tab-bar-kill-buffer-and-tab ()
