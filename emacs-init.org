@@ -6627,7 +6627,9 @@ Use groq as the LLM service.
   :preface
   ;; Launch initial install script.
   (unless (f-dir-p (format "%s/straight/%s/eaf/app" straight-base-dir straight-build-dir))
-    (eaf-install-and-update)))
+    (eaf-install-and-update))
+  :custom
+  (eaf-python-command "/usr/bin/python3"))
 #+end_src
 
 ** eaf-browser
