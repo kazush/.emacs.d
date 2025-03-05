@@ -6294,7 +6294,7 @@ Use groq as the LLM service.
          (";" . elfeed-kill-buffer)
          ("j" . scroll-up-command)
          ("k" . scroll-down-command)
-         ("v" . elfeed-show-visit)
+         ("v" . my/elfeed-show-visit-with-eaf)
          ("b" . my/elfeed-show-visit-with-eww)
          ("B" . elfeed-show-visit)
          ("SPC" . my/elfeed-show-scroll-up-then-quit)
@@ -6359,6 +6359,11 @@ Use groq as the LLM service.
       (scroll-up-command arg)
       (when (eobp)
         (elfeed-kill-buffer))))
+
+  (defun my/elfeed-show-visit-with-eaf (&optional use-generic-p)
+    (interactive "P")
+    (let ((browse-url-browser-function #'eaf-open-browser))
+      (elfeed-show-visit use-generic-p)))
 
   (defun my/elfeed-show-visit-with-eww (&optional use-generic-p)
     (interactive "P")
@@ -6663,7 +6668,6 @@ Use groq as the LLM service.
   (eaf-browser-continue-where-left-off t)
   (eaf-browser-enable-adblocker t)
   (eaf-browser-translate-language "ja")
-  (browse-url-browser-function 'eaf-open-browser)
   :config
   (defalias 'browse-web #'eaf-open-browser)
   (eaf-bind-key insert_or_scroll_down_page "<backspace>" eaf-browser-keybinding)
