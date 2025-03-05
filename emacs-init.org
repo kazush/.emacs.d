@@ -1849,6 +1849,23 @@ Dabbrev settings copied from the GitHub Corfu page.
   (add-hook 'marginalia-mode-hook #'nerd-icons-completion-marginalia-setup))
 #+end_src
 
+** completion preview mode
+
+A new mode integrated in Emacs 30.
+
+#+begin_src emacs-lisp
+(use-package completion-preview
+  :straight (:type built-in)
+  :hook ((org-mode text-mode markdown-mode
+          lisp-interaction-mode) . completion-preview-mode)
+  :bind (:map completion-preview-active-mode-map
+          ("M-n" . completion-preview-next-candidate)
+          ("M-p" . completion-preview-prev-candidate))
+  :custom
+  (completion-preview-minimum-symbol-length 2)
+)
+#+end_src
+
 * Edit modes
 
 ** YAML
