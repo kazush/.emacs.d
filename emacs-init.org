@@ -1206,8 +1206,8 @@ goggles is now used instead of volatile-highlights.
 (defun my/dimmer-process-all-predicates (orig-fn &rest args)
     "Avoid invoking dimmer-process-all in certain situations."
     (cond
-     ((and (fboundp 'lsp-ui-doc--get-frame)
-           (frame-visible-p (lsp-ui-doc--get-frame)))
+     ((let ((frame (frame-parameter (frame-parent) 'lsp-ui-doc-frame)))
+        (and frame (frame-visible-p frame)))
       nil)
      ((and (boundp 'corfu--frame)
            (not (null corfu--frame))
