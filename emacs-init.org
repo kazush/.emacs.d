@@ -560,7 +560,15 @@ called in hooks.
    '(ansi-color-bright-blue ((t :foreground "#81a1f1" :background "#81a1f1")))
    '(ansi-color-bright-magenta ((t :foreground "#b48ead" :background "#b48ead")))
    '(ansi-color-bright-cyan ((t :foreground "#8fbcbb" :background "#8fbcbb")))
-   '(ansi-color-bright-white ((t :foreground "#eceff4" :background "#eceff4"))))
+   '(ansi-color-bright-white ((t :foreground "#eceff4" :background "#eceff4")))
+   '(diff-header ((t :foreground "gray95" :background "gray20")))
+   '(diff-file-header ((t :foreground "gray95" :background "gray30")))
+   '(ediff-even-diff-A ((t :foreground 'unspecified :background "gray25")))
+   '(ediff-even-diff-B ((t :foreground 'unspecified :background "gray25")))
+   '(ediff-even-diff-C ((t :foreground 'unspecified :background "gray25")))
+   '(ediff-odd-diff-A ((t :foreground 'unspecified :background "gray25")))
+   '(ediff-odd-diff-B ((t :foreground 'unspecified :background "gray25")))
+   '(ediff-odd-diff-C ((t :foreground 'unspecified :background "gray25"))))
 
   (unless (daemonp)
     (set-face-attribute 'mode-line-inactive nil
