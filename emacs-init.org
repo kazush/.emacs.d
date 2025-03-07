@@ -3872,6 +3872,7 @@ A fork of aider.el that seems to have better integration with Emacs.
   (aidermacs-backend 'vterm)
   (aidermacs-auto-commits t)
   :config
+  (aidermacs-setup-minor-mode)
   (defun my/aidermacs ()
     "Set known API keys before launching aidermacs."
     (interactive)
