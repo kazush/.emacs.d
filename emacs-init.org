@@ -794,6 +794,13 @@ prefix. This way which-key will be more useful.
 
 ** Input Method
 
+Disable GTK native input to allow toggling Mozc using the same key as Fcitx5.
+
+#+begin_src emacs-lisp
+(when (boundp 'x-gtk-use-native-input)
+  (setq x-gtk-use-native-input nil))
+#+end_src
+
 Specify Japanese input method ~Mozc~ (which bases Google Japanese Input method).
 Currently it is disabled as I don't want to build emacs-mozc on Arch.
 
