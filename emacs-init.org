@@ -802,11 +802,11 @@ Currently it is disabled as I don't want to build emacs-mozc on Arch.
   :custom
   (default-input-method "japanese-mozc")
   (mozc-candidate-style 'echo-area)
-  :bind (("<muhenkan>" . toggle-input-method)
+  :bind (("<hiragana-katakana>" . toggle-input-method)
          ("S-SPC" . my/scroll-down-or-toggle-input-method)
          :map mozc-mode-map
          ("S-SPC" . my/deactivate-input-method)
-         ("<muhenkan>" . my/deactivate-input-method))
+         ("<hiragana-katakana>" . my/deactivate-input-method))
   :config
   (defun my/scroll-down-or-toggle-input-method ()
     "Scroll down in EAF browser buffer or toggle-input-method."
