@@ -2290,6 +2290,15 @@ Align tables with variable pitch fonts.
 (use-package htmlize)
 #+end_src
 
+** vlf
+
+#+begin_src emacs-lisp
+(use-package vlf
+  :bind ("C-c V" . vlf)
+  :config
+  (require 'vlf-setup))
+#+end_src
+
 * Window and workspace management
 
 ** Persp-mode
