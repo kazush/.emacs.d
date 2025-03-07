@@ -440,6 +440,12 @@ Add small wrappers so that I can launch intended browser as needed.
   (recentf-max-saved-items 100)
   (recentf-exclude '("/org/roam/"))
   :config
+
+  (add-to-list 'recentf-exclude
+               (lambda (file)
+                 (when (boundp 'org-agenda-files)
+                   (member file org-agenda-files))))
+
   (recentf-mode))
 #+end_src
 
@@ -4240,7 +4246,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
      (sequence "SHOPPING(s)" "|" "DONE(d!)" "CANCELLED(c@)")))
   (org-log-done 'time)
   (org-capture-templates nil) ;; Migrated to org-roam-capture.
-  (org-agenda-files '("agenda.org" "economic-calendar.org"))
+  (org-agenda-files '("~/org/agenda.org" "~/org/economic-calendar.org"))
   (org-tag-alist
    '(("ai")
      ("algo")
