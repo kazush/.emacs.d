@@ -506,7 +506,7 @@ called in hooks.
                       :inherit 'default)
   (set-face-attribute 'region nil
                       :foreground 'unspecified
-                      :background "RoyalBlue4")
+                      :background "#203050")
   (set-face-foreground 'show-paren-match "orange")
   (set-face-attribute 'font-lock-doc-face nil
                       :foreground "azure3"
@@ -563,12 +563,18 @@ called in hooks.
    '(ansi-color-bright-white ((t :foreground "#eceff4" :background "#eceff4")))
    '(diff-header ((t :foreground "gray95" :background "gray20")))
    '(diff-file-header ((t :foreground "gray95" :background "gray30")))
-   '(ediff-even-diff-A ((t :foreground 'unspecified :background "gray25")))
-   '(ediff-even-diff-B ((t :foreground 'unspecified :background "gray25")))
-   '(ediff-even-diff-C ((t :foreground 'unspecified :background "gray25")))
-   '(ediff-odd-diff-A ((t :foreground 'unspecified :background "gray25")))
-   '(ediff-odd-diff-B ((t :foreground 'unspecified :background "gray25")))
-   '(ediff-odd-diff-C ((t :foreground 'unspecified :background "gray25"))))
+   '(ediff-current-diff-A ((t :foreground nil :background "#403030")))
+   '(ediff-current-diff-B ((t :foreground nil :background "#304030")))
+   '(ediff-current-diff-C ((t :foreground nil :background "#404030")))
+   '(ediff-fine-diff-A ((t :foreground nil :background "#504040")))
+   '(ediff-fine-diff-B ((t :foreground nil :background "#405040")))
+   '(ediff-fine-diff-C ((t :foreground nil :background "#505040")))
+   '(ediff-even-diff-A ((t :foreground nil :background "#403030")))
+   '(ediff-even-diff-B ((t :foreground nil :background "#304030")))
+   '(ediff-even-diff-C ((t :foreground nil :background "#404030")))
+   '(ediff-odd-diff-A ((t :foreground nil :background "#403030")))
+   '(ediff-odd-diff-B ((t :foreground nil :background "#304030")))
+   '(ediff-odd-diff-C ((t :foreground nil :background "#404030"))))
 
   (unless (daemonp)
     (set-face-attribute 'mode-line-inactive nil
