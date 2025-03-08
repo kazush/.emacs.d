@@ -274,6 +274,7 @@ TODO: watch [[https://protesilaos.com/codelog/2020-04-10-emacs-smerge-ediff/][th
 #+begin_src emacs-lisp
 (use-package ediff
   :commands (ediff ediff3)
+  :hook (ediff-after-quit-hook-internal . winner-undo)
   :custom
   (ediff-window-setup-function 'ediff-setup-windows-plain)
   (ediff-split-window-function 'split-window-horizontally))
