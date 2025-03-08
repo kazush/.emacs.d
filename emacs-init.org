@@ -6262,8 +6262,64 @@ Macros to retrive API keys for LLM servce providers.
    :category "web"
    :async t)
 
-  )
+;;
+;; Hooks to enable Google Search with Gemini
+;;
 
+(defcustom my/gptel-gemini-use-google-search t
+  "Whether Google Search should be enabled with Gemini.")
+
+(defun my/gptel-gemini-use-google-search-advice (orig-fn &rest args)
+  "Advice to add Google Search tool to request data."
+  (let ((plist (apply orig-fn args)))
+    (if (and my/gptel-gemini-use-google-search
+             (string-match-p "gemini.*" (symbol-name gptel-model)))
+        (let ((tools (plist-get plist :tools)))
+          (plist-put plist :tools
+                     (if tools (vconcat '[(:google_search ())] tools)
+                       '[(:google_search ())])))
+      plist)))
+
+(advice-add #'gptel--request-data :around #'my/gptel-gemini-use-google-search-advice)
+
+(defun my/gptel-gemini-format-grounding-web (web)
+  "Return a formatted link suitable for gptel-default-mode."
+  (let ((uri (plist-get web :uri))
+        (title (plist-get web :title)))
+    (pcase gptel-default-mode
+      ('org-mode (format "[[%s][%s]]" uri title))
+      ('markdown-mode (format "[%s](%s)" uri title))
+      (_ title))))
+
+(defun my/gptel-gemini-add-grounding-info-advice (orig-fn backend response info &optional include-text)
+  "Advice to attach grounding information."
+  (let* ((text (funcall orig-fn backend response info include-text))
+         (cand0 (map-nested-elt response '(:candidates 0)))
+         (chunks (map-nested-elt cand0 '(:groundingMetadata :groundingChunks)))
+         (queries (map-nested-elt cand0 '(:groundingMetadata :webSearchQueries)))
+         (src-info
+          (cl-loop
+           for chunk across chunks
+           when (plist-get chunk :web) collect it into webs
+           finally return webs))
+         )
+    (concat text
+            (when src-info
+              (format "\nGrounding Sources:\n%s"
+                      (apply #'concat
+                             (mapcar (lambda (src)
+                                       (format "- %s\n" (my/gptel-gemini-format-grounding-web src)))
+                                     src-info))))
+            (when queries
+              (format "\nSearch Queries:\n%s"
+                      (apply #'concat
+                             (mapcar (lambda (kw) (format "- %s\n" kw)) queries)))))))
+
+  (advice-add #'gptel--parse-response :around #'my/gptel-gemini-add-grounding-info-advice)
+
+  ;; (setq gptel-log-level 3)
+  ;; (setq test-response '(:candidates [(:groundingMetadata (:groundingChunks [(:web (:uri "url1" :title "title1")) (:web (:uri "url2" :title "title2"))] :searchQueries ["query1" "query2"]))]))
+  ) ;; use-package gptel
 #+end_src
 
 ** org-ai
