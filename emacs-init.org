@@ -4019,7 +4019,7 @@ Use pyvenv package to simply support virtualenv.
     "Activate venv at buffer's default directory or home directory."
     (interactive)
     (let ((venv-dir (concat default-directory "/.venv")))
-      (pyvenv-activate (if (f-dir-p venv-dir) venv-dir "~/.venv"))))
+      (pyvenv-activate (if (file-directory-p venv-dir) venv-dir "~/.venv"))))
 
   (defun my/pyvenv-setup ()
     (require 'esh-mode)  ;; for eshell-mode-map
@@ -4719,7 +4719,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
   (my/org-agenda-update-agenda-files)
 
   :config
-  (unless (f-dir-p org-roam-directory)
+  (unless (file-directory-p org-roam-directory)
     (mkdir org-roam-directory t))
   (org-roam-db-autosync-enable)
 
@@ -4751,7 +4751,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
              (node (org-roam-node-create :file file :title title))
              (hook (lambda ()
                      (my/org-roam-project-add-properties prj props))))
-        (unless (f-dir-p prj-dir)
+        (unless (file-directory-p prj-dir)
           (mkdir prj-dir t))
         (add-hook 'org-roam-capture-new-node-hook hook)
         (org-roam-capture- :node node)
@@ -5941,7 +5941,7 @@ Macros to retrive API keys for LLM servce providers.
     (setf (alist-get 'org-mode gptel-response-prefix-alist) "- @ai :: "))
 
   (defvar my/gptel-save-directory "~/org/gptel")
-  (unless (f-dir-p my/gptel-save-directory)
+  (unless (file-directory-p my/gptel-save-directory)
     (mkdir my/gptel-save-directory t))
 
   (defun my/gptel-insert-new-chat-heading ()
@@ -6668,7 +6668,7 @@ Use groq as the LLM service.
                                    ("extension" "extension/*") ("core" "core/*")))
   :preface
   ;; Launch initial install script.
-  (unless (f-dir-p (format "%s/straight/%s/eaf/app" straight-base-dir straight-build-dir))
+  (unless (file-directory-p (format "%s/straight/%s/eaf/app" straight-base-dir straight-build-dir))
     (eaf-install-and-update))
   :custom
   (eaf-python-command "/usr/bin/python3"))
