@@ -3122,6 +3122,7 @@ Yet another terminal emulator. Trying out now.
      (cpp "https://github.com/tree-sitter/tree-sitter-cpp" "v0.22.0")
      (css "https://github.com/tree-sitter/tree-sitter-css")
      (csharp "https://github.com/tree-sitter/tree-sitter-c-sharp")
+     (dockerfile "https://github.com/camdencheek/tree-sitter-dockerfile")
      (elisp "https://github.com/Wilfred/tree-sitter-elisp")
      (go "https://github.com/tree-sitter/tree-sitter-go")
      (go-mod "https://github.com/camdencheek/tree-sitter-go-mod")
