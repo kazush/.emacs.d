@@ -508,7 +508,7 @@ called in hooks.
                       :inherit 'default)
   (set-face-attribute 'region nil
                       :foreground 'unspecified
-                      :background "#203050")
+                      :background "#404068")
   (set-face-foreground 'show-paren-match "orange")
   (set-face-attribute 'font-lock-doc-face nil
                       :foreground "azure3"
