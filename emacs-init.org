@@ -6275,10 +6275,11 @@ Macros to retrive API keys for LLM servce providers.
     (if (and my/gptel-gemini-use-google-search
              (string-match-p "gemini.*" (symbol-name gptel-model)))
         (let ((tools (plist-get plist :tools)))
-          (plist-put plist :tools
-                     (if tools (vconcat '[(:google_search ())] tools)
-                       '[(:google_search ())])))
-      plist)))
+          (unless (cl-some (lambda (pl) (plist-member pl :google_search)) tools)
+            (plist-put plist :tools
+                       (if tools (vconcat '[(:google_search ())] tools)
+                         '[(:google_search ())])))))
+    plist))
 
 (advice-add #'gptel--request-data :around #'my/gptel-gemini-use-google-search-advice)
 
