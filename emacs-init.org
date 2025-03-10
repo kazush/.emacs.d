@@ -6266,59 +6266,86 @@ Macros to retrive API keys for LLM servce providers.
    :category "web"
    :async t)
 
-;;
-;; Hooks to enable Google Search with Gemini
-;;
+  ;;
+  ;; Tweak request data
+  ;;
+  (defun my/gptel-addtional-system-message ()
+    (concat
+     "The following is supplementary information.\n"
+     (format-time-string  "The current time in %Z is %r on %B %d, %Y." nil t)
+     ))
 
-(defcustom my/gptel-gemini-use-google-search t
-  "Whether Google Search should be enabled with Gemini.")
+  (defun my/gptel-tweak-request-data-advice (orig-fn &rest args)
+    "Advice to tweak request data before sending it."
+    (let* ((plist (apply orig-fn args))
+           (genconfig (plist-get plist :generationConfig))
+           (sysmsg-place (map-nested-elt plist '(:system_instruction :parts)))
+           (sysmsg (plist-get sysmsg-place :text)))
+      ;; Set temperature since the original function enforces a minimum temperature of 1.0 for some reason...
+      (plist-put genconfig :temperature gptel-temperature)
+      ;; Inject additional information to system prompt message.
+      (plist-put sysmsg-place :text (concat sysmsg (my/gptel-addtional-system-message)))
+      plist))
 
-(defun my/gptel-gemini-use-google-search-advice (orig-fn &rest args)
-  "Advice to add Google Search tool to request data."
-  (let ((plist (apply orig-fn args)))
-    (if (and my/gptel-gemini-use-google-search
-             (string-match-p "gemini.*" (symbol-name gptel-model)))
-        (let ((tools (plist-get plist :tools)))
-          (unless (cl-some (lambda (pl) (plist-member pl :google_search)) tools)
-            (plist-put plist :tools
-                       (if tools (vconcat '[(:google_search ())] tools)
-                         '[(:google_search ())])))))
-    plist))
+  (advice-add #'gptel--request-data :around #'my/gptel-tweak-request-data-advice)
 
-(advice-add #'gptel--request-data :around #'my/gptel-gemini-use-google-search-advice)
+  ;;
+  ;; Hooks to enable Google Search with Gemini
+  ;;
 
-(defun my/gptel-gemini-format-grounding-web (web)
-  "Return a formatted link suitable for gptel-default-mode."
-  (let ((uri (plist-get web :uri))
-        (title (plist-get web :title)))
-    (pcase gptel-default-mode
-      ('org-mode (format "[[%s][%s]]" uri title))
-      ('markdown-mode (format "[%s](%s)" uri title))
-      (_ title))))
+  (defcustom my/gptel-gemini-use-google-search t
+    "Whether Google Search should be enabled with Gemini.")
 
-(defun my/gptel-gemini-add-grounding-info-advice (orig-fn backend response info &optional include-text)
-  "Advice to attach grounding information."
-  (let* ((text (funcall orig-fn backend response info include-text))
-         (cand0 (map-nested-elt response '(:candidates 0)))
-         (chunks (map-nested-elt cand0 '(:groundingMetadata :groundingChunks)))
-         (queries (map-nested-elt cand0 '(:groundingMetadata :webSearchQueries)))
-         (src-info
-          (cl-loop
-           for chunk across chunks
-           when (plist-get chunk :web) collect it into webs
-           finally return webs))
-         )
-    (concat text
-            (when src-info
-              (format "\nGrounding Sources:\n%s"
-                      (apply #'concat
-                             (mapcar (lambda (src)
-                                       (format "- %s\n" (my/gptel-gemini-format-grounding-web src)))
-                                     src-info))))
-            (when queries
-              (format "\nSearch Queries:\n%s"
-                      (apply #'concat
-                             (mapcar (lambda (kw) (format "- %s\n" kw)) queries)))))))
+  (defun my/gptel-gemini-use-google-search-advice (orig-fn &rest args)
+    "Advice to add Google Search tool to request data."
+    (let* ((plist (apply orig-fn args)))
+      (if (and my/gptel-gemini-use-google-search
+               (string-match-p "gemini.*" (symbol-name gptel-model)))
+          (let ((tools (plist-get plist :tools)))
+            (unless (cl-some (lambda (pl) (plist-member pl :google_search)) tools)
+              (plist-put plist :tools
+                         (if tools (vconcat '[(:google_search ())] tools)
+                           '[(:google_search ())])))))
+      plist))
+
+  (advice-add #'gptel--request-data :around #'my/gptel-gemini-use-google-search-advice)
+
+  (defvar my/gptel-gemini-grounding-web-force-mode nil)
+  (defun my/gptel-gemini-format-grounding-web (web)
+    "Return a formatted link suitable for gptel-default-mode."
+    (let ((uri (plist-get web :uri))
+          (title (plist-get web :title)))
+      (pcase (or my/gptel-gemini-grounding-web-force-mode gptel-default-mode)
+        ('org-mode (format "[[%s][%s]]" uri title))
+        ('markdown-mode (format "[%s](%s)" uri title))
+        (_ title))))
+
+  (defun my/gptel-gemini-add-grounding-info-advice (orig-fn backend response info &optional include-text)
+    "Advice to attach grounding information."
+    (let* ((text (funcall orig-fn backend response info include-text))
+           (cand0 (map-nested-elt response '(:candidates 0)))
+           (chunks (map-nested-elt cand0 '(:groundingMetadata :groundingChunks)))
+           (queries (map-nested-elt cand0 '(:groundingMetadata :webSearchQueries)))
+           (src-info
+            (cl-loop
+             for chunk across chunks
+             when (plist-get chunk :web) collect it into webs
+             finally return webs))
+           ;; HACK to forcibly format source links in text mode for requests from gptel-quick.
+           (my/gptel-gemini-grounding-web-force-mode
+            (eq (plist-get info :callback) #'gptel-quick--callback-posframe))
+           )
+      (concat text
+              (when src-info
+                (format "\n\nGrounding Sources:\n%s"
+                        (apply #'concat
+                               (mapcar (lambda (src)
+                                         (format "- %s\n" (my/gptel-gemini-format-grounding-web src)))
+                                       src-info))))
+              (when queries
+                (format "\nSearch Queries:\n%s"
+                        (apply #'concat
+                               (mapcar (lambda (kw) (format "- %s\n" kw)) queries)))))))
 
   (advice-add #'gptel--parse-response :around #'my/gptel-gemini-add-grounding-info-advice)
 
