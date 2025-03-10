@@ -5916,7 +5916,7 @@ Macros to retrive API keys for LLM servce providers.
           ("g" . my/gptel-new)
           ("G" . gptel-send)
           :map gptel-mode-map
-          ("C-c i h" . my/gptel-insert-new-chat-heading)
+          ("C-c i h" . my/gptel-insert-new-chat)
           ("C-c i p" . my/gptel-insert-prompt-prefix))
   :commands (gptel gptel-send gptel-menu my/gptel-new)
   :hook (gptel-mode . (lambda () (goggles-mode -1)))
@@ -5958,6 +5958,12 @@ Macros to retrive API keys for LLM servce providers.
     "Insert prompt prefix."
     (interactive)
     (insert (concat "\n" (gptel-prompt-prefix-string))))
+
+  (defun my/gptel-insert-new-chat ()
+    "Insert new chat heading and prompt prefix."
+    (interactive)
+    (my/gptel-insert-new-chat-heading)
+    (my/gptel-insert-prompt-prefix))
 
   (defun my/gptel-new (&optional arg)
     "Create a new buffer backed by a file and start gptel there.."
