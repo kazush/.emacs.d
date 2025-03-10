@@ -5935,14 +5935,13 @@ Macros to retrive API keys for LLM servce providers.
   :custom
   (gptel-default-mode #'org-mode)
   (gptel-use-tools t)
-  (gptel-temperature 0.7)
   :config
 
   ;; Enable branching to limit context (requires >= Org 9.7).
   (when (fboundp 'org-element-lineage-map)
     (setq-default gptel-org-branching-context t)
-    (setf (alist-get 'org-mode gptel-prompt-prefix-alist) "**** @me: ")
-    (setf (alist-get 'org-mode gptel-response-prefix-alist) "**** @ai: "))
+    (setf (alist-get 'org-mode gptel-prompt-prefix-alist) "- @me :: ")
+    (setf (alist-get 'org-mode gptel-response-prefix-alist) "- @ai :: "))
 
   (defvar my/gptel-save-directory "~/org/gptel")
   (unless (file-directory-p my/gptel-save-directory)
