@@ -834,11 +834,10 @@ Currently it is disabled as I don't want to build emacs-mozc on Arch.
   (defun my/scroll-down-or-toggle-input-method ()
     "Scroll down in EAF browser buffer or toggle-input-method."
     (interactive)
-    (let ((mode (with-current-buffer (current-buffer) major-mode)))
-      (if (and (derived-mode-p 'eaf-mode)
-               (string= eaf--buffer-app-name "browser"))
-          (eaf-py-proxy-scroll_down_page)
-        (toggle-input-method))))
+    (if (and (derived-mode-p 'eaf-mode)
+             (string= eaf--buffer-app-name "browser"))
+        (eaf-py-proxy-scroll_down_page)
+      (toggle-input-method)))
 
   (defun my/deactivate-input-method ()
     (interactive)
