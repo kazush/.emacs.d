@@ -3564,7 +3564,11 @@ Disabled for now. This entry is for future use.
 
 #+begin_src emacs-lisp
 (use-package forge
-  :after magit)
+  :after magit
+  :config
+  ;; patch problematic face
+  (custom-set-faces
+   '(forge-topic-header-line ((t :inherit magit-header-line)))))
 #+end_src
 
 *** Git timemachine
