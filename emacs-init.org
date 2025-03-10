@@ -6271,7 +6271,7 @@ Macros to retrive API keys for LLM servce providers.
   ;;
   (defun my/gptel-addtional-system-message ()
     (concat
-     "The following is supplementary information.\n"
+     "\nThe following is supplementary information.\n"
      (format-time-string  "The current time in %Z is %r on %B %d, %Y." nil t)
      ))
 
