@@ -6365,6 +6365,54 @@ Macros to retrive API keys for LLM servce providers.
   ) ;; use-package gptel
 #+end_src
 
+** gptel-quick
+
+#+begin_src emacs-lisp
+(use-package gptel-quick
+  :straight (:type git :host github :repo "karthink/gptel-quick")
+  :bind-keymap ("C-c q" . my/gptel-quick-map)
+  :bind ( :map my/gptel-quick-map
+          ("e" . my/gptel-quick-explain)
+          ("t" . my/gptel-quick-translate)
+          ("s" . my/gptel-quick-summarize))
+  :init
+  (define-prefix-command 'my/gptel-quick-map)
+  :custom-face
+  (vertical-border ((t :foreground "gray")))
+  :config
+  ;; Setting these here as somehow :custom does not work...
+  (setq gptel-quick-word-count 150)
+  (setq gptel-quick-timeout 180)
+
+  (defun my/make-gptel-quick (action &optional system-message count google-search use-tools)
+    "Create a gptel-quick wrapper with given system message."
+    (fset (intern (format "my/gptel-quick-%s" action))
+          `(lambda () (interactive)
+             (let ((my/gptel-gemini-use-google-search ,google-search)
+                   (gptel-use-tools ,use-tools)
+                   (gptel-quick-word-count ,(or count gptel-quick-word-count))
+                   (gptel-quick-system-message
+                    (lambda (count)
+                      (format ,(or system-message
+                                   (concat (capitalize action) " in %d words or fewer. Provide only the answer without any greetings.")) count))))
+               (call-interactively #'gptel-quick)))))
+
+  (my/make-gptel-quick "explain" "日本語で%d文字以内で説明して。回答のみで挨拶等省略すること。" nil t)
+  (my/make-gptel-quick "translate" "%d文字以内で日本語に訳して。回答のみで挨拶等省略すること。")
+  (my/make-gptel-quick "summarize" "日本語で%d文字以内に要約して。回答のみで挨拶等省略すること。" 800)
+
+  (defun my/gptel-request-advice (orig-fn &rest args)
+    "Quick patch gptel-request to forcibly enable curl disabled in
+gptel-quick. Apparently responses become empty if gptel-use-curl is nil
+and stream is t."
+    (let ((gptel-use-curl t))
+      (apply orig-fn args)))
+  (advice-add #'gptel-request :around #'my/gptel-request-advice))
+#+end_src
+
+#+RESULTS:
+: my/gptel-quick-summarize
+
 ** org-ai
 
 Use groq as the LLM service.
