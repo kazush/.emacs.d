@@ -6304,15 +6304,20 @@ Macros to retrive API keys for LLM servce providers.
 
   (defun my/gptel-gemini-use-google-search-advice (orig-fn &rest args)
     "Advice to add Google Search tool to request data."
-    (let* ((plist (apply orig-fn args)))
+    (let* ((plist (apply orig-fn args))
+           (tools (plist-get plist :tools)))
       (if (and my/gptel-gemini-use-google-search
                (string-match-p "gemini.*" (symbol-name gptel-model)))
-          (let ((tools (plist-get plist :tools)))
+          (progn
             (unless (cl-some (lambda (pl) (plist-member pl :google_search)) tools)
-              (plist-put plist :tools
-                         (if tools (vconcat '[(:google_search ())] tools)
-                           '[(:google_search ())])))))
-      plist))
+                (plist-put plist :tools
+                           (if tools (vconcat '[(:google_search ())] tools)
+                             '[(:google_search ())])))
+            plist)
+        (setq tools (seq-remove (lambda (pl) (equal pl '(:google_search nil))) tools))
+        (if tools
+            (plist-put plist :tools (vconcat tools))
+          (map-delete plist :tools)))))
 
   (advice-add #'gptel--request-data :around #'my/gptel-gemini-use-google-search-advice)
 
