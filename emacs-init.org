@@ -4661,7 +4661,16 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
 ** org-bebel extensions
 
 #+begin_src emacs-lisp
-(use-package ob-go)
+(use-package ob-go
+  :after org)
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package ob-rust
+  :after org)
+#+end_src
+
+#+begin_src emacs-lisp
 (use-package ob-async
   :after org
   :config
