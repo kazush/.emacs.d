@@ -1910,15 +1910,15 @@ A new mode integrated in Emacs 30.
 ** Markdown
 
 #+begin_src emacs-lisp
-;; gfm-preview is a 1-line script containing "grip --export $1 -"
 (use-package markdown-mode
   :commands (markdown-mode gfm-mode)
   :mode (("README\\.md\\'" . gfm-mode)
          ("\\.md\\'" . markdown-mode)
          ("\\.markdown\\'" . markdown-mode))
-  :init
-  (let ((cmd (expand-file-name "~/bin/gfm-preview")))
-    (when (file-exists-p cmd) (setq markdown-command cmd)))
+  ;; :init
+  ;; ;; gfm-preview is a 1-line script containing "grip --export $1 -"
+  ;; (let ((cmd (expand-file-name "~/bin/gfm-preview")))
+  ;;   (when (file-exists-p cmd) (setq markdown-command cmd)))
   )
 #+end_src
 
@@ -6891,14 +6891,22 @@ Use groq as the LLM service.
 (use-package eaf-markdown-previewer
   :after eaf
   :straight nil
-  :commands (eaf-markdown-previewer-open))
+  :config
+  (with-eval-after-load 'markdown-mode
+    (defun my/markdown-preview (&optional output-buffer-name)
+      "Advice to launch eaf-markdown-previewer with the current buffer."
+      (interactive)
+      (when (derived-mode-p 'markdown-mode)
+        (eaf-open-this-buffer)))
+
+    (advice-add #'markdown-preview :override #'my/markdown-preview)))
 #+end_src
 
 ** eaf-org-previewer
 
 #+begin_src emacs-lisp
 (use-package eaf-org-previewer
-  :after (eaf htmlize)
+  :after eaf
   :straight nil)
 #+end_src
 
