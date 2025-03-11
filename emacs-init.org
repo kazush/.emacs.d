@@ -4897,11 +4897,21 @@ Disabled for now as it's not working well with some Org buffers (e.g. copilot-ch
   :bind (("C-c o L" . org-cliplink)))
 #+end_src
 
+
+** ox-hugo
+
 #+begin_src emacs-lisp
 (use-package ox-hugo
   :after ox
   :custom
   (org-hugo-default-section-directory "posts"))
+#+end_src
+
+** ox-pandoc
+
+#+begin_src emacs-lisp
+(use-package ox-pandoc
+  :after ox)
 #+end_src
 
 ** org-download
