@@ -4110,6 +4110,7 @@ TBH this is not maintaned these days.
   ;;                      (face-foreground 'font-lock-constant-face))
   ;; (set-face-foreground 'web-mode-type-face "navy")
   ;; (set-face-foreground 'web-mode-variable-name-face "lightblue")
+)
 #+end_src
 
 ** Javascript
