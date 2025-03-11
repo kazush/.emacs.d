@@ -3528,7 +3528,13 @@ Enable indentation guide bars for some modes.
   ;;                                  list list_comprehension
   ;;                                  dictionary dictionary_comprehension
   ;;                                  parenthesized_expression subscript)))
-  :hook ((python-base-mode yaml-mode) . indent-bars-mode))
+  :hook ((python-base-mode yaml-mode) . my/indent-bars-mode)
+  :config
+  (defun my/indent-bars-mode ()
+    "Perform pre-checks before enabling indent-bars-mode to avoid some known issues."
+    (interactive)
+    (unless (string-match-p " \\*org-src-fontification.*" (buffer-name))
+      (indent-bars-mode))))
 #+end_src
 
 *** Diff HL mode
