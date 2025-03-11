@@ -5364,6 +5364,15 @@ Want monthly view.
   (setq cfw:org-face-agenda-item-foreground-color "#abb2bf"))
 #+end_src
 
+** org-pandoc-import
+
+#+begin_src emacs-lisp
+(use-package org-pandoc-import
+  :after org
+  :straight (:type git :host github :repo "tecosaur/org-pandoc-import"
+             :files ("*.el" "filters" "preprocessors")))
+#+end_src
+
 * Docker / Containers
 
 ** Docker Tramp
