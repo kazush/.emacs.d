@@ -4604,9 +4604,6 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
                   #'my/org-do-emphasis-faces-9.7
                 #'my/org-do-emphasis-faces-9.6))
 
-  ;; Specify which major-mode to be used for a given language of src block
-  (setf (alist-get "python" org-src-lang-modes nil nil #'equal) 'python-ts)
-
   ;; Enable template expansion with '<' prefix.
   (require 'org-tempo)
 
@@ -4632,7 +4629,12 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
   (setq org-src-lang-modes
         (append org-src-lang-modes
                 '(("conf" . conf)
-                  ("bash" . bash-ts))))
+                  ("ini" . conf)
+                  ("jupyter-python" . python-ts)
+                  ("python" . python-ts)
+                  ("c++" . c++-ts)
+                  ("mql4" . c++-ts)
+                  ("mql5" . c++-ts))))
 
   ;; For Encrypting contents.
   (require 'org-crypt)
