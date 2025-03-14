@@ -476,6 +476,13 @@ Use pp for eval output.
           ("C-x C-e" . pp-eval-last-sexp)))
 #+end_src
 
+** save cursor positions
+#+begin_src emacs-lisp
+(use-package saveplace
+  :straight (:type built-in)
+  :config
+  (save-place-mode))
+#+end_src
 * User Interface
 
 Configure different features and settings that are related to user interface.
