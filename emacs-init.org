@@ -4323,7 +4323,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
                  (:name "Blocked" :todo "BLOCKED")
                  (:discard (:anything t))))
               (org-agenda-overriding-header "Task Status")))
-       (tags-todo "+PROJECT=\"personal\"-TODO=\"SHOPPING\""
+       (tags-todo "+PROJECT=\"personal\"-TODO=\"SHOPPING\"-STYLE=\"habit\""
                   ((org-super-agenda-groups
                     '((:todo "NEXT")
                       (:todo "TODO")
@@ -4332,6 +4332,13 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
                    (org-use-property-inheritance '("project"))
                    (org-agenda-files (list (my/org-roam-project-file "personal" "tasks")))
                    (org-agenda-overriding-header "Personal Tasks Awaiting Processing")
+                   (org-agenda-prefix-format
+                    '((tags . " %-2i %-18(my/org-get-todo-date-str) %l")))))
+       (tags-todo "+PROJECT=\"personal\"+STYLE=\"habit\""
+                  (
+                   (org-use-property-inheritance '("project"))
+                   (org-agenda-files (list (my/org-roam-project-file "personal" "tasks")))
+                   (org-agenda-overriding-header "Habits")
                    (org-agenda-prefix-format
                     '((tags . " %-2i %-18(my/org-get-todo-date-str) %l")))))
        (todo "SHOPPING"
@@ -4373,6 +4380,8 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
      (search . " %-2i %-18(my/org-get-todo-date-str)   %-10(my/org-agenda-property \"project\" 10) %l")))
   (org-deadline-warning-days 7)
   :config
+
+  (add-to-list 'org-modules 'habit)
 
   ;; Faces
 
