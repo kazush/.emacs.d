@@ -4308,18 +4308,40 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
    '(("d" "Today"
       ((agenda ""
                ((org-agenda-span 'day)))
-       (todo "NEXT"
-             ((org-agenda-overriding-header "Next")))
-       (todo "BLOCKED|WAITING"
-             ((org-agenda-overriding-header "Blocked / Waiting")))
-       (tags-todo "+TODO=\"TODO\"-SCHEDULED>=\"<now>\""
-                  ((org-agenda-overriding-header "Inbox")))
        (todo ""
              ((org-super-agenda-groups
-               '((:auto-property "project")))
-              (org-agenda-overriding-header "By Project")))
+               '((:name "Deadline Today" :deadline today)
+                 (:name "Scheduled Today" :scheduled today)
+                 (:name "Overdue" :deadline past)
+                 (:name "Scheduled Past" :scheduled past)
+                 (:name "Next" :todo "NEXT")
+                 (:name "Active" :todo "ACTIVE")
+                 (:name "Blocked/Waiting" :todo ("BLOCKED" "WAITING"))
+                 (:discard (:anything t))))
+              (org-agenda-overriding-header "Tasks")))
+       (tags-todo "+PROJECT=\"personal\"-TODO=\"SHOPPING\""
+                  ((org-super-agenda-groups
+                    '((:todo "NEXT")
+                      (:todo "TODO")
+                      (:todo "ACTIVE")
+                      (:todo ("BLOCKED" "WAITING"))
+                      (:auto-todo)))
+                   (org-use-property-inheritance '("project"))
+                   (org-agenda-files (list (my/org-roam-project-file "personal" "tasks")))
+                   (org-agenda-overriding-header "Personal")
+                   (org-agenda-prefix-format
+                    '((tags . " %-2i %-18(my/org-get-todo-date-str) %l")))))
        (todo "SHOPPING"
-             ((org-agenda-overriding-header "Shopping List")))))))
+             ((org-agenda-overriding-header "Shopping List")))
+       (tags-todo "-PROJECT=\"personal\"+LEVEL<=4"
+                  ((org-use-property-inheritance '("project"))
+                   (org-super-agenda-groups
+                    '((:auto-property "project")
+                      (:discard (:anything t))))
+                   (org-agenda-files (my/org-roam-projects))
+                   (org-agenda-overriding-header "Projects")
+                   (org-agenda-prefix-format
+                    '((tags . " %-2i %-18(my/org-get-todo-date-str) %l")))))))))
   (org-stuck-projects
    '("+PROJECT/-DONE-SOMEDAY" ("TODO" "WAIT")))
 
@@ -4342,10 +4364,10 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
    "⭠ now ─────────────────────────────────────────────────")
   (org-ellipsis "⇣")
   (org-agenda-prefix-format
-   '((agenda . " %-2i %21t%-10(my/org-agenda-property \"project\" 10)  ")
-     (todo . " %-2i %-18(my/org-get-todo-date-str)   %-10(my/org-agenda-property \"project\" 10)  ")
-     (tags . " %-2i %-18(my/org-get-todo-date-str)   %-10(my/org-agenda-property \"project\" 10)  ")
-     (search . " %-2i %-18(my/org-get-todo-date-str)   %-10(my/org-agenda-property \"project\" 10)  ")))
+   '((agenda . " %-2i %21t%-10(my/org-agenda-property \"project\" 10)   ")
+     (todo . " %-2i %-18(my/org-get-todo-date-str)   %-10(my/org-agenda-property \"project\" 10) %l")
+     (tags . " %-2i %-18(my/org-get-todo-date-str)   %-10(my/org-agenda-property \"project\" 10) %l")
+     (search . " %-2i %-18(my/org-get-todo-date-str)   %-10(my/org-agenda-property \"project\" 10) %l")))
   (org-deadline-warning-days 3)
   :config
 
@@ -4407,11 +4429,15 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
     (variable-pitch-mode))
 
   (defun my/org-agenda-property (property &optional width)
-    "Helper function to return a string representing vaflues of a given property."
-    (let ((value (string-join (org-property-values property) ",")))
-      (if (and width (> (length value) width))
-          (concat (substring value 0 (- width 2)) "..")
-        value)))
+    "Helper function to retrieve the string representation of a specified property."
+    ;; (message "%s" (org-entry-properties))
+    (let ((prop
+           (when (derived-mode-p 'org-mode)  ;; could be org-agenda buffer (e.g. time-grid entry)
+             (let ((value (org-entry-get nil property t)))
+               (if (and width (> (length value) width))
+                   (concat (substring value 0 (- width 2)) "..")
+                 value)))))
+      (if prop prop "")))
 
   (defun my/org-get-todo-date-str ()
     "Get formatted date string from current org todo entry."
