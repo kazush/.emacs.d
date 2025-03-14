@@ -4765,20 +4765,19 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
                          "#+title: ${title}")
       :unnarrowed t)))
   :init
-  ;; Add project files to org-agenda.
   (setq org-roam-directory "~/org/roam")
+  (setq my/org-roam-project-root "~/org/roam/projects")
 
-  ;; Helper function to update org-agenda-files
-  (defun my/org-agenda-update-agenda-files ()
-    (interactive)
-    (setq org-agenda-files
-          (append org-agenda-files
-                  (directory-files
-                   (format "%s/projects/" org-roam-directory)
-                   t "\\`[^.]"))))
+  (defun my/org-roam-projects (&optional name-only include-personal)
+    (let ((projects (directory-files my/org-roam-project-root (not name-only) "\\`[^.]")))
+      (if include-personal projects
+        (seq-filter (lambda (ent)
+                      (not (string-match-p "\\(\\`\\|/\\)personal\\'" ent)))
+                    projects))))
 
-  (my/org-agenda-update-agenda-files)
-
+  ;; Add project files to org-agenda.
+  (setq org-agenda-files
+        (append org-agenda-files (my/org-roam-projects nil t)))
   :config
   (unless (file-directory-p org-roam-directory)
     (mkdir org-roam-directory t))
@@ -4797,68 +4796,89 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
         (dolist (entry props)
           (org-entry-put pos (car entry) (cdr entry))))))
 
-  (defun my/org-roam-project-create-new-file (prj basename &optional props)
+  (defun my/org-roam-project-dir (prj)
+    (file-name-concat my/org-roam-project-root prj))
+
+  (defun my/org-roam-project-file (prj basename)
+    (format "%s/%s.org" (my/org-roam-project-dir prj) basename))
+
+  (defun my/org-roam-project-target (prj plist)
+    "Return org-capture target."
+    (let* ((basename (plist-get plist :basename))
+           (file (my/org-roam-project-file prj basename))
+           (node-headline (or (plist-get plist :node-headline) (capitalize basename)))
+           (target (plist-get plist :target)))
+      (pcase target
+        ('file+olp+datetree `(,target ,file))
+        ('file+headline `(,target ,file ,node-headline))
+        (_ `(file ,file)))))
+
+  (defun my/org-roam-project-create-new-file (prj plist)
     "Set up a new file node for the project.
      - create a project directory under projects/ if needed.
      - setup a new file node."
-    (let ((prj-dir (file-name-concat org-roam-directory "projects" prj)))
-      (let* ((file (format "%s/%s.org" prj-dir basename))
-             (title (format "projects/%s/%s" prj basename))
-             (org-roam-capture-templates
-              `(("d" "default - create a new node"
-                 plain "%?"
-                 :target (file+head ,file "#+title: ${title}\n")
-                 :immediate-finish t)))
-             (node (org-roam-node-create :file file :title title))
-             (hook (lambda ()
-                     (my/org-roam-project-add-properties prj props))))
-        (unless (file-directory-p prj-dir)
-          (mkdir prj-dir t))
-        (add-hook 'org-roam-capture-new-node-hook hook)
-        (org-roam-capture- :node node)
-        (remove-hook 'org-roam-capture-new-node-hook hook))))
+    (let* ((prj-dir (my/org-roam-project-dir prj))
+           (basename (plist-get plist :basename))
+           (file (my/org-roam-project-file prj basename))
+           (title (or (plist-get plist :title) (format "Project %s: %s" prj basename)))
+           (props (plist-get plist :property))
+           (org-roam-capture-templates
+            `(("d" "default - create a new node"
+               plain "%?"
+               :target (file+head ,file "#+title: ${title}\n")
+               :immediate-finish t)))
+           (node (org-roam-node-create :file file :title title))
+           (hook (lambda ()
+                   (my/org-roam-project-add-properties prj props))))
+      (unless (file-directory-p prj-dir)
+        (mkdir prj-dir t))
+      (add-hook 'org-roam-capture-new-node-hook hook)
+      (org-roam-capture- :node node)
+      (remove-hook 'org-roam-capture-new-node-hook hook)))
 
   (defun my/org-roam-project-read ()
     (interactive)
-    (completing-read
-     "Project: "
-     (directory-files
-      (format "%s/projects/" org-roam-directory)
-      nil "\\`[^.]")
-     (lambda (f) (file-directory-p (format "%s/projects/%s" org-roam-directory f))) 'confirm))
+    (completing-read "Project: " (my/org-roam-projects t) nil 'confirm))
 
-  (defun my/org-roam-project-capture (prj basename entry-str &optional props)
+  (defun my/org-roam-project-capture (prj plist)
     "Capture new task for the selected project."
-    (let* ((file (format "%s/projects/%s/%s.org"
-                         org-roam-directory prj basename))
+    (let* ((basename (plist-get plist :basename))
+           (target (my/org-roam-project-target prj plist))
            (org-capture-templates
             `(("d" "capture a new entry to the selected project"
-               entry (file+olp+datetree ,file) ,entry-str
+               entry ,target ,(plist-get plist :headline)
                :unnarrowed t :kill-buffer t))))
-      (unless (file-exists-p file)
-        (my/org-roam-project-create-new-file prj basename props))
+      (unless (file-exists-p (my/org-roam-project-file prj basename))
+        (my/org-roam-project-create-new-file prj plist))
       (org-capture nil "d")))
 
   (defun my/org-roam-project-capture-journal (prj)
     "Capture new journal for the selected project."
     (interactive (list (my/org-roam-project-read)))
-    (my/org-roam-project-capture prj "journal" "* %<%H:%M> %?"))
+    (my/org-roam-project-capture prj '( :basename "journal"
+                                        :target file+olp+datetree
+                                        :headline "* %<%H:%M> %?")))
 
-  (defun my/org-roam-project-capture-task (prj)
+  (defun my/org-roam-project-capture-task (prj &optional node-headline headline)
     "Capture new task for the selected project."
     (interactive (list (my/org-roam-project-read)))
-    (my/org-roam-project-capture prj "tasks" "* TODO %?"
-                                 '(("category" . "task"))))
+    (my/org-roam-project-capture prj `( :basename "tasks"
+                                        :target file+headline
+                                        :node-headline ,(or node-headline "Tasks")
+                                        :headline ,(or headline "* TODO %?")
+                                        :property (("category" . "task")))))
 
   (defun my/org-roam-personal-capture-journal ()
     "Capture new journal for personal project."
     (interactive)
     (my/org-roam-project-capture-journal "personal"))
 
-  (defun my/org-roam-personal-capture-task ()
+  (defun my/org-roam-personal-capture-task (task-type)
     "Capture new task for personal project."
-    (interactive)
-    (my/org-roam-project-capture-task "personal"))
+    (interactive (list (completing-read "Task Type: " '("Task" "Shopping"))))
+    (let ((node-headline (when (string= task-type "Shopping") "Shopping List"))
+          (headline (when (string= task-type "Shopping") "* SHOPPING %?")))
+      (my/org-roam-project-capture-task "personal" node-headline headline)))
 
   ;; add org-roam-directory to consult-omni-notes's source list
   (with-eval-after-load 'consult-omni-notes
