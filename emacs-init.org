@@ -4265,7 +4265,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
   (org-confirm-babel-evaluate nil)
   (org-hide-emphasis-markers t)
   (org-todo-keywords
-   '((sequence "TODO(t!)" "NEXT(n!)" "ACTIVE(a!)"
+   '((sequence "TODO(t)" "NEXT(n!)" "ACTIVE(a!)"
                "WAITING(w@/!)" "BLOCKED(b@/!)" "|" "DONE(d!)" "CANCELLED(c@)")
      (sequence "SHOPPING(s)" "|" "DONE(d!)" "CANCELLED(c@)")))
   (org-log-done 'time)
