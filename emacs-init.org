@@ -4318,9 +4318,12 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
                  (:name "Scheduled Today" :scheduled today)
                  (:name "Overdue" :deadline past)
                  (:name "Scheduled Past" :scheduled past)
-                 (:name "WIP" :todo "WIP")
-                 (:name "Active" :todo "ACTIVE")
-                 (:name "Blocked" :todo "BLOCKED")
+                 (:name "WIP" :todo "WIP"
+                        :face (:foreground "#ffcc00"))
+                 (:name "Active" :todo "ACTIVE"
+                        :face (:foreground "#00aaff"))
+                 (:name "Blocked" :todo "BLOCKED"
+                        :face (:foreground "#8888bb"))
                  (:discard (:anything t))))
               (org-agenda-overriding-header "Task Status")))
        (tags-todo "+PROJECT=\"personal\"-TODO=\"SHOPPING\"-STYLE=\"habit\""
