@@ -4273,7 +4273,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
   (org-clock-in-switch-to-state "WIP")
   (org-todo-keywords
    '((sequence "TODO(t)" "NEXT(n!)" "ACTIVE(a/!)" "WIP(i/!)"
-               "WAITING(w@/!)" "BLOCKED(b@/!)" "|" "DONE(d!)" "CANCELLED(c@)")
+               "ONHOLD(h@/!)" "BLOCKED(b@/!)" "|" "DONE(d!)" "CANCELLED(c@)")
      (sequence "SHOPPING(s)" "|" "DONE(d!)" "CANCELLED(c@)")))
   (org-log-done 'time)
   (org-capture-templates nil) ;; Migrated to org-roam-capture.
@@ -4317,21 +4317,20 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
                  (:name "Scheduled Today" :scheduled today)
                  (:name "Overdue" :deadline past)
                  (:name "Scheduled Past" :scheduled past)
-                 (:name "Next" :todo "NEXT")
+                 (:name "WIP" :todo "WIP")
                  (:name "Active" :todo "ACTIVE")
-                 (:name "Blocked/Waiting" :todo ("BLOCKED" "WAITING"))
+                 (:name "Blocked" :todo "BLOCKED")
                  (:discard (:anything t))))
-              (org-agenda-overriding-header "Tasks")))
+              (org-agenda-overriding-header "Task Status")))
        (tags-todo "+PROJECT=\"personal\"-TODO=\"SHOPPING\""
                   ((org-super-agenda-groups
                     '((:todo "NEXT")
                       (:todo "TODO")
-                      (:todo "ACTIVE")
-                      (:todo ("BLOCKED" "WAITING"))
-                      (:auto-todo)))
+                      (:todo "ONHOLD")
+                      (:discard (:anything t))))
                    (org-use-property-inheritance '("project"))
                    (org-agenda-files (list (my/org-roam-project-file "personal" "tasks")))
-                   (org-agenda-overriding-header "Personal")
+                   (org-agenda-overriding-header "Personal Tasks Awaiting Processing")
                    (org-agenda-prefix-format
                     '((tags . " %-2i %-18(my/org-get-todo-date-str) %l")))))
        (todo "SHOPPING"
@@ -4371,7 +4370,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
      (todo . " %-2i %-18(my/org-get-todo-date-str)   %-10(my/org-agenda-property \"project\" 10) %l")
      (tags . " %-2i %-18(my/org-get-todo-date-str)   %-10(my/org-agenda-property \"project\" 10) %l")
      (search . " %-2i %-18(my/org-get-todo-date-str)   %-10(my/org-agenda-property \"project\" 10) %l")))
-  (org-deadline-warning-days 3)
+  (org-deadline-warning-days 7)
   :config
 
   ;; Faces
