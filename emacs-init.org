@@ -583,7 +583,10 @@ called in hooks.
    '(ediff-even-diff-C ((t :foreground nil :background "#404030")))
    '(ediff-odd-diff-A ((t :foreground nil :background "#403030")))
    '(ediff-odd-diff-B ((t :foreground nil :background "#304030")))
-   '(ediff-odd-diff-C ((t :foreground nil :background "#404030"))))
+   '(ediff-odd-diff-C ((t :foreground nil :background "#404030")))
+   '(diff-refine-removed ((t :foreground nil :background "#504040")))
+   '(diff-refine-added ((t :foreground nil :background "#405040")))
+   '(diff-refine-changed ((t :foreground nil :background "#404030"))))
 
   (unless (daemonp)
     (set-face-attribute 'mode-line-inactive nil
