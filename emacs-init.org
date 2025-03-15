@@ -4970,7 +4970,6 @@ add ctime and mtime properties to org-roam nodes.
 )
 #+end_src
 
-
 ** org-modern-indent
 
 Disabled for now as it's not working well with some Org buffers (e.g. copilot-chat).
@@ -4995,7 +4994,6 @@ Disabled for now as it's not working well with some Org buffers (e.g. copilot-ch
   (org-cliplink-curl-transport-arguments '("--http2" "-L"))
   :bind (("C-c o L" . org-cliplink)))
 #+end_src
-
 
 ** ox-hugo
 
@@ -5035,6 +5033,7 @@ As of 3/19/2022, this does not work with Chrome. Works well with Firefox.
   :straight (org-appear :type git :host github :repo "awth13/org-appear")
   :hook (org-mode . org-appear-mode))
 #+end_src
+
 ** org-remoteimg
 
 Display remote images specified by URLs inline in org-mode.
@@ -5046,6 +5045,7 @@ Display remote images specified by URLs inline in org-mode.
   (org-display-remote-inline-images 'cache) ;; enable caching
   )
 #+end_src
+
 ** org-fragtog
 
 Disabled at the moment in favor of xenops.
@@ -5367,7 +5367,6 @@ Citar provides a rich UI frontend for org-cite. citar-org-roam provides more int
   (citar-org-roam-mode))
 #+end_src
 
-
 ** org-gcal
 
 #+begin_src emacs-lisp
@@ -5485,6 +5484,15 @@ installed."
     (shell-command-on-region
      start end
      "pandoc -f markdown -t org --wrap=preserve" t t))
+#+end_src
+
+** verb
+
+#+begin_src emacs-lisp
+(use-package verb
+  :after org
+  :config
+  (define-key org-mode-map (kbd "C-c C-r") verb-command-map))
 #+end_src
 
 * Docker / Containers
