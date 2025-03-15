@@ -4744,19 +4744,19 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
            :box (:line-width (1 . 1) :color "white")))))
    '(org-habit-alert-future-face
      ((t ( :background "light coral"
-           :foreground "#444444"
+           :foreground "#aa0000"
            :width expanded
            :height 1.0
            :box (:line-width (1 . 1) :color "white")))))
    '(org-habit-alert-face
      ((t ( :background "light coral"
-           :foreground "#444444"
+           :foreground "#aa0000"
            :width expanded
            :height 1.0
            :box (:line-width (1 . 1) :color "white")))))
    '(org-habit-overdue-face
      ((t ( :background "light coral"
-           :foreground "#444444"
+           :foreground "#aa0000"
            :width expanded
            :height 1.0
            :box (:line-width (1 . 1) :color "white")))))
@@ -4768,7 +4768,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
            :box (:line-width (1 . 1) :color "white")))))
    '(org-habit-ready-face
      ((t ( :background "pale green"
-           :foreground "#444444"
+           :foreground "#00aa00"
            :width expanded
            :height 1.0
            :box (:line-width (1 . 1) :color "white")))))
