@@ -4382,8 +4382,6 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
   (org-deadline-warning-days 7)
   :config
 
-  (add-to-list 'org-modules 'habit)
-
   ;; Faces
 
   (custom-set-faces
@@ -4709,8 +4707,80 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
     (org-agenda nil "d"))
 
   (add-hook 'emacs-startup-hook 'my/org-agenda-custom-view))
+#+end_src
 
+#+begin_src emacs-lisp
+(use-package org-habit
+  :straight nil
+  :after org
+  :hook (org-agenda-mode . my/org-habit-set-graph-column)
+  :custom
+  (org-habit-show-habits nil)  ;; Type K to toggle showing consistency graph.
+  (org-habit-show-done-always-green t)
+  (org-habit-overdue-glyph ?○)
+  (org-habit-alert-glyph ?○)
+  (org-habit-today-glyph ?○)
+  (org-habit-completed-glyph ?●)
+  (org-habit-preceding-days 7)
+  (org-habit-following-days 1)
+  :config
+  (defun my/org-habit-set-graph-column ()
+    "Set graph column based on window-width."
+    (setq org-habit-graph-column (- (window-width) 10)))
 
+  ;; Borrowed from https://www.reddit.com/r/emacs/comments/1ik87vs/my_edited_orghabit_module/
+  (custom-set-faces
+   '(org-habit-clear-face
+     ((t ( :background "pale green"
+           :foreground "#444444"
+           :width expanded
+           :height 1.0
+           :box (:line-width (1 . 1) :color "white")))))
+   '(org-habit-clear-future-face
+     ((t ( :background "gray"
+           :foreground "#444444"
+           :width expanded
+           :height 1.0
+           :box (:line-width (1 . 1) :color "white")))))
+   '(org-habit-alert-future-face
+     ((t ( :background "light coral"
+           :foreground "#444444"
+           :width expanded
+           :height 1.0
+           :box (:line-width (1 . 1) :color "white")))))
+   '(org-habit-alert-face
+     ((t ( :background "light coral"
+           :foreground "#444444"
+           :width expanded
+           :height 1.0
+           :box (:line-width (1 . 1) :color "white")))))
+   '(org-habit-overdue-face
+     ((t ( :background "light coral"
+           :foreground "#444444"
+           :width expanded
+           :height 1.0
+           :box (:line-width (1 . 1) :color "white")))))
+   '(org-habit-overdue-future-face
+     ((t ( :background "gray"
+           :foreground "#444444"
+           :width expanded
+           :height 1.0
+           :box (:line-width (1 . 1) :color "white")))))
+   '(org-habit-ready-face
+     ((t ( :background "pale green"
+           :foreground "#444444"
+           :width expanded
+           :height 1.0
+           :box (:line-width (1 . 1) :color "white")))))
+   '(org-habit-ready-future-face
+     ((t (;;:background ""
+          :foreground "#444444"
+          :width expanded
+          :height 1.0
+          :box (:line-width (1 . 1) :color "white")))))))
+#+end_src
+
+#+begin_src emacs-lisp
 (use-package org-clock
   :straight nil
   :commands (my/org-update-clock org-clock-in org-clock-out)
