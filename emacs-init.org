@@ -7057,7 +7057,16 @@ Use groq as the LLM service.
   (eaf-bind-key insert_or_close_buffer "q" eaf-browser-keybinding)
   (eaf-bind-key insert_or_history_backward "b" eaf-browser-keybinding)
   (eaf-bind-key insert_or_edit_url "C-l" eaf-browser-keybinding)
-  )
+
+  (defun my/toggle-eaf-browser ()
+    "Toggle setting eaf-browser to browse-url-browser-function."
+    (interactive)
+    (defvar my/browse-url-saved-browser-function)
+    (setq browse-url-browser-function
+          (if (eq browse-url-browser-function #'eaf-open-browser)
+              my/browse-url-saved-browser-function
+            (setq my/browse-url-saved-browser-function browse-url-browser-function)
+            #'eaf-open-browser))))
 #+end_src
 
 ** eaf-pdf-viewer
