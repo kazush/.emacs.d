@@ -4242,8 +4242,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
   :hook ((org-mode . org-indent-mode)
          (org-mode . visual-line-mode)
          (org-agenda-mode . (lambda () (hl-line-mode 1)))
-         (org-babel-after-execute . org-redisplay-inline-images)
-         (org-after-todo-state-change . my/org-update-clock))
+         (org-babel-after-execute . org-redisplay-inline-images))
   :custom
   (org-emphasis-regexp-components
    '("-[:nonascii:][:space:]('\"{" "-[:space:][:nonascii:].,:!?;'\")}\\[" "[:space:]" "." 1))
@@ -4271,9 +4270,8 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
   (org-hide-emphasis-markers t)
   ;; Work in Progress (WIP) status should be used exclusively for time recording
   ;; and should only be active while actively recording time.
-  (org-clock-in-switch-to-state "WIP")
   (org-todo-keywords
-   '((sequence "TODO(t)" "NEXT(n!)" "ACTIVE(a/!)" "WIP(i/!)"
+   '((sequence "TODO(t)" "NEXT(n!)" "ACTIVE(a!)" "WIP(i!/!)"
                "ONHOLD(h@/!)" "BLOCKED(b@/!)" "|" "DONE(d!)" "CANCELLED(c@)")
      (sequence "SHOPPING(s)" "|" "DONE(d!)" "CANCELLED(c@)")))
   (org-log-done 'time)
@@ -4513,6 +4511,9 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
                            (list (my/emoji-icon emoji))
                            nil nil :ascent 'center)))))
 
+  ;; Set up hooks for org-clock
+  (org-clock-persistence-insinuate)
+
   (with-eval-after-load 'org-agenda
     (define-key org-agenda-mode-map (kbd "p") #'org-agenda-backward-block)
     (define-key org-agenda-mode-map (kbd "n") #'org-agenda-forward-block)
@@ -4521,15 +4522,6 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
   ;; Reset org-emp-re and org-verbatim-re to take non ASCII characters into
   ;; account for boundary of emphasis.
   (setopt org-emphasis-alist org-emphasis-alist)  ;; trigger org-set-emph-re
-
-  (defun my/org-update-clock ()
-    "Update clock state. Called via org-after-todo-state-change-hook."
-    (interactive)
-    (require 'org-clock)
-    (if (string= org-state org-clock-in-switch-to-state)
-        (org-clock-in)
-      (when (org-clocking-p)
-        (org-clock-out))))
 
   ;; Patched org-do-emphasis-faces to allow nested emphasis markers.
 
@@ -4717,6 +4709,25 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
     (org-agenda nil "d"))
 
   (add-hook 'emacs-startup-hook 'my/org-agenda-custom-view))
+
+
+(use-package org-clock
+  :straight nil
+  :commands (my/org-update-clock org-clock-in org-clock-out)
+  :hook (org-after-todo-state-change . my/org-update-clock)
+  :custom-face
+  (org-agenda-clocking ((t :foreground: "#ffcc00" :background "unspecified")))
+  :custom
+  (org-clock-in-switch-to-state "WIP")
+  (org-clock-persist t)
+  :config
+  (defun my/org-update-clock ()
+    "Update clock state. Called via org-after-todo-state-change-hook."
+    (interactive)
+    (if (string= org-state org-clock-in-switch-to-state)
+        (org-clock-in)
+      (when (org-clocking-p)
+        (org-clock-out)))))
 #+end_src
 
 ** org-bebel extensions
