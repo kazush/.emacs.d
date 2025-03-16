@@ -4729,6 +4729,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
   (org-habit-completed-glyph ?●)
   (org-habit-preceding-days 7)
   (org-habit-following-days 1)
+  (org-habit-show-all-today t)
   :config
   (defun my/org-habit-set-graph-column ()
     "Set graph column based on window-width."
@@ -4738,7 +4739,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
   (custom-set-faces
    '(org-habit-clear-face
      ((t ( :background "pale green"
-           :foreground "#444444"
+           :foreground "#00aa00"
            :width expanded
            :height 1.0
            :box (:line-width (1 . 1) :color "white")))))
