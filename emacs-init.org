@@ -4798,14 +4798,14 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
   :custom-face
   (org-agenda-clocking ((t :foreground: "#ffcc00" :background "unspecified")))
   :custom
-  (org-clock-in-switch-to-state "WIP")
   (org-clock-persist t)
   :config
   (defun my/org-update-clock ()
     "Update clock state. Called via org-after-todo-state-change-hook."
     (interactive)
     (if (string= org-state org-clock-in-switch-to-state)
-        (org-clock-in)
+        (unless (org-clocking-p)
+          (org-clock-in))
       (when (org-clocking-p)
         (org-clock-out)))))
 #+end_src
