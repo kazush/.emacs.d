@@ -5953,6 +5953,8 @@ Macros to retrive API keys for LLM servce providers.
   "Set the environment variable with the API key for each specified provider.
    PROVIDER can be a symbol or a list of symbols.
    'ALL represents all registered providers."
+  (interactive (list (intern (completing-read "Provider: "
+                                              (mapcar 'car my/llm-provider-alist)))))
   (let ((provider-list (if (eq provider 'ALL) nil
                          (if (listp provider) provider (list provider)))))
     (dolist (p my/llm-provider-alist)
