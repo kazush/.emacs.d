@@ -6065,7 +6065,7 @@ Macros to retrive API keys for LLM servce providers.
   ;;          :chat-model "deepseek-coder-v2:latest"))
 
   (setopt ellama-provider (my/make-llm-gemini
-                           :chat-model "gemini-2.0-flash"))
+                           :chat-model "gemini-2.0-flash-exp"))
   ;; Predefined llm providers for interactive switching.
   ;; You shouldn't add ollama providers here - it can be selected interactively
   ;; without it. It is just example.
@@ -6219,6 +6219,7 @@ Macros to retrive API keys for LLM servce providers.
   (gptel-make-gemini "Gemini"
     :key #'my/get-gemini-api-key
     :models '(gemini-2.0-flash
+              gemini-2.0-flash-exp
               gemini-2.0-flash-lite-preview-02-05
               gemini-2.0-flash-thinking-exp-01-21
               gemini-2.0-pro-exp-02-05)
@@ -6295,7 +6296,7 @@ Macros to retrive API keys for LLM servce providers.
 
   ;; Set default backend.
   (setq gptel-backend (my/gptel-get-backend "Gemini"))
-  (setq gptel-model 'gemini-2.0-flash)
+  (setq gptel-model 'gemini-2.0-flash-exp)
 
   ;;
   ;; Tools - mostly copied from https://github.com/karthink/gptel/issues/514
