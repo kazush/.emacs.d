@@ -4161,6 +4161,12 @@ TBH this is not maintaned these days.
   (flycheck-add-mode 'typescript-tslint 'web-mode))
 #+end_src
 
+** JSON
+
+#+begin_src emacs-lisp
+(use-package json-mode)
+#+end_src
+
 ** MQL
 
 MQL is a subset of C++.
