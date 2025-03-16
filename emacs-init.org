@@ -4318,15 +4318,15 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
                ((org-agenda-span 'day)))
        (todo ""
              ((org-super-agenda-groups
-               '((:name "Deadline Today" :deadline today
+               '((:name "Work In Progress" :todo "WIP"
+                        :face (:foreground "#333333" :background "#eecc00"))
+                 (:name "Deadline Today" :deadline today
                         :face (:foreground "#ff6600"))
                  (:name "Scheduled Today" :scheduled today
                         :face (:foreground "#ff8800"))
                  (:name "Overdue" :deadline past
                         :face (:foreground "#ff3300"))
                  (:name "Scheduled Past" :scheduled past)
-                 (:name "WIP" :todo "WIP"
-                        :face (:foreground "#ffcc00" :box (:line-width (1 . 1) :color "orange")))
                  (:name "Active" :todo "ACTIVE"
                         :face (:foreground "#00aaff"))
                  (:name "Blocked" :todo "BLOCKED"
