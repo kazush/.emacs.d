@@ -5486,7 +5486,15 @@ Citar provides a rich UI frontend for org-cite. citar-org-roam provides more int
             `((,calendar . "~/org/gcal.org")
               (,family-calendar . "~/org/family-calendar.org")
               ("monex.co.jp_hkslb9v1kj95se5r8ag2mms4k8@group.calendar.google.com" . "~/org/us-market-holidays.org")))
-      (org-gcal-reload-client-id-secret))))
+      (org-gcal-reload-client-id-secret)))
+
+  (defun my/org-gcal-fetch ()
+    "Import calendar events to Org files from Google Calendar."
+    (interactive)
+    (my/org-gcal-setup)
+    (org-gcal-fetch))
+
+  (defvar my/org-gcal-fetch-timer (run-with-idle-timer 3600 t #'my/org-gcal-fetch)))
 #+end_src
 
 ** org-super-agenda
