@@ -4260,7 +4260,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
      (tags priority-down category-keep)
      (search category-keep)))
   (org-agenda-start-on-weekday calendar-week-start-day)
-  (org-agenda-window-setup 'other-tab)
+  (org-agenda-window-setup 'current-window)
   (org-log-into-drawer t)
   (org-list-allow-alphabetical t)
   (org-startup-indented t)
@@ -4318,20 +4318,23 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
                ((org-agenda-span 'day)))
        (todo ""
              ((org-super-agenda-groups
-               '((:name "Work In Progress" :todo "WIP"
+               '((:name "Work In Progress" :and (:todo "WIP" :children nil)
                         :face (:foreground "#333333" :background "#eecc00"))
-                 (:name "Deadline Today" :deadline today
+                 (:name "Deadline Today" :and (:deadline today :children nil)
                         :face (:foreground "#ff6600"))
-                 (:name "Scheduled Today" :scheduled today
+                 (:name "Scheduled Today" :and (:scheduled today :children nil)
                         :face (:foreground "#ff8800"))
-                 (:name "Overdue" :deadline past
+                 (:name "Overdue" :and (:deadline past :children nil)
                         :face (:foreground "#ff3300"))
-                 (:name "Scheduled Past" :scheduled past)
-                 (:name "Active" :todo "ACTIVE"
+                 (:name "Scheduled Past" :and (:scheduled past :children nil)
+                        :face (:foreground "#ff3300"))
+                 (:name "Active" :and (:todo "ACTIVE" :children nil)
                         :face (:foreground "#00aaff"))
-                 (:name "Blocked" :todo "BLOCKED"
+                 (:name "Blocked" :and (:todo "BLOCKED" :children nil)
                         :face (:foreground "#8888bb"))
                  (:discard (:anything t))))
+              (org-agenda-prefix-format
+               '((todo . " %-2i %-18(my/org-get-todo-date-str)   %-10(my/org-agenda-property \"project\" 10)   ")))
               (org-agenda-overriding-header "Task Status")))
        (tags-todo "+PROJECT=\"personal\"-TODO=\"SHOPPING\"-STYLE=\"habit\""
                   ((org-super-agenda-groups
