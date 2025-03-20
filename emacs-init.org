@@ -5595,7 +5595,9 @@ installed."
 (use-package verb
   :after org
   :config
-  (define-key org-mode-map (kbd "C-c C-r") verb-command-map))
+  (define-key org-mode-map (kbd "C-c C-r") verb-command-map)
+  (org-babel-do-load-languages
+   'org-babel-load-languages '((verb . t))))
 #+end_src
 
 * Docker / Containers
