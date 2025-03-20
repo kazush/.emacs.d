@@ -6336,13 +6336,46 @@ Macros to retrive API keys for LLM servce providers.
   ;;
 
   (gptel-make-tool
-   :function (lambda (location units lang)
-               (let ((url (format "https://api.openweathermap.org/data/2.5/forecast?q=%s%s%s&mode=json&appid=%s"
-                                  location
+   :function (lambda (city state country)
+               (let ((url (format "https://api.openweathermap.org/geo/1.0/direct?q=%s,%s,%s&limit=1&appid=%s"
+                                  (if city city "")
+                                  (if state state "")
+                                  (if country country "")
+                                  (auth-source-pick-first-password :host "weather-api-key"))))
+                 (message "get_coordinates: city=%s state=%s country=%s" city state country)
+                 (with-current-buffer (url-retrieve-synchronously url)
+                   (let ((data
+                          (save-excursion
+                            (goto-char (point-min))
+                            (forward-paragraph)
+                            (forward-char)
+                            (delete-region (point-min) (point))
+                            (buffer-string))))
+                     (run-at-time 0 nil #'kill-buffer (current-buffer))
+                     (json-parse-string data)))))
+   :name "get_coordinates"
+   :description "Retrieve geographical coordinates (latitude and longitude) for a given location in JSON format."
+   :args (list '(:name "city"
+                       :type "string"
+                       :description "The name of the city for the location.")
+               '(:name "state"
+                       :type "string"
+                       :description
+                       "The name of the state for the location. Optional."
+                       :optional t)
+               '(:name "country"
+                       :type "string"
+                       :description "The name of the country for the location."))
+   :category "web")
+
+  (gptel-make-tool
+   :function (lambda (lat lon units lang)
+               (let ((url (format "https://api.openweathermap.org/data/2.5/forecast?lat=%s&lon=%s%s%s&mode=json&appid=%s"
+                                  lat lon
                                   (if (member units '("metric" "imperial")) (format "&units=%s" units) "")
                                   (if (= (length lang) 2) (format "&lang=%s" lang) "")
                                   (auth-source-pick-first-password :host "weather-api-key"))))
-                 (message "get_weather_forecast: %s" url)
+                 (message "get_weather_forecast: lat=%s lon=%s units=%s lang=%s" lat lon units lang)
                  (with-current-buffer (url-retrieve-synchronously url)
                    (let ((data
                           (save-excursion
@@ -6354,10 +6387,13 @@ Macros to retrive API keys for LLM servce providers.
                      (run-at-time 0 nil #'kill-buffer (current-buffer))
                      (json-parse-string data)))))
    :name "get_weather_forecast"
-   :description "Get 5-day, 3-hour step weather forecast for a given location in JSON format"
-   :args (list '(:name "location"
+   :description "Get 5-day, 3-hour step weather forecast for a given location in JSON format. Timestamps in the response are in UTC."
+   :args (list '(:name "lat"
                        :type "string"
-                       :description "The location in the form of city,state,country. eg. Setagaya-ku,Tokyo,Japan")
+                       :description "The latitude of the location.")
+               '(:name "lon"
+                       :type "string"
+                       :description "The longitude of the location.")
                '(:name "units"
                        :type "string"
                        :enum ("metric" "imperial")
