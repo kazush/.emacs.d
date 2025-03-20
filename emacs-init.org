@@ -4438,7 +4438,8 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
    '(org-agenda-date-today ((t :foreground "#6699cc" :weight bold :slant italic :inherit org-agenda-date)))
    '(org-agenda-date-weekend ((t :foreground "#aa6633" :inherit org-agenda-date)))
    '(org-agenda-date-weekend-today ((t :foreground "#cc9966" :inherit org-agenda-date-today)))
-   '(org-agenda-structure ((t :family "Noto Serif" :foreground "#cccc88" :weight bold :height 1.2))))
+   '(org-agenda-structure ((t :family "Noto Serif" :foreground "#cccc88" :weight bold :height 1.2)))
+   '(org-headline-done ((t :foreground "#999999" :background "#333333"))))
 
   (defun my/org-setup-variable-font ()
     "Override default face with variable fonts."
