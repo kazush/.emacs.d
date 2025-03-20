@@ -6253,6 +6253,7 @@ Macros to retrive API keys for LLM servce providers.
     :key #'my/get-groq-api-key
     :models '(llama-3.3-70b-specdec
               llama-3.3-70b-versatile
+              qwen-qwq-32b
               deepseek-r1-distill-llama-70b))
 
   (gptel-make-ollama "Ollama"
@@ -6289,7 +6290,9 @@ Macros to retrive API keys for LLM servce providers.
     :stream t
     :key #'my/get-huggingface-api-key
     :models '(Qwen/Qwen2.5-Coder-32B-Instruct
-              Qwen/Qwen2.5-72B-Instruct))
+              Qwen/Qwen2.5-72B-Instruct
+              Qwen/QwQ-32B
+              black-forest-labs/FLUX.1-dev))
 
   (gptel-make-anthropic "Anthropic"
     :stream t
@@ -6310,7 +6313,13 @@ Macros to retrive API keys for LLM servce providers.
     :endpoint "/api/v1/chat/completions"
     :stream t
     :key #'my/get-openrouter-api-key
-    :models '(openai/o1-preview))
+    :models '(openai/o1
+              openai/o3-mini
+              openai/o3-mini-high
+              deepseek/deepseek-chat:free
+              deepseek/deepseek-r1:free
+              qwen/qwq-32b:free
+              google/gemma-3-27b-it:free))
 
   (defun my/gptel-get-backend (key)
     (alist-get key gptel--known-backends nil nil 'string=))
@@ -6361,7 +6370,7 @@ Macros to retrive API keys for LLM servce providers.
 
   (gptel-make-tool
    :function (lambda (url)
-               (message "read_url: %s" url)
+               (message "get_url_content: %s" url)
                (with-current-buffer (url-retrieve-synchronously url)
                  (goto-char (point-min)) (forward-paragraph)
                  (let ((dom (libxml-parse-html-region (point) (point-max))))
@@ -6369,11 +6378,11 @@ Macros to retrive API keys for LLM servce providers.
                    (with-temp-buffer
                      (shr-insert-document dom)
                      (buffer-substring-no-properties (point-min) (point-max))))))
-   :name "read_url"
-   :description "Fetch and read the contents of a URL"
+   :name "get_url_content"
+   :description "Fetch the content from a URL."
    :args (list '(:name "url"
                        :type "string"
-                       :description "The URL to read"))
+                       :description "The URL from which to retrieve the content."))
    :category "web")
 
   (gptel-make-tool
@@ -6547,12 +6556,13 @@ Macros to retrive API keys for LLM servce providers.
     (let* ((plist (apply orig-fn args))
            (tools (plist-get plist :tools)))
       (if (and my/gptel-gemini-use-google-search
-               (string-match-p "gemini.*" (symbol-name gptel-model)))
+               (string-match-p "gemini.*" (symbol-name gptel-model))
+               (not (cl-some (lambda (pl) (plist-member pl :function_declarations)) tools)))
           (progn
             (unless (cl-some (lambda (pl) (plist-member pl :google_search)) tools)
-                (plist-put plist :tools
-                           (if tools (vconcat '[(:google_search ())] tools)
-                             '[(:google_search ())])))
+              (plist-put plist :tools
+                         (if tools (vconcat '[(:google_search ())] tools)
+                           '[(:google_search ())])))
             plist)
         (setq tools (seq-remove (lambda (pl) (equal pl '(:google_search nil))) tools))
         (if tools
