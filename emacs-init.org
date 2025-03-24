@@ -316,6 +316,7 @@ environment.
 #+begin_src emacs-lisp
 (use-package eww
   :bind ( :map eww-mode-map
+          ("c" . my/eww-org-roam-capture)
           ("j" . scroll-up-command)
           ("k" . scroll-down-command)
           ("N" . scroll-up-command)
@@ -373,7 +374,23 @@ environment.
                 (set-window-start nil (window-point))
                 (setq alist nil))))
           (setq alist (cdr alist))))))
-  )
+
+  (defun my/eww-org-roam-capture ()
+    "Capture the current eww content to org-roam."
+    (interactive)
+    (let* ((title (plist-get eww-data :title))
+           (link (plist-get eww-data :url))
+           (node (org-roam-node-create :title title))
+           (org-roam-capture-templates
+            `(("d" "default - capture the current eww content"
+               plain "\n%?\n\nlink: %a\n\n%c"
+               :target (file+head "fleeting/${slug}.org"
+                                  "#+title: ${title}\n")
+               :unnarrowed t
+               :kill-buffer t))))
+      (org-eww-store-link)
+      (org-eww-copy-for-org-mode)
+      (org-roam-capture- :keys "d" :node node :info `(:ref ,link)))))
 #+end_src
 
 ** SHR
@@ -6754,6 +6771,7 @@ Use groq as the LLM service.
          ("v" . my/elfeed-show-visit-with-eaf)
          ("b" . my/elfeed-show-visit-with-eww)
          ("B" . elfeed-show-visit)
+         ("c" . my/elfeed-org-roam-capture)
          ("SPC" . my/elfeed-show-scroll-up-then-quit)
          ("RET" . my/elfeed-show-visit-with-eww))
   :hook (elfeed-show-mode . visual-line-mode)
@@ -6827,7 +6845,23 @@ Use groq as the LLM service.
     (let ((browse-url-browser-function #'my/elfeed-eww-browse-url)
           (eww-retrieve-command my/eww-retrieve-command))
       (elfeed-show-visit use-generic-p)))
-  )
+
+  (defun my/elfeed-org-roam-capture ()
+    "Capture metadata of the current elfeed-entry to org-roam."
+    (interactive)
+    (let* ((title (elfeed-entry-title elfeed-show-entry))
+           (link (elfeed-entry-link elfeed-show-entry))
+           (node (org-roam-node-create :title title))
+           (org-roam-capture-templates
+            `(("d" "default - capture the current elfeed show entry"
+               plain ,(format "\n%%?\nlink: [[%s][%s]]\n\n%s" link title
+                              (elfeed-insert-html
+                               (elfeed-deref (elfeed-entry-content elfeed-show-entry))))
+               :target (file+head "fleeting/${slug}.org"
+                                  "#+title: ${title}\n")
+               :unnarrowed t
+               :kill-buffer t))))
+      (org-roam-capture- :keys "d" :node node :info `(:ref ,link)))))
 
 (use-package elfeed-goodies
   :disabled
