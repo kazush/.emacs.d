@@ -3142,7 +3142,8 @@ Yet another terminal emulator. Trying out now.
            (go-dot-mod-mode . go-mod-ts-mode)
            (go-mode . go-ts-mode)
            (java-mode . java-ts-mode)
-           (python-mode . python-ts-mode))))
+           (python-mode . python-ts-mode)
+           (typescript-mode . typescript-ts-mode))))
   :config
   ;; setting treesit-language-source-alist via :custom not working
   (setq treesit-language-source-alist
@@ -3182,10 +3183,8 @@ Yet another terminal emulator. Trying out now.
   )
 #+end_src
 
-** LSP
-
+** lsp-mode
 *** lsp-mode
-
 #+begin_src emacs-lisp
 (use-package lsp-mode
   :hook
@@ -3251,7 +3250,11 @@ Yet another terminal emulator. Trying out now.
               (cons "emacs-lsp-booster" orig-result))
           orig-result)))
     (advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command)))
+#+end_src
 
+*** lsp-ui
+
+#+begin_src emacs-lisp
 (use-package lsp-ui
   :after lsp-mode
   :bind (:map lsp-ui-doc-frame-mode-map
@@ -3329,27 +3332,54 @@ Yet another terminal emulator. Trying out now.
                   my/lsp-ui-doc-scroll-down-by-1))
     (put sym 'completion-predicate #'ignore))
   )
+#+end_src
 
+*** lsp-pyright
+
+#+begin_src emacs-lisp
 (use-package lsp-pyright
   :after lsp-mode
   :custom
   (lsp-pyright-langserver-command "basedpyright"))
-
-(use-package lsp-treemacs
-  :requires lsp-mode)
-
-(defvar my/lsp-enabled-mode-hook-list
-  (if (< (string-to-number emacs-version) 29)
-      '(python-mode-hook yaml-mode-hook)
-    '(python-base-mode-hook yaml-mode-hook)))
-(defun my/setup-lsp ()
-  "Set up hooks to enable lsp-mode."
-  (interactive)
-  (dolist (hook my/lsp-enabled-mode-hook-list)
-    (add-hook hook #'lsp)))
 #+end_src
 
-*** eglot
+*** lsp-eslint
+
+#+begin_src emacs-lisp
+(use-package lsp-eslint
+  :straight nil
+  :after lsp-mode)
+#+end_src
+
+*** lsp-tailwindcss
+
+#+begin_src emacs-lisp
+(use-package lsp-tailwindcss
+  :straight (:type git :host github :repo "merrickluo/lsp-tailwindcss")
+  :after lsp-mode
+  :custom
+  (lsp-tailwindcss-add-on-mode t)
+  :config
+  (setq lsp-tailwindcss-major-modes
+        (append lsp-tailwindcss-major-modes
+           '(css-mode
+             css-ts-mode
+             typescript-mode
+             typescript-ts-mode
+             tsx-ts-mode
+             js2-mode
+             js-ts-mode
+             clojure-mode))))
+#+end_src
+
+*** lsp-treemacs
+
+#+begin_src emacs-lisp
+(use-package lsp-treemacs
+  :requires lsp-mode)
+#+end_src
+
+** eglot
 
 Currently eglot is disabled to try lsp-mode out again.
 
@@ -3475,6 +3505,16 @@ Eldoc-box displays eldoc contents in a child frame but is currently disabled.
 (use-package aggressive-indent
   :hook ((go-mode . aggressive-indent-mode)
          (emacs-lisp-mode . aggressive-indent-mode)))
+#+end_src
+
+** Formatting
+
+*** Apheleia
+
+#+begin_src emacs-lisp
+(use-package apheleia
+  :config
+  (apheleia-global-mode +1))
 #+end_src
 
 ** Highlighting
@@ -4163,23 +4203,18 @@ TBH this is not maintaned these days.
                        (setq-local tab-width 2))))
 #+end_src
 
-** Typescript
-
-TBH this is not maintaned these days.
+** Typescript & TSX
 
 #+begin_src emacs-lisp
-(use-package tide
-  :after (flycheck)
-  :mode (("\\.tsx\\'" . web-mode))
-  :hook ((typescript-mode . tide-setup)
-         (typescript-mode . tide-hl-identifier-mode)
-         (web-mode . (lambda ()
-                       (when (string-equal "tsx" (file-name-extension buffer-file-name))
-                         (tide-setup)
-                         (tide-hl-identifier-mode))))
-         (before-save . tide-format-before-save))
-  :config
-  (flycheck-add-mode 'typescript-tslint 'web-mode))
+(use-package typescript-ts-mode
+  :straight (:type built-in)
+  :mode (("\\.ts\\'" . typescript-ts-mode)))
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package tsx-ts-mode
+  :straight (:type built-in)
+  :mode (("\\.[jt]sx\\'" . tsx-ts-mode)))
 #+end_src
 
 ** JSON
