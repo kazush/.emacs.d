@@ -4391,7 +4391,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
                  (:discard (:anything t))))
               (org-agenda-prefix-format
                '((todo . " %-2i %-18(my/org-get-todo-date-str)   %-10(my/org-agenda-property \"project\" 10)   ")))
-              (org-agenda-overriding-header "Task Status")))
+              (org-agenda-overriding-header "Focused Tasks")))
        (tags-todo "+PROJECT=\"personal\"-TODO=\"SHOPPING\"-STYLE=\"habit\""
                   ((org-super-agenda-groups
                     '((:todo "NEXT")
@@ -4856,14 +4856,14 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
   :commands (my/org-update-clock org-clock-in org-clock-out)
   :hook (org-after-todo-state-change . my/org-update-clock)
   :custom-face
-  (org-agenda-clocking ((t :foreground: "#ffcc00" :background "unspecified")))
+  (org-agenda-clocking ((t :foreground "#ffcc00" :background "unspecified")))
   :custom
   (org-clock-persist t)
   :config
   (defun my/org-update-clock ()
     "Update clock state. Called via org-after-todo-state-change-hook."
     (interactive)
-    (if (string= org-state org-clock-in-switch-to-state)
+    (if (string= org-state "WIP")
         (unless (org-clocking-p)
           (org-clock-in))
       (when (org-clocking-p)
@@ -5551,7 +5551,7 @@ Citar provides a rich UI frontend for org-cite. citar-org-roam provides more int
     (my/org-gcal-setup)
     (org-gcal-fetch))
 
-  (defvar my/org-gcal-fetch-timer (run-with-idle-timer 3600 t #'my/org-gcal-fetch)))
+  (defvar my/org-gcal-fetch-timer (run-with-idle-timer 3600 nil #'my/org-gcal-fetch)))
 #+end_src
 
 ** org-super-agenda
