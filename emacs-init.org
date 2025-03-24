@@ -6899,11 +6899,14 @@ and stream is t."
     (let* ((title (elfeed-entry-title elfeed-show-entry))
            (link (elfeed-entry-link elfeed-show-entry))
            (node (org-roam-node-create :title title))
+           (body (elfeed-deref (elfeed-entry-content elfeed-show-entry)))
            (org-roam-capture-templates
             `(("d" "default - capture the current elfeed show entry"
                plain ,(format "\n%%?\nlink: [[%s][%s]]\n\n%s" link title
-                              (elfeed-insert-html
-                               (elfeed-deref (elfeed-entry-content elfeed-show-entry))))
+                              (with-temp-buffer
+                                (insert body)
+                                (shr-render-region (point-min) (point-max))
+                                (buffer-substring-no-properties (point-min) (point-max))))
                :target (file+head "fleeting/${slug}.org"
                                   "#+title: ${title}\n")
                :unnarrowed t
