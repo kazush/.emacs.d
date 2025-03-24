@@ -209,6 +209,10 @@ Customization for miscellaneous built-in features.
 ;; Add word-wrap-whitespace-mode to visual line mode so line wrapping works as
 ;; expected for non English text.
 (add-hook 'visual-line-mode-hook #'word-wrap-whitespace-mode)
+
+;; Preferences on isearch
+(setq isearch-allow-scroll t)
+(setq isearch-lazy-count t)
 #+end_src
 
 Change the format of buffer name to /<unique dir suffix>/<filename>/.
