@@ -6758,31 +6758,43 @@ and stream is t."
 #+RESULTS:
 : my/gptel-quick-summarize
 
-** org-ai
-
-Use groq as the LLM service.
+** mcp
 
 #+begin_src emacs-lisp
-(use-package org-ai
-  :diminish
-  :after org
-  :straight (org-ai :type git :host github :repo "rksm/org-ai"
-                    :local-repo "org-ai"
-                    :files ("*.el" "README.md" "snippets"))
-  :commands (org-ai-mode
-             org-ai-global-mode)
-  :hook (org-mode . org-ai-mode)
+(use-package mcp-hub
+  :straight (:type git :host github :repo "lizqwerscott/mcp.el")
+  :hook (gptel-mode . my/gptel-enable-mcp-tools)
+  :custom
+  (mcp-hub-servers
+   `(("filesystem" "npx" ("-y" "@modelcontextprotocol/server-filesystem" ,(file-name-concat (getenv "HOME") "prj")))
+     ("puppeteer" "npx" ("-y" "@modelcontextprotocol/server-puppeteer"))))
   :config
-  ;; Use Llama 3.1 70B by Groq as the backend. The API key is in authinfo.
-  (setq org-ai-default-chat-model "")
-  (setq org-ai-openai-chat-endpoint "https://openrouter.ai/api/v1/chat/completions")
-  (setq org-ai-openai-completion-endpoint "https://openrouter.ai/api/v1/completions")
 
-  (org-ai-install-yasnippets)
+  (defun gptel-mcp-register-tool ()
+    "A function for registering all MCP tools."
+    (interactive)
+    (let ((tools (mcp-hub-get-all-tool :asyncp t :categoryp t)))
+      (mapcar #'(lambda (tool)
+                  (apply #'gptel-make-tool
+                         tool))
+              tools)))
 
-  ;; remove C-c r from org-ai-mode-map
-  (keymap-unset org-ai-mode-map "C-c r" t)
-  )
+  (defun gptel-mcp-use-tool ()
+    "Activate all MCP tools using gptel."
+    (interactive)
+    (let ((tools (mcp-hub-get-all-tool :asyncp t :categoryp t)))
+      (mapcar #'(lambda (tool)
+                  (let ((path (list (plist-get tool :category)
+                                    (plist-get tool :name))))
+                    (push (gptel-get-tool path)
+                          gptel-tools)))
+              tools)))
+  (defun my/gptel-enable-mcp-tools ()
+    "Setup MCP servers as tools for gptel."
+    (interactive)
+    (mcp-hub-start-all-server)
+    (run-with-timer 5 nil #'gptel-mcp-register-tool)
+    ))
 #+end_src
 
 * Internet Information and Media Tools
