@@ -6816,6 +6816,7 @@ and stream is t."
          ("j" . scroll-up-command)
          ("k" . scroll-down-command)
          ("v" . my/elfeed-show-visit-with-eaf)
+         ("." . browse-url-at-point)
          ("b" . my/elfeed-show-visit-with-eww)
          ("B" . elfeed-show-visit)
          ("c" . my/elfeed-org-roam-capture)
