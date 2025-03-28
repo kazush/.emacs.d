@@ -6766,8 +6766,12 @@ and stream is t."
   :hook (gptel-mode . my/gptel-enable-mcp-tools)
   :custom
   (mcp-hub-servers
-   `(("filesystem" "npx" ("-y" "@modelcontextprotocol/server-filesystem" ,(file-name-concat (getenv "HOME") "prj")))
-     ("puppeteer" "npx" ("-y" "@modelcontextprotocol/server-puppeteer"))))
+   `(("filesystem" . (:command "npx" :args ("-y" "@modelcontextprotocol/server-filesystem" ,(file-name-concat (getenv "HOME") "prj"))))
+     ("playwright" . (:command "npx" :args ("-y" "@playwright/mcp@latest")))
+     ("firecrawl" . (:command "npx" :args ("-y" "firecrawl-mcp")
+                           :env (:FIRECRAWL_API_KEY ,(auth-source-pick-first-password :host "firecrawl-api-key"))))
+     ("tavily" . (:command "npx" :args ("-y" "tavily-mcp@0.1.4")
+                           :env (:TAVILY_API_KEY ,(auth-source-pick-first-password :host "tavily-api-key"))))))
   :config
 
   (defun gptel-mcp-register-tool ()
