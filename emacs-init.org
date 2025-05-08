@@ -2050,6 +2050,7 @@ Trim spaces from EOL. Only lines touched get trimmed.
 
 #+begin_src emacs-lisp
 (use-package ws-butler
+  :straight ( :type git :host github :repo "lewang/ws-butler" :branch "master")
   :diminish ws-butler-mode
   :hook (prog-mode . ws-butler-mode))
 #+end_src
