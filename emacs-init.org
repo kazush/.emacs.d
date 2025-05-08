@@ -4790,7 +4790,8 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
   ;; Open custom agenda view on startup.
   (defun my/org-agenda-custom-view ()
     (interactive)
-    (org-agenda nil "d"))
+    (when (file-directory-p "~/org")
+      (org-agenda nil "d")))
 
   (add-hook 'emacs-startup-hook 'my/org-agenda-custom-view))
 #+end_src
