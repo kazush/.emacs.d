@@ -4953,11 +4953,12 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
   (setq my/org-roam-project-root "~/org/roam/projects")
 
   (defun my/org-roam-projects (&optional name-only include-personal)
-    (let ((projects (directory-files my/org-roam-project-root (not name-only) "\\`[^.]")))
-      (if include-personal projects
-        (seq-filter (lambda (ent)
-                      (not (string-match-p "\\(\\`\\|/\\)personal\\'" ent)))
-                    projects))))
+    (when (file-directory-p my/org-roam-project-root)
+      (let ((projects (directory-files my/org-roam-project-root (not name-only) "\\`[^.]")))
+        (if include-personal projects
+          (seq-filter (lambda (ent)
+                        (not (string-match-p "\\(\\`\\|/\\)personal\\'" ent)))
+                      projects)))))
 
   ;; Add project files to org-agenda.
   (setq org-agenda-files
