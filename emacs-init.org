@@ -5555,20 +5555,22 @@ Citar provides a rich UI frontend for org-cite. citar-org-roam provides more int
            (client (plist-get authinfo :client))
            (secret (auth-source-pick-first-password :host "org-gcal"))
            (calendar (plist-get authinfo :calendar))
-          (family-calendar (plist-get authinfo :family-calendar)))
+           (family-calendar (plist-get authinfo :family-calendar)))
       (setq org-gcal-client-id client)
-      (setq org-gcal-client-secret secret)
-      (setq org-gcal-fetch-file-alist
-            `((,calendar . "~/org/gcal.org")
-              (,family-calendar . "~/org/family-calendar.org")
-              ("monex.co.jp_hkslb9v1kj95se5r8ag2mms4k8@group.calendar.google.com" . "~/org/us-market-holidays.org")))
-      (org-gcal-reload-client-id-secret)))
+      (when org-gcal-client-id
+        (setq org-gcal-client-secret secret)
+        (setq org-gcal-fetch-file-alist
+              `((,calendar . "~/org/gcal.org")
+                (,family-calendar . "~/org/family-calendar.org")
+                ("monex.co.jp_hkslb9v1kj95se5r8ag2mms4k8@group.calendar.google.com" . "~/org/us-market-holidays.org")))
+        (org-gcal-reload-client-id-secret))))
 
   (defun my/org-gcal-fetch ()
     "Import calendar events to Org files from Google Calendar."
     (interactive)
     (my/org-gcal-setup)
-    (org-gcal-fetch))
+    (when org-gcal-client-id
+      (org-gcal-fetch)))
 
   (defvar my/org-gcal-fetch-timer (run-with-idle-timer 3600 nil #'my/org-gcal-fetch)))
 #+end_src
