@@ -6410,7 +6410,7 @@ Macros to retrive API keys for LLM servce providers.
 
   ;; Set default backend.
   (setq gptel-backend (my/gptel-get-backend "Gemini"))
-  (setq gptel-model 'gemini-2.0-flash-exp)
+  (setq gptel-model 'gemini-2.5-flash-preview-04-17)
 
   ;;
   ;; Tools - mostly copied from https://github.com/karthink/gptel/issues/514
