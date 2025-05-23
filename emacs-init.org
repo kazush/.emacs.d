@@ -5419,12 +5419,7 @@ Install cdlatex to enable some useful features. cdlatex depends on texmathp.el i
          (cdlatex-mode . my/setup-cdlatex-mode)
          (org-cdlatex-mode . my/setup-cdlatex-mode))
   :bind ( :map org-cdlatex-mode-map
-          ("$" . cdlatex-dollar)
-          ("(" . cdlatex-pbb)
-          ("{" . cdlatex-pbb)
-          ("[" . cdlatex-pbb)
-          ("|" . cdlatex-pbb)
-          ("<" . cdlatex-pbb))
+          ("$" . cdlatex-dollar))
   :custom
   (cdlatex-paired-parens "$([{")
   :config
