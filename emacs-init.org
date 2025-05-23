@@ -6161,19 +6161,21 @@ Macros to retrive API keys for LLM servce providers.
   ;;          :chat-model "deepseek-coder-v2:latest"))
 
   (setopt ellama-provider (my/make-llm-gemini
-                           :chat-model "gemini-2.0-flash-exp"))
+                           :chat-model "gemini-2.5-flash-preview-04-17"))
   ;; Predefined llm providers for interactive switching.
   ;; You shouldn't add ollama providers here - it can be selected interactively
   ;; without it. It is just example.
   (setopt ellama-providers
-          '(("gemini-flash" . (my/make-llm-gemini
+          '(("gemini-2.0-flash" . (my/make-llm-gemini
                                :chat-model "gemini-2.0-flash"))
-            ("gemini-flash-lite" . (my/make-llm-gemini
-                                        :chat-model "gemini-2.0-flash-lite-preview-02-05"))
-            ("gemini-flash-thinking" . (my/make-llm-gemini
-                                        :chat-model "gemini-2.0-flash-thinking-exp-01-21"))
-            ("gemini-pro" . (my/make-llm-gemini
-                               :chat-model "gemini-2.0-pro-exp-02-05"))
+            ("gemini-2.0-flash-lite" . (my/make-llm-gemini
+                                        :chat-model "gemini-2.0-flash-lite"))
+            ("gemini-2.0-flash-preview" . (my/make-llm-gemini
+                                        :chat-model "gemini-2.0-flash-preview-image-generation"))
+            ("gemini-2.5-flash-preview" . (my/make-llm-gemini
+                               :chat-model "gemini-2.5-flash-preview-04-17"))
+            ("gemini-2.5-pro-preview" . (my/make-llm-gemini
+                               :chat-model "gemini-2.5-pro-preview-05-06"))
             ("groq-llama-3.3-specdec" . (my/make-llm-groq
                                          :chat-model "llama-3.3-70b-specdec"))
             ("groq-llama-3.3-versatile" . (my/make-llm-groq
@@ -6315,11 +6317,9 @@ Macros to retrive API keys for LLM servce providers.
   (gptel-make-gemini "Gemini"
     :key #'my/get-gemini-api-key
     :models '(gemini-2.0-flash
-              gemini-2.0-flash-exp
               gemini-2.0-flash-lite
-              gemini-2.0-flash-thinking-exp-01-21
-              gemini-2.0-pro-exp-02-05
-              gemini-2.5-pro-preview-03-25
+              gemini-2.0-flash-preview-image-generation
+              gemini-2.5-pro-preview-05-06
               gemini-2.5-flash-preview-04-17)
     :stream t)
 
