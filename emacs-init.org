@@ -5419,15 +5419,19 @@ Install cdlatex to enable some useful features. cdlatex depends on texmathp.el i
          (cdlatex-mode . my/setup-cdlatex-mode)
          (org-cdlatex-mode . my/setup-cdlatex-mode))
   :bind ( :map org-cdlatex-mode-map
-          ("$" . cdlatex-dollar))
+          ("$" . cdlatex-dollar)
+          ("(" . cdlatex-pbb)
+          ("{" . cdlatex-pbb)
+          ("[" . cdlatex-pbb)
+          ("|" . cdlatex-pbb)
+          ("<" . cdlatex-pbb))
   :custom
   (cdlatex-paired-parens "$([{")
   :config
   (defun my/setup-cdlatex-mode ()
     "Setup config suitable for cdlatex-mode and org-cdlatex-mode."
     (require 'auctex)
-    (setq-local org-use-sub-superscripts t)
-    (setq-local org-export-with-sub-superscripts t)
+    (setq-local org-pretty-entities-include-sub-superscripts nil)
     (electric-pair-mode -1))
 )
 #+end_src
