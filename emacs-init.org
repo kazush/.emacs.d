@@ -1927,6 +1927,21 @@ A new mode integrated in Emacs 30.
 
 * Edit modes
 
+** AUCTeX
+
+#+begin_src emacs-lisp
+(use-package auctex
+  :mode (("\\.tex\\'" . LaTeX-mode))
+  :hook ((LaTeX-mode . LaTeX-math-mode)
+         (LaTeX-mode . visual-line-mode))
+  :custom
+  (TeX-engine 'xetex)
+  (LaTeX-command "xelatex")
+  :config
+  (with-eval-after-load 'tex
+    (add-to-list 'TeX-command-list '("XeLaTeX" "%`xelatex --synctex=1%(mode)%' %t" TeX-run-TeX nil t))))
+#+end_src
+
 ** YAML
 
 #+begin_src emacs-lisp
@@ -5472,10 +5487,6 @@ Seeme like Xenops can replace slow latex preview. Trying it out now.
 (use-package xenops
   :after org
   :hook ((cdlatex-mode org-cdlatex-mode) . xenops-mode)
-  :custom
-  ;; TODO(me): move config for common tex/latex variables to a dedicated section.
-  (latex-run-command "xelatex")
-  (LaTeX-command "xelatex")
   :config
 
   (setq xenops-reveal-on-entry t)
@@ -7270,7 +7281,6 @@ and stream is t."
   (eaf-bind-key scroll_down "C-p" eaf-pdf-viewer-keybinding)
 
   (with-eval-after-load 'tex
-    (add-to-list 'TeX-command-list '("XeLaTeX" "%`xelatex --synctex=1%(mode)%' %t" TeX-run-TeX nil t))
     (add-to-list 'TeX-view-program-list '("eaf" eaf-pdf-synctex-forward-view))
     (add-to-list 'TeX-view-program-selection '(output-pdf "eaf"))))
 #+end_src
