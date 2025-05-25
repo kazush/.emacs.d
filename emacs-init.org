@@ -213,6 +213,11 @@ Customization for miscellaneous built-in features.
 ;; Preferences on isearch
 (setq isearch-allow-scroll t)
 (setq isearch-lazy-count t)
+
+;; Disable saving active region to the primary selection.
+;; This could cause Emacs to freeze especially if it's running in a container.
+(setq select-active-regions nil)
+
 #+end_src
 
 Change the format of buffer name to /<unique dir suffix>/<filename>/.
