@@ -5500,6 +5500,20 @@ Seeme like Xenops can replace slow latex preview. Trying it out now.
   ;; Override xenops specific latex processs alist with org-preview-latex one.
   (setq xenops-math-latex-process-alist org-preview-latex-process-alist)
 
+  ;; Override xenops-math-reveal to prevent unwanted cursor jump.
+  ;; https://github.com/dandavison/xenops/issues/59
+  (defun xenops-math-reveal (element)
+    "Remove image overlay for ELEMENT.
+If a prefix argument is in effect, also delete its cache file."
+    (xenops-element-overlays-delete element)
+    (if current-prefix-arg
+        (delete-file (xenops-math-get-cache-file element)))
+    ;; TODO: is :begin-content for block math off by one?
+    (let ((element-type (plist-get element :type))
+          (begin-content (plist-get element :begin-content)))
+      )
+    (xenops-math-render-below-maybe element))
+
   ;; Fix background color issues with fragment images.
   (defun my/xenops-tweak-latex-document (orig-fn &rest args)
     "Delete \\pagecolor and \\color directives from the output so latex fragment will have transparent background."
