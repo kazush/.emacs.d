@@ -5275,6 +5275,7 @@ Disabled at the moment in favor of xenops.
 \\fi
 [NO-DEFAULT-PACKAGES]
 \\usepackage{amsmath}
+\\usepackage{mathtools}
 \\usepackage{newtxtext,newtxmath}
 \\ifdefined\\kanjiskip
   \\usepackage{graphicx}
@@ -5301,6 +5302,7 @@ Disabled at the moment in favor of xenops.
 \\fi
 [NO-DEFAULT-PACKAGES]
 \\usepackage{amsmath}
+\\usepackage{mathtools}
 \\usepackage{newtxtext,newtxmath}
 \\ifdefined\\kanjiskip
   \\usepackage{graphicx}
@@ -5323,6 +5325,7 @@ Disabled at the moment in favor of xenops.
                    "\\documentclass[autodetect-engine,dvi=dvipdfmx,11pt,a4paper,ja=standard]{bxjsarticle}
 [NO-DEFAULT-PACKAGES]
 \\usepackage{amsmath}
+\\usepackage{mathtools}
 \\usepackage{mathcomp}
 \\usepackage{newtxtext,newtxmath}
 \\usepackage{graphicx}
@@ -5401,6 +5404,7 @@ Disabled at the moment in favor of xenops.
 \[DEFAULT-PACKAGES]
 \[PACKAGES]
 \\usepackage{amsmath}
+\\usepackage{mathtools}
 \\usepackage{mathcomp}
 \\usepackage{newtxtext,newtxmath}
 \\usepackage{graphicx}
