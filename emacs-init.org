@@ -2349,7 +2349,8 @@ Align tables with variable pitch fonts.
   :diminish
   :custom
   (valign-fancy-bar t)
-  :hook ((org-mode markdown-mode) . valign-mode))
+  ;; :hook ((org-mode markdown-mode) . valign-mode)
+  )
 #+end_src
 
 ** htmlize
@@ -5128,7 +5129,8 @@ add ctime and mtime properties to org-roam nodes.
   :hook ((org-mode . org-modern-mode)
          (org-agenda-finalize . org-modern-agenda))
   :custom
-  (org-modern-table nil)
+  ;; Uncomment if org-modern-table conflicts with valign-mode.
+  ;; (org-modern-table nil)
   :config
   ;; borrowed from https://misohena.jp/blog/2022-08-27-fix-org-table-lines-using-org-modern-and-org-indent.html
 
