@@ -5128,7 +5128,7 @@ add ctime and mtime properties to org-roam nodes.
 (use-package org-modern
   :hook ((org-mode . org-modern-mode)
          (org-agenda-finalize . org-modern-agenda))
-  :custom
+  ;; :custom
   ;; Uncomment if org-modern-table conflicts with valign-mode.
   ;; (org-modern-table nil)
   :config
