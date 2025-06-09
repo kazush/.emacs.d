@@ -527,12 +527,13 @@ called in hooks.
 (setq font-lock-maximum-decoration t)
 (global-font-lock-mode t)
 
+(defvar my/default-background (if window-system "#282c34" "#000000"))
 (defun my/setup-faces ()
   "Set faces for my preference."
   (interactive)
   (set-face-attribute 'default nil
                       :foreground "#abb2bf"
-                      :background (if window-system "#282c34" "#000000"))
+                      :background my/default-background)
   (set-face-attribute 'fixed-pitch nil
                       :family 'unspecified
                       :inherit 'default)
@@ -665,39 +666,57 @@ called in hooks.
 Different tweaks on appearance.
 
 #+begin_src emacs-lisp
-  ;; Display time and load in the mode line.
-  (when-use-exwm
-   (display-time-mode +1))
+;; Display time and load in the mode line.
+(when-use-exwm
+ (display-time-mode +1))
 
-  ;; Display line and column numbers in the mode line.
-  (line-number-mode +1)
-  (column-number-mode +1)
+;; Display line and column numbers in the mode line.
+(line-number-mode +1)
+(column-number-mode +1)
 
-  ;; Enable visual bell.
-  (setq visible-bell t)
+;; Enable visual bell.
+(setq visible-bell t)
 
-  ;; Highlight line mode.
-  ;; (use-package hl-line
-  ;;   :hook ((org-mode-hook
-  ;;          prog-mode-hook
-  ;;          text-mode-hook
-  ;;          yaml-mode-hook) . hl-line-mode)
-  ;;   :config
-  ;;   (set-face-attribute 'hl-line nil
-  ;;                       :foreground 'unspecified
-  ;;                       :background "gray15")
-  ;;   )
+;; Highlight line mode.
+;; (use-package hl-line
+;;   :hook ((org-mode-hook
+;;          prog-mode-hook
+;;          text-mode-hook
+;;          yaml-mode-hook) . hl-line-mode)
+;;   :config
+;;   (set-face-attribute 'hl-line nil
+;;                       :foreground 'unspecified
+;;                       :background "gray15")
+;;   )
 
-  ;; Disable unnecessary features for some performance optimization.
-  (setq use-dialog-box nil)
-  (setq bidi-inhibit-bpa t)
-  (setq redisplay-skip-fontification-on-input t)
-  (setq-default indicate-empty-lines t)
-  (setq-default bidi-display-reordering 'left-to-right)
+;; Disable unnecessary features for some performance optimization.
+(setq use-dialog-box nil)
+(setq bidi-inhibit-bpa t)
+(setq redisplay-skip-fontification-on-input t)
+(setq-default indicate-empty-lines t)
+(setq-default bidi-display-reordering 'left-to-right)
 
-  ;; Somehow pixel scrolling does not work well yet.
-  ;; (setq pixel-scroll-precision-use-momentum t)
-  ;; (pixel-scroll-precision-mode)
+;; Somehow pixel scrolling does not work well yet.
+;; (setq pixel-scroll-precision-use-momentum t)
+;; (pixel-scroll-precision-mode)
+
+;; Toggle transparency
+(defvar my/transparency 0.8)
+(defun my/toggle-transparency ()
+  "Toggle transparency of background of default face."
+  (interactive)
+  (if window-system
+      (let ((alpha (frame-parameter nil 'alpha)))
+        (if (eql alpha my/transparency)
+            (progn
+              (set-frame-parameter nil 'alpha 1.0)
+              (set-face-background 'default my/default-background))
+          (set-frame-parameter nil 'alpha my/transparency)
+          (set-face-background 'default "black")))
+    (set-face-background
+     'default
+     (if (string= (face-attribute 'default :background) "unspecified")
+         my/default-background "unspecified"))))
 #+end_src
 
 ** Icons
