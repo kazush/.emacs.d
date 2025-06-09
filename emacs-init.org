@@ -3183,6 +3183,8 @@ Yet another terminal emulator. Trying out now.
            (go-dot-mod-mode . go-mod-ts-mode)
            (go-mode . go-ts-mode)
            (java-mode . java-ts-mode)
+           (javascript-mode . js-ts-mode)
+           (js-mode . js-ts-mode)
            (python-mode . python-ts-mode)
            (typescript-mode . typescript-ts-mode))))
   :config
