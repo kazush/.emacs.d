@@ -701,18 +701,18 @@ Different tweaks on appearance.
 ;; (pixel-scroll-precision-mode)
 
 ;; Toggle transparency
-(defvar my/transparency 0.8)
+(defvar my/transparency 0.9)
 (defun my/toggle-transparency ()
   "Toggle transparency of background of default face."
   (interactive)
   (if window-system
       (let ((alpha (frame-parameter nil 'alpha)))
-        (if (eql alpha my/transparency)
+        (if (eql alpha 1.0)
             (progn
-              (set-frame-parameter nil 'alpha 1.0)
-              (set-face-background 'default my/default-background))
-          (set-frame-parameter nil 'alpha my/transparency)
-          (set-face-background 'default "black")))
+              (set-frame-parameter nil 'alpha my/transparency)
+              (set-face-background 'default "black"))
+          (set-frame-parameter nil 'alpha 1.0)
+          (set-face-background 'default my/default-background)))
     (set-face-background
      'default
      (if (string= (face-attribute 'default :background) "unspecified")
