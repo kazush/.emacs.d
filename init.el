@@ -116,7 +116,8 @@
   (tool-bar-mode -1)
   (menu-bar-mode -1)
   (fringe-mode 10)
-  (set-frame-size nil 100 35))
+  ;; (set-frame-size nil 100 35)
+  )
 
 ;; Use straight.el for package management.
 
