@@ -707,9 +707,10 @@ Different tweaks on appearance.
   (interactive)
   (if window-system
       (let ((alpha (frame-parameter nil 'alpha)))
-        (if (eql alpha 1.0)
+        (if (or (null alpha)
+                (eql alpha 1.0))
             (progn
-              (set-frame-parameter nil 'alpha my/transparency)
+`              (set-frame-parameter nil 'alpha my/transparency)
               (set-face-background 'default "black"))
           (set-frame-parameter nil 'alpha 1.0)
           (set-face-background 'default my/default-background)))
