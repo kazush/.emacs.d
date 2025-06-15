@@ -3159,6 +3159,20 @@ Yet another terminal emulator. Trying out now.
               (setq-local indent-tabs-mode nil)))
 #+end_src
 
+** Makefile
+
+Enable indent-tabs-mode for makefile mode.
+
+#+begin_src emacs-lisp
+(use-package make-mode
+  :straight (:type built-in)
+  :hook ((makefile-mode . my/makefile-mode-hook))
+  :config
+  (defun my/makefile-mode-hook ()
+    (setq indent-tabs-mode t))
+)
+#+end_src
+
 ** Tree Sitter
 
 #+begin_src emacs-lisp
