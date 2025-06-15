@@ -3183,7 +3183,6 @@ Enable indent-tabs-mode for makefile mode.
   (treesit-font-lock-level 4)
   (treesit-load-name-override-list
    '((c++ "libtree-sitter-cpp" "tree_sitter_cpp")
-     (js "libtree-sitter-js" "tree_sitter_javascript")
      (common-lisp "libtree-sitter-common-lisp" "tree_sitter_commonlisp")
      (csharp "libtree-sitter-csharp" "tree_sitter_c_sharp")
      (go-mod "libtree-sitter-go-mod" "tree_sitter_gomod")))
@@ -3217,7 +3216,7 @@ Enable indent-tabs-mode for makefile mode.
           (go "https://github.com/tree-sitter/tree-sitter-go" "v0.20.0")
           (go-mod "https://github.com/camdencheek/tree-sitter-go-mod")
           (html "https://github.com/tree-sitter/tree-sitter-html" "v0.20.1")
-          (js . ("https://github.com/tree-sitter/tree-sitter-javascript" "v0.20.1"))
+          (javascript . ("https://github.com/tree-sitter/tree-sitter-javascript" "v0.20.1"))
           (json "https://github.com/tree-sitter/tree-sitter-json" "v0.20.2")
           (lua "https://github.com/Azganoth/tree-sitter-lua")
           (make "https://github.com/alemuller/tree-sitter-make")
