@@ -6236,21 +6236,23 @@ Macros to retrive API keys for LLM servce providers.
   ;;          :chat-model "deepseek-coder-v2:latest"))
 
   (setopt ellama-provider (my/make-llm-gemini
-                           :chat-model "gemini-2.5-flash-preview-04-17"))
+                           :chat-model "gemini-2.5-flash-lite-preview-06-17"))
   ;; Predefined llm providers for interactive switching.
   ;; You shouldn't add ollama providers here - it can be selected interactively
   ;; without it. It is just example.
   (setopt ellama-providers
           '(("gemini-2.0-flash" . (my/make-llm-gemini
-                               :chat-model "gemini-2.0-flash"))
+                                   :chat-model "gemini-2.0-flash"))
             ("gemini-2.0-flash-lite" . (my/make-llm-gemini
                                         :chat-model "gemini-2.0-flash-lite"))
             ("gemini-2.0-flash-preview" . (my/make-llm-gemini
-                                        :chat-model "gemini-2.0-flash-preview-image-generation"))
+                                           :chat-model "gemini-2.0-flash-preview-image-generation"))
+            ("gemini-2.5-flash-lite-preview" . (my/make-llm-gemini
+                                                :chat-model "gemini-2.5-flash-lite-preview-06-17"))
             ("gemini-2.5-flash-preview" . (my/make-llm-gemini
-                               :chat-model "gemini-2.5-flash-preview-04-17"))
-            ("gemini-2.5-pro-preview" . (my/make-llm-gemini
-                               :chat-model "gemini-2.5-pro-preview-05-06"))
+                                           :chat-model "gemini-2.5-flash-preview-04-17"))
+            ("gemini-2.5-pro" . (my/make-llm-gemini
+                                         :chat-model "gemini-2.5-pro"))
             ("groq-llama-3.3-specdec" . (my/make-llm-groq
                                          :chat-model "llama-3.3-70b-specdec"))
             ("groq-llama-3.3-versatile" . (my/make-llm-groq
@@ -6264,7 +6266,7 @@ Macros to retrive API keys for LLM servce providers.
             ("cohere-command-r-plus" . (my/make-llm-cohere
                                         :chat-model "command-r-plus"))
             ("huggingface-qwen2.5-coder" . (my/make-llm-huggingface
-                                   :chat-model "Qwen/Qwen2.5-Coder-32B-Instruct"))
+                                            :chat-model "Qwen/Qwen2.5-Coder-32B-Instruct"))
             ("ezo-common" . (my/make-llm-local-server
                              :chat-model "ezo-common"))
             ("ezo-humanities" . (my/make-llm-local-server
