@@ -6236,7 +6236,7 @@ Macros to retrive API keys for LLM servce providers.
   ;;          :chat-model "deepseek-coder-v2:latest"))
 
   (setopt ellama-provider (my/make-llm-gemini
-                           :chat-model "gemini-2.5-flash-lite-preview-06-17"))
+                           :chat-model "gemini-2.5-flash-lite"))
   ;; Predefined llm providers for interactive switching.
   ;; You shouldn't add ollama providers here - it can be selected interactively
   ;; without it. It is just example.
@@ -6247,10 +6247,10 @@ Macros to retrive API keys for LLM servce providers.
                                         :chat-model "gemini-2.0-flash-lite"))
             ("gemini-2.0-flash-preview" . (my/make-llm-gemini
                                            :chat-model "gemini-2.0-flash-preview-image-generation"))
-            ("gemini-2.5-flash-lite-preview" . (my/make-llm-gemini
-                                                :chat-model "gemini-2.5-flash-lite-preview-06-17"))
-            ("gemini-2.5-flash-preview" . (my/make-llm-gemini
-                                           :chat-model "gemini-2.5-flash-preview-04-17"))
+            ("gemini-2.5-flash-lite" . (my/make-llm-gemini
+                                                :chat-model "gemini-2.5-flash-lite"))
+            ("gemini-2.5-flash" . (my/make-llm-gemini
+                                           :chat-model "gemini-2.5-flash"))
             ("gemini-2.5-pro" . (my/make-llm-gemini
                                          :chat-model "gemini-2.5-pro"))
             ("groq-llama-3.3-specdec" . (my/make-llm-groq
@@ -6396,8 +6396,9 @@ Macros to retrive API keys for LLM servce providers.
     :models '(gemini-2.0-flash
               gemini-2.0-flash-lite
               gemini-2.0-flash-preview-image-generation
-              gemini-2.5-pro-preview-05-06
-              gemini-2.5-flash-preview-04-17)
+              gemini-2.5-pro
+              gemini-2.5-flash-lite
+              gemini-2.5-flash)
     :stream t)
 
   (gptel-make-openai "Groq"
@@ -6482,7 +6483,7 @@ Macros to retrive API keys for LLM servce providers.
 
   ;; Set default backend.
   (setq gptel-backend (my/gptel-get-backend "Gemini"))
-  (setq gptel-model 'gemini-2.5-flash-preview-04-17)
+  (setq gptel-model 'gemini-2.5-flash-lite)
 
   ;;
   ;; Tools - mostly copied from https://github.com/karthink/gptel/issues/514
