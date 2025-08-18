@@ -7131,8 +7131,8 @@ and stream is t."
 
 #+begin_src emacs-lisp
 (use-package plz)
-(use-package go-translate
-  :bind (("C-c y" . gt-do-translate))
+(use-package gt
+  :bind (("C-c y" . gt-translate))
   :config
   (setq gt-langs '(en ja))
 
@@ -7150,7 +7150,7 @@ and stream is t."
                                :then #'my/gt-strip-linebreak)
                        :engines (gt-google-engine)
                        :render (gt-buffer-render
-                                :buffer-name "*gt-result*"
+                                :name "*gt-result*"
                                 :window-config '((display-buffer-at-bottom))
                                 :then (lambda (_) (pop-to-buffer "*gt-result*"))))
         my/gt-groq-llama-3.1
@@ -7162,7 +7162,7 @@ and stream is t."
                                  :host "https://api.groq.com/openai"
                                  :model "llama-3.1-70b-versatile")
                        :render (gt-buffer-render
-                                :buffer-name "*gt-result*"
+                                :name "*gt-result*"
                                 :window-config '((display-buffer-at-bottom))
                                 :then (lambda (_) (pop-to-buffer "*gt-result*")))))
 
