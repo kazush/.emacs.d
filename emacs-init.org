@@ -718,6 +718,9 @@ Different tweaks on appearance.
      'default
      (if (string= (face-attribute 'default :background) "unspecified")
          my/default-background "unspecified"))))
+
+;; Enable transparent background
+(add-hook 'after-init-hook #'my/toggle-transparency)
 #+end_src
 
 ** Icons
