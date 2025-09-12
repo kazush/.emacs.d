@@ -11,7 +11,7 @@
 ;; - font-size can be a function.
 (defvar my/default-font-size-alist
   `(("DSI-.+:minibookx\\'" . 19)  ;; Wayland
-    ("eDP-.*:\\(vivobook\\|ubuntu\\)\\'" . 22)
+    ("eDP-.*:\\(vivobook\\|ubuntu\\)\\'" . 21)
     (".*" . 16)))
 
 (defvar my/default-jp-font "Noto Sans CJK JP")
