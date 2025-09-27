@@ -5212,7 +5212,6 @@ Disabled for now as it's not working well with some Org buffers (e.g. copilot-ch
 
 #+begin_src emacs-lisp
 (use-package org-modern-indent
-  :disabled
   :straight (org-modern-indent
              :type git
              :host github
