@@ -5167,12 +5167,16 @@ add ctime and mtime properties to org-roam nodes.
 #+begin_src emacs-lisp
 (use-package org-modern
   :hook ((org-mode . org-modern-mode)
-         (org-agenda-finalize . org-modern-agenda))
+         (org-agenda-finalize . org-modern-agenda)
+         (org-modern-mode . my/org-modern-mode-hook))
   ;; :custom
   ;; Uncomment if org-modern-table conflicts with valign-mode.
   ;; (org-modern-table nil)
   :config
   ;; borrowed from https://misohena.jp/blog/2022-08-27-fix-org-table-lines-using-org-modern-and-org-indent.html
+
+  (defun my/org-modern-mode-hook ()
+    (set-face-foreground 'org-hide "black"))
 
   (defun my/org-indent--compute-prefixes-after ()
     ;; org-indent--text-line-prefixes is line-prefix at each level。
