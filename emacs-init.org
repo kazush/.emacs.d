@@ -527,13 +527,14 @@ called in hooks.
 (setq font-lock-maximum-decoration t)
 (global-font-lock-mode t)
 
-(defvar my/default-background (if window-system "#282c34" "#000000"))
 (defun my/setup-faces ()
   "Set faces for my preference."
   (interactive)
-  (set-face-attribute 'default nil
-                      :foreground "#abb2bf"
-                      :background my/default-background)
+  (set-face-foreground 'default my/default-face-foreground)
+  (set-face-background 'default
+    (if my/transparent-bg-p
+        (if window-system "#000000" "unspecified-bg")
+      my/default-face-background))
   (set-face-attribute 'fixed-pitch nil
                       :family 'unspecified
                       :inherit 'default)
@@ -652,13 +653,19 @@ called in hooks.
                         :font base-font
                         :fontset fontset)))
 
-(defun my/setup-fonts ()
-  "Set up fontsets for my preference."
+(defun my/setup-other-fonts ()
+  "Set up non-default fontsets for my preference."
   (interactive)
   (setq use-default-font-for-symbols nil)
   (my/set-fontset-jp-font)
   (my/set-fontset-emoji-font)
   (my/setup-variable-font))
+
+(defun my/setup-fonts ()
+  "Set up all fontsets for my preference."
+  (interactive)
+  (my/setup-default-font)
+  (my/setup-other-fonts))
 #+end_src
 
 ** Misc display tweaks
@@ -700,27 +707,31 @@ Different tweaks on appearance.
 ;; (setq pixel-scroll-precision-use-momentum t)
 ;; (pixel-scroll-precision-mode)
 
-;; Toggle transparency
-(defvar my/transparency 0.85)
-(defun my/toggle-transparency ()
-  "Toggle transparency of background of default face."
+;; Background transparency settings.
+(defun my/set-transparency (enable &optional frame)
+  "Set background transparency of default face."
   (interactive)
-  (if window-system
-      (let ((alpha (frame-parameter nil 'alpha)))
-        (if (or (null alpha)
-                (eql alpha 1.0))
-            (progn
-              (set-frame-parameter nil 'alpha my/transparency)
-              (set-face-background 'default "black"))
-          (set-frame-parameter nil 'alpha 1.0)
-          (set-face-background 'default my/default-background)))
-    (set-face-background
-     'default
-     (if (string= (face-attribute 'default :background) "unspecified")
-         my/default-background "unspecified"))))
+  (if enable
+      (progn
+        (if (not window-system)
+            (set-face-background 'default "unspecified-bg")
+          (set-frame-parameter frame 'alpha my/transparency)
+          (set-face-background 'default "black"))
+        (setq my/transparent-bg-p t))
+    (when window-system
+      (set-frame-parameter frame 'alpha 1.0))
+    (set-face-background 'default my/default-face-background)
+    (setq my/transparent-bg-p nil)))
 
-;; Enable transparent background
-(add-hook 'after-init-hook #'my/toggle-transparency)
+(defun my/toggle-transparency ()
+  "Toggle background transparency of default face."
+  (interactive)
+  (let ((alpha (frame-parameter nil 'alpha)))
+    (my/set-transparency
+     (if window-system
+         (or (null alpha) (eql alpha 1.0))
+       (string= (face-attribute 'default :background)
+                my/default-face-background)))))
 #+end_src
 
 ** Icons
@@ -956,25 +967,31 @@ Currently it is disabled as I don't want to build emacs-mozc on Arch.
 
 When running as daemon, apparently these functions need to be called whenever a
 new emacsclient is connected hence ~server-after-make-frame-hook~ is set here.
-Otherwise the same UI setup functions are called via ~emacs-startup-hook~.
 
 #+begin_src emacs-lisp
 (defun my/setup-ui ()
   "Sets up UI apperance."
   (interactive)
-  (menu-bar-mode -1)
-  (tool-bar-mode -1)
+  ;; (menu-bar-mode -1)
+  ;; (tool-bar-mode -1)
   (my/setup-faces)
   (when window-system
-    (scroll-bar-mode -1)
-    (fringe-mode 10)
+    ;; (scroll-bar-mode -1)
+    ;; (fringe-mode 10)
     (my/setup-fonts)))
+
+(defun my/setup-default-frame-bgcolor ()
+  "To resolve the issue where the server cannot create a new X frame when the unspecified-bg (tty-specific value) is set to background."
+  (interactive)
+  (set-face-background 'default "black"))
+(add-hook 'before-make-frame-hook #'my/setup-default-frame-bgcolor)
 
 ;; Hooks to forcibly reset UI for new frames by emacsclient.
 (add-hook 'server-after-make-frame-hook 'my/setup-ui)
 
 ;; Initialize UI appearance for my preference.
-(my/setup-ui)
+(unless (daemonp)
+  (my/setup-ui))
 #+end_src
 
 ** Key binding guidance
@@ -4562,7 +4579,6 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
    '(org-block-begin-line ((t :background "#2e3652")))
    '(org-block-end-line ((t :background unspecified
                             :inherit 'org-block-begin-line)))
-   `(org-block ((t :background ,(if window-system "#252938" "color-236"))))
    '(org-code ((t :foreground "sea green"
                   :family "Inconsolata Nerd Font")))
    '(org-ellipsis ((t  :inherit default :box nil)))
@@ -4574,6 +4590,8 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
    '(org-agenda-date-weekend-today ((t :foreground "#cc9966" :inherit org-agenda-date-today)))
    '(org-agenda-structure ((t :family "Noto Serif" :foreground "#cccc88" :weight bold :height 1.2)))
    '(org-headline-done ((t :foreground "#999999" :background "#333333"))))
+  (unless my/transparent-bg-p
+   (set-face-background 'org-block "#252938"))
 
   (defun my/org-setup-variable-font ()
     "Override default face with variable fonts."

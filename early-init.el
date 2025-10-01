@@ -62,9 +62,28 @@
 ;; Initialize startup frame to minimize flicker.
 ;;
 
-(set-face-attribute 'default nil
-                    :foreground "#abb2bf"
-                    :background "#282c34")
+(defvar my/enable-transparency t)
+(defvar my/transparent-bg-p my/enable-transparency)
+(defvar my/transparency 0.85)
+(defvar my/default-face-foreground "#abb2bf")
+(defvar my/default-face-background "#282c34")
+(set-face-foreground 'default my/default-face-foreground)
+(unless my/enable-transparency
+  (set-face-background 'default my/default-face-background))
+(when (and initial-window-system my/enable-transparency)
+  (set-face-background 'default "#000000"))
+
 (set-face-attribute 'mode-line nil
                     :foreground "#d3d3d3"
                     :background "#000000")
+
+;; Initialize GUI frame parameters.
+(setq default-frame-alist
+      `((foreground-color . ,my/default-face-foreground)
+        (alpha . ,(if my/enable-transparency my/transparency 1.0))
+        (tool-bar-lines . 0)
+        (tab-bar-lines . 0)
+        (menu-bar-lines . 0)
+        (vertical-scroll-bars . nil)
+        (left-fringe . 10)
+        (right-fringe . 10)))

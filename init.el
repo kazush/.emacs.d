@@ -88,7 +88,7 @@
                    finally return (let ((value (cdr pair)))
                                     (if (functionp value) (funcall value) value))))))
 
-(defun my/set-default-font ()
+(defun my/setup-default-font ()
   "Set default font size for each font as per the current monitor environment."
   (interactive)
 
@@ -105,19 +105,6 @@
   (set-face-attribute 'default nil
                       :font (my/make-font-str my/default-font
                                               my/default-font-size)))
-
-;; Initialize default font.
-(when (display-graphic-p)
-  (my/set-default-font))
-
-;; Initialize GUI frame parameters.
-(when window-system
-  (scroll-bar-mode -1)
-  (tool-bar-mode -1)
-  (menu-bar-mode -1)
-  (fringe-mode 10)
-  ;; (set-frame-size nil 100 35)
-  )
 
 ;; Use straight.el for package management.
 
