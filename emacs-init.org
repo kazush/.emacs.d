@@ -6130,7 +6130,8 @@ Macros to retrive API keys for LLM servce providers.
     (groq :auth-source "groq-api-key" :envvar "GROQ_API_KEY")
     (cohere :auth-source "cohere-api-key" :envvar "COHERE_API_KEY")
     (sambanova :auth-source "sambanova-api-key")
-    (huggingface :auth-source "huggingface-api-key")))
+    (huggingface :auth-source "huggingface-api-key")
+    (deepl :auth-source "deepl-api-key")))
 
 ;; Generate my/get-<provider>-api-key function
 (dolist (conf my/llm-provider-alist)
@@ -7155,8 +7156,18 @@ and stream is t."
             (mapcar (lambda (s) (string-replace "\n" " " s)) text))
       ))
 
-  (setq gt-chatgpt-key (my/get-groq-api-key))
-  (setq my/gt-google-translate
+  (setq my/gt-deepl
+        (gt-translator :taker (gt-taker
+                               :langs '(en ja)
+                               :text 'word
+                               :then #'my/gt-strip-linebreak)
+                       :engines (gt-deepl-engine
+                                 :key (my/get-deepl-api-key))
+                       :render (gt-buffer-render
+                                :name "*gt-result*"
+                                :window-config '((display-buffer-at-bottom))
+                                :then (lambda (_) (pop-to-buffer "*gt-result*"))))
+        my/gt-google-translate
         (gt-translator :taker (gt-taker
                                :langs '(en ja)
                                :text 'word
@@ -7166,22 +7177,24 @@ and stream is t."
                                 :name "*gt-result*"
                                 :window-config '((display-buffer-at-bottom))
                                 :then (lambda (_) (pop-to-buffer "*gt-result*"))))
-        my/gt-groq-llama-3.1
+        my/gt-groq-llama-3.3
         (gt-translator :taker (gt-taker
                                :langs '(en ja)
                                :text 'sentence
                                :then #'my/gt-strip-linebreak)
                        :engines (gt-chatgpt-engine
                                  :host "https://api.groq.com/openai"
-                                 :model "llama-3.1-70b-versatile")
+                                 :model "llama-3.3-70b-versatile"
+                                 :key (my/get-groq-api-key))
                        :render (gt-buffer-render
                                 :name "*gt-result*"
                                 :window-config '((display-buffer-at-bottom))
                                 :then (lambda (_) (pop-to-buffer "*gt-result*")))))
 
   (setq gt-preset-translators
-        `((google-translate . ,my/gt-google-translate)
-          (groq-llama-3.1 . ,my/gt-groq-llama-3.1)))
+        `((deepl . ,my/gt-deepl)
+          (google-translate . ,my/gt-google-translate)
+          (groq-llama-3.3 . ,my/gt-groq-llama-3.3)))
 
   ;; Add key bindings for the render buffer.
   (advice-add #'gt-keybinds :after
