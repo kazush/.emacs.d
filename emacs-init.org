@@ -1304,6 +1304,7 @@ goggles is now used instead of volatile-highlights.
 
 #+begin_src emacs-lisp
 (use-package dimmer
+  :disabled
   :straight (:type git :host github :repo "gonewest818/dimmer.el")
   :custom
   (dimmer-fraction 0.25)
