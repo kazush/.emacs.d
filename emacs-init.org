@@ -7146,7 +7146,8 @@ and stream is t."
 #+begin_src emacs-lisp
 (use-package plz)
 (use-package gt
-  :bind (("C-c y" . gt-translate))
+  :bind (("C-c y" . gt-translate)
+         ("C-c Y" . gt-switch-translator))
   :config
   (setq gt-langs '(en ja))
 
@@ -7192,8 +7193,8 @@ and stream is t."
                                 :then (lambda (_) (pop-to-buffer "*gt-result*")))))
 
   (setq gt-preset-translators
-        `((deepl . ,my/gt-deepl)
-          (google-translate . ,my/gt-google-translate)
+        `((google-translate . ,my/gt-google-translate)
+          (deepl . ,my/gt-deepl)
           (groq-llama-3.3 . ,my/gt-groq-llama-3.3)))
 
   ;; Add key bindings for the render buffer.
