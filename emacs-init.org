@@ -5689,9 +5689,10 @@ Citar provides a rich UI frontend for org-cite. citar-org-roam provides more int
   (defun my/org-gcal-fetch ()
     "Import calendar events to Org files from Google Calendar."
     (interactive)
-    (my/org-gcal-setup)
-    (when org-gcal-client-id
-      (org-gcal-fetch)))
+    (unless (getenv "NO_ORG_GCAL_FETCH")
+      (my/org-gcal-setup)
+      (when org-gcal-client-id
+        (org-gcal-fetch))))
 
   (defvar my/org-gcal-fetch-timer (run-with-idle-timer 3600 nil #'my/org-gcal-fetch)))
 #+end_src
