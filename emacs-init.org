@@ -4500,25 +4500,31 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
                    (org-agenda-overriding-header "Personal Tasks Awaiting Processing")
                    (org-agenda-prefix-format
                     '((tags . " %-2i %-18(my/org-get-todo-date-str) %l")))))
-       (todo "SHOPPING"
-             ((org-super-agenda-groups
-               '((:auto-tags t)
-                 (:anything t)))
-              (org-agenda-overriding-header "Shopping List")))
        (tags-todo "-PROJECT=\"personal\"+LEVEL<=2"
                   ((org-use-property-inheritance '("project"))
                    (org-super-agenda-groups
                     '((:auto-property "project")
                       (:discard (:anything t))))
                    (org-agenda-files (my/org-roam-projects))
-                   (org-agenda-overriding-header "Projects")
+                   (org-agenda-overriding-header "Project Overview")
                    (org-agenda-prefix-format
                     '((tags . " %-2i %-18(my/org-get-todo-date-str) %l")))))
-       (todo "LATER"
-             ((org-super-agenda-groups
-               '((:auto-tags t)
+       (todo "SHOPPING"
+             ((org-use-property-inheritance '("project"))
+              (org-super-agenda-groups
+               '((:auto-property "project")
                  (:anything t)))
-              (org-agenda-overriding-header "Check Out Later")))))
+              (org-agenda-overriding-header "Shopping List")
+              (org-agenda-prefix-format
+                    '((todo . " %-2i %-18(my/org-get-todo-date-str) %l")))))
+       (todo "LATER"
+             ((org-use-property-inheritance '("project"))
+              (org-super-agenda-groups
+               '((:auto-property "project")
+                 (:anything t)))
+              (org-agenda-overriding-header "Check Out Later")
+              (org-agenda-prefix-format
+                    '((todo . " %-2i %-18(my/org-get-todo-date-str) %l")))))))
      ("p" "Projects"
       ((tags-todo "-PROJECT=\"personal\"+LEVEL<=4"
                   ((org-use-property-inheritance '("project"))
