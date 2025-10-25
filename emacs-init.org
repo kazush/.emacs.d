@@ -4432,7 +4432,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
   (org-todo-keywords
    '((sequence "TODO(t)" "NEXT(n!)" "ACTIVE(a!)" "WIP(i!/!)"
                "ONHOLD(h@/!)" "BLOCKED(b@/!)" "|" "DONE(d!)" "CANCELLED(c@)")
-     (sequence "SHOPPING(s)" "|" "DONE(d!)" "CANCELLED(c@)")))
+     (sequence "SHOPPING(s)" "LATER(l)" "|" "DONE(d!)" "CANCELLED(c@)")))
   (org-log-done 'time)
   (org-capture-templates nil) ;; Migrated to org-roam-capture.
   (org-agenda-files '("~/org/agenda.org" "~/org/economic-calendar.org"))
@@ -4489,7 +4489,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
               (org-agenda-prefix-format
                '((todo . " %-2i %-18(my/org-get-todo-date-str)   %-10(my/org-agenda-property \"project\" 10)   ")))
               (org-agenda-overriding-header "Focused Tasks")))
-       (tags-todo "+PROJECT=\"personal\"-TODO=\"SHOPPING\"-STYLE=\"habit\""
+       (tags-todo "+PROJECT=\"personal\"-TODO=\"SHOPPING\"-TODO=\"LATER\"-STYLE=\"habit\""
                   ((org-super-agenda-groups
                     '((:todo "NEXT")
                       (:todo "TODO")
@@ -4500,22 +4500,41 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
                    (org-agenda-overriding-header "Personal Tasks Awaiting Processing")
                    (org-agenda-prefix-format
                     '((tags . " %-2i %-18(my/org-get-todo-date-str) %l")))))
-       (tags-todo "+PROJECT=\"personal\"+STYLE=\"habit\""
-                  (
-                   (org-use-property-inheritance '("project"))
-                   (org-agenda-files (list (my/org-roam-project-file "personal" "tasks")))
-                   (org-agenda-overriding-header "Habits")
-                   (org-agenda-prefix-format
-                    '((tags . " %-2i %-18(my/org-get-todo-date-str) %l")))))
        (todo "SHOPPING"
-             ((org-agenda-overriding-header "Shopping List")))
-       (tags-todo "-PROJECT=\"personal\"+LEVEL<=4"
+             ((org-super-agenda-groups
+               '((:auto-tags t)
+                 (:anything t)))
+              (org-agenda-overriding-header "Shopping List")))
+       (tags-todo "-PROJECT=\"personal\"+LEVEL<=2"
                   ((org-use-property-inheritance '("project"))
                    (org-super-agenda-groups
                     '((:auto-property "project")
                       (:discard (:anything t))))
                    (org-agenda-files (my/org-roam-projects))
                    (org-agenda-overriding-header "Projects")
+                   (org-agenda-prefix-format
+                    '((tags . " %-2i %-18(my/org-get-todo-date-str) %l")))))
+       (todo "LATER"
+             ((org-super-agenda-groups
+               '((:auto-tags t)
+                 (:anything t)))
+              (org-agenda-overriding-header "Check Out Later")))))
+     ("p" "Projects"
+      ((tags-todo "-PROJECT=\"personal\"+LEVEL<=4"
+                  ((org-use-property-inheritance '("project"))
+                   (org-super-agenda-groups
+                    '((:auto-property "project")
+                      (:discard (:anything t))))
+                   (org-agenda-files (my/org-roam-projects))
+                   (org-agenda-overriding-header "Projects")
+                   (org-agenda-prefix-format
+                    '((tags . " %-2i %-18(my/org-get-todo-date-str) %l")))))))
+     ("h" "Habits"
+      ((tags-todo "+PROJECT=\"personal\"+STYLE=\"habit\""
+                  (
+                   (org-use-property-inheritance '("project"))
+                   (org-agenda-files (list (my/org-roam-project-file "personal" "tasks")))
+                   (org-agenda-overriding-header "Habits")
                    (org-agenda-prefix-format
                     '((tags . " %-2i %-18(my/org-get-todo-date-str) %l")))))))))
   (org-stuck-projects
@@ -4593,7 +4612,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
    '(org-agenda-structure ((t :family "Noto Serif" :foreground "#cccc88" :weight bold :height 1.2)))
    '(org-headline-done ((t :foreground "#999999" :background "#333333"))))
   (unless my/transparent-bg-p
-   (set-face-background 'org-block "#252938"))
+    (set-face-background 'org-block "#252938"))
 
   (defun my/org-setup-variable-font ()
     "Override default face with variable fonts."
@@ -5141,9 +5160,13 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
 
   (defun my/org-roam-personal-capture-task (task-type)
     "Capture new task for personal project."
-    (interactive (list (completing-read "Task Type: " '("Task" "Shopping"))))
-    (let ((node-headline (when (string= task-type "Shopping") "Shopping List"))
-          (headline (when (string= task-type "Shopping") "* SHOPPING %?")))
+    (interactive (list (completing-read "Task Type: " '("Task" "Shopping" "Later"))))
+    (let ((node-headline (cond
+                          ((string= task-type "Shopping") "Shopping List")
+                          ((string= task-type "Later") "Check Out Later")))
+          (headline (cond
+                     ((string= task-type "Shopping") "* SHOPPING %?")
+                     ((string= task-type "Later") "* LATER %u %?"))))
       (my/org-roam-project-capture-task "personal" node-headline headline)))
 
   ;; add org-roam-directory to consult-omni-notes's source list
