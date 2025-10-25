@@ -6969,7 +6969,6 @@ and stream is t."
          ("c" . my/elfeed-org-roam-capture)
          ("SPC" . my/elfeed-show-scroll-up-then-quit)
          ("RET" . my/elfeed-show-visit-with-eww))
-  :hook (elfeed-show-mode . visual-line-mode)
   ;; :custom
   ;; (elfeed-search-remain-on-entry t)  ;; for navigation from split entry pane.
   :config
