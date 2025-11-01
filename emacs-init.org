@@ -6554,6 +6554,7 @@ Macros to retrive API keys for LLM servce providers.
               z-ai/glm-4.5-air:free
               tngtech/deepseek-r1t2-chimera:free
               meituan/longcat-flash-chat:free
+              minimax/minimax-m2:free
               moonshotai/kimi-k2:free
               deepseek/deepseek-r1:free
               qwen/qwen3-coder:free))
