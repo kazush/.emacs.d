@@ -5805,6 +5805,35 @@ installed."
    'org-babel-load-languages '((verb . t))))
 #+end_src
 
+** org-remark
+
+#+begin_src emacs-lisp
+(use-package org-remark
+  :bind (;; :bind keyword also implicitly defers org-remark itself.
+         ;; Keybindings before :map is set for global-map. Adjust the keybinds
+         ;; as you see fit.
+         ("C-c N m" . org-remark-mark)
+         ("C-c N l" . org-remark-mark-line)
+         :map org-remark-mode-map
+         ("C-c N o" . org-remark-open)
+         ("C-c N ]" . org-remark-view-next)
+         ("C-c N [" . org-remark-view-prev)
+         ("C-c N r" . org-remark-remove)
+         ("C-c N d" . org-remark-delete))
+  :hook ((after-init . org-remark-global-tracking-mode)
+         (Info-mode . org-remark-info-mode)
+         (eww-mode . org-remark-eww-mode))
+  :config
+  (org-remark-create "dark-pastel-green" '(:background "#3a6b35"))
+  (org-remark-create "dark-pastel-blue" '(:background "#34547a"))
+  (org-remark-create "dark-pastel-red" '(:background "#7a453a"))
+  (org-remark-create "dark-pastel-purple" '(:background "#6a4b7b"))
+  (org-remark-create "dark-pastel-orange" '(:background "#b56c49"))
+  (org-remark-create "dark-pastel-teal" '(:background "#3b7165"))
+  (org-remark-create "dark-pastel-brown" '(:background "#7b6046"))
+  (org-remark-create "dark-pastel-yellow" '(:background "#a6954e")))
+#+end_src
+
 * Docker / Containers
 
 ** Docker Tramp
