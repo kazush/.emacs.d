@@ -4920,6 +4920,10 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
       (org-agenda nil "d")))
 
   (add-hook 'emacs-startup-hook 'my/org-agenda-custom-view))
+
+  ;; add org-roam-directory to consult-omni-notes's source list
+  (with-eval-after-load 'consult-omni-notes
+    (add-to-list 'consult-omni-notes-files org-directory))
 #+end_src
 
 #+begin_src emacs-lisp
@@ -5195,9 +5199,11 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
                      ((string= task-type "Later") "* LATER %u %?"))))
       (my/org-roam-project-capture-task "personal" node-headline headline)))
 
-  ;; add org-roam-directory to consult-omni-notes's source list
-  (with-eval-after-load 'consult-omni-notes
-    (add-to-list 'consult-omni-notes-files org-roam-directory)))
+  ;; Comment out as org-mode config adds org-directory (parent of org-roam-directory).
+  ;; ;; add org-roam-directory to consult-omni-notes's source list
+  ;; (with-eval-after-load 'consult-omni-notes
+  ;;   (add-to-list 'consult-omni-notes-files org-roam-directory))
+  )
 #+end_src
 
 *** org-roam-ui
@@ -7394,6 +7400,18 @@ and stream is t."
 
   ;;; Set your shorthand favorite interactive command
   (setq consult-omni-default-interactive-command #'consult-omni-multi)
+
+  ;; Set symbol in region or at point as initial input.
+  (dolist (cmd '( consult-omni-multi consult-omni-apps consult-omni-elfeed
+                  consult-omni-google consult-omni-github consult-omni-locate
+                  consult-omni-notes-search consult-omni-multi-static
+                  consult-omni-wikipedia consult-omni-youtube))
+    (eval
+     `(consult-customize
+       ,cmd
+       :initial (if (use-region-p)
+                    (buffer-substring (region-beginning) (region-end))
+                  (thing-at-point 'symbol)))))
   )
 #+end_src
 
