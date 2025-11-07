@@ -2014,6 +2014,26 @@ A new mode integrated in Emacs 30.
   ;; ;; gfm-preview is a 1-line script containing "grip --export $1 -"
   ;; (let ((cmd (expand-file-name "~/bin/gfm-preview")))
   ;;   (when (file-exists-p cmd) (setq markdown-command cmd)))
+  :custom
+  (markdown-header-scaling t)
+  (markdown-fontify-code-blocks-natively t)
+  (markdown-enable-math t)
+  (markdown-enable-highlighting-syntax t)
+  (markdown-indent-no-enter 'indent-and-new-item)
+  (markdown-list-indent-width 2)
+  :config
+  (custom-set-faces
+   '(markdown-header-face-1 ((t :inherit org-level-1)))
+   '(markdown-header-face-2 ((t :inherit org-level-2)))
+   '(markdown-header-face-3 ((t :inherit org-level-3)))
+   '(markdown-header-face-4 ((t :inherit org-level-4)))
+   '(markdown-header-face-5 ((t :inherit org-level-5)))
+   '(markdown-header-face-6 ((t :inherit org-level-6)))
+   '(markdown-code-face ((t :background "#151b23"
+                            :extend t
+                            :inherit default)))
+   '(markdown-inline-code-face ((t :inherit org-code)))
+   )
   )
 #+end_src
 
