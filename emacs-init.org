@@ -4525,7 +4525,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
                    (org-agenda-files (list (my/org-roam-project-file "personal" "tasks")))
                    (org-agenda-overriding-header "Personal Tasks Awaiting Processing")
                    (org-agenda-prefix-format
-                    '((tags . " %-2i %-18(my/org-get-todo-date-str) %l")))))
+                    '((tags . " %-2i %-18(my/org-get-todo-date-str)   ")))))
        (tags-todo "-PROJECT=\"personal\"-TODO=\"SHOPPING\"-TODO=\"LATER\"-STYLE=\"habit\""
                   ((org-use-property-inheritance '("project"))
                    (org-super-agenda-groups
@@ -4541,7 +4541,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
                  (:anything t)))
               (org-agenda-overriding-header "Shopping List")
               (org-agenda-prefix-format
-               '((todo . " %-2i %-18(my/org-get-todo-date-str) %l")))))
+               '((todo . " %-2i %-18(my/org-get-todo-date-str)   ")))))
        (todo "LATER"
              ((org-use-property-inheritance '("project"))
               (org-super-agenda-groups
@@ -4549,7 +4549,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
                  (:anything t)))
               (org-agenda-overriding-header "Check Out Later")
               (org-agenda-prefix-format
-               '((todo . " %-2i %-18(my/org-get-todo-date-str) %l")))))))
+               '((todo . " %-2i %-18(my/org-get-todo-date-str)   ")))))))
      ("p" "Projects"
       ((tags-todo "-PROJECT=\"personal\"+LEVEL<=4"
                   ((org-use-property-inheritance '("project"))
@@ -4567,7 +4567,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
                    (org-agenda-files (list (my/org-roam-project-file "personal" "tasks")))
                    (org-agenda-overriding-header "Habits")
                    (org-agenda-prefix-format
-                    '((tags . " %-2i %-18(my/org-get-todo-date-str) %l")))))))))
+                    '((tags . " %-2i %-18(my/org-get-todo-date-str) ")))))))))
   (org-stuck-projects
    '("+PROJECT/-DONE-SOMEDAY" ("TODO" "WAIT")))
 
@@ -4591,9 +4591,9 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
   (org-ellipsis "⇣")
   (org-agenda-prefix-format
    '((agenda . " %-2i %21t%-10(my/org-agenda-property \"project\" 10)   ")
-     (todo . " %-2i %-18(my/org-get-todo-date-str)   %-10(my/org-agenda-property \"project\" 10) %l")
-     (tags . " %-2i %-18(my/org-get-todo-date-str)   %-10(my/org-agenda-property \"project\" 10) %l")
-     (search . " %-2i %-18(my/org-get-todo-date-str)   %-10(my/org-agenda-property \"project\" 10) %l")))
+     (todo . " %-2i %-18(my/org-get-todo-date-str)   %-10(my/org-agenda-property \"project\" 10)   ")
+     (tags . " %-2i %-18(my/org-get-todo-date-str)   %-10(my/org-agenda-property \"project\" 10)   ")
+     (search . " %-2i %-18(my/org-get-todo-date-str)   %-10(my/org-agenda-property \"project\" 10)   ")))
   (org-deadline-warning-days 7)
   :config
 
