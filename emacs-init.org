@@ -2851,6 +2851,7 @@ return the same window."
         (car buflist) (my/find-last-shellish-buffer (cdr buflist) shell-str))))
 
 (defvar my/last-non-shellish-buffer nil)
+(defvar my/shellish-use-tab-p t)
 
 (defun my/remember-last-non-shellish-buffer ()
   "Remember last non-shellish buffer."
@@ -2864,42 +2865,40 @@ return the same window."
 (defun my/get-display-buffer-action-for-shellish (&optional shell-str)
   "Return display-buffer's ACTION parameter applied to shellish buffers."
   (let ((tab-name (my/shellish-tab-name shell-str)))
-    `(display-buffer-in-tab . ((tab-name . ,tab-name)))))
+    (if my/shellish-use-tab-p
+        `(display-buffer-in-tab . ((tab-name . ,tab-name)))
+      '(display-buffer-at-bottom . ()))))
 
 (defun my/get-shellish (arg shellfunc shell-str)
   "Switch to the shell-ish buffer last used or create new without prefix (ARG).
   - Close the window if the current buffer is already a shell-ish buffer of
     the same type.
   - With single prefix, show buffers list.
-  - With double prefixes, unconditionally create new one by calling SHELLFUNC."
+  - With double prefixes, unconditionally create new one by calling SHELLFUNC.
+  - With triple prefixes, toggle display buffer function between tab and bottom window."
   (interactive "p")
+  (when (= arg 64)
+    (setq my/shellish-use-tab-p (not my/shellish-use-tab-p)))
   (let ((b (my/find-last-shellish-buffer (buffer-list (selected-frame))
                                          shell-str))
         (display-buffer-overriding-action (my/get-display-buffer-action-for-shellish shell-str)))
     (cond ((or (not b) (= arg 16))
            (my/remember-last-non-shellish-buffer)
            (call-interactively shellfunc))
-          ;; ((and (= arg 64) b)
-          ;;  (select-window (display-buffer my/last-non-shellish-buffer)))
           ((= arg 4)
            (when b
              (select-window (display-buffer b)))
            (call-interactively my/display-shellish-buffer-list))
           ((string= (alist-get 'name (tab-bar-get-buffer-tab (current-buffer)))
                     (my/shellish-tab-name shell-str))
-           (if (my/shellish-buffer-p (current-buffer) shell-str)
-               (let ((tab-name (alist-get 'name (tab-bar-get-buffer-tab my/last-non-shellish-buffer))))
-                 (if tab-name
-                     (tab-bar-switch-to-tab tab-name)
-                   (tab-bar-switch-to-recent-tab)))
-             (select-window (display-buffer b))
-             (delete-other-windows)))
+           (tab-close))
           ((my/shellish-buffer-p (current-buffer) shell-str)
            (delete-window (get-buffer-window (current-buffer))))
           (b
            (my/remember-last-non-shellish-buffer)
            (select-window (display-buffer b))
-           (delete-other-windows)))))
+           (when my/shellish-use-tab-p
+             (delete-other-windows))))))
 
 (defun my/newshell ()
   "Create a new shell with specified buffer name."
