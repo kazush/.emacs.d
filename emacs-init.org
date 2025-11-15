@@ -2893,7 +2893,10 @@ return the same window."
                     (my/shellish-tab-name shell-str))
            (tab-close))
           ((my/shellish-buffer-p (current-buffer) shell-str)
-           (delete-window (get-buffer-window (current-buffer))))
+           (condition-case err
+               (delete-window (get-buffer-window (current-buffer)))
+             (error
+              (switch-to-prev-buffer))))
           (b
            (my/remember-last-non-shellish-buffer)
            (select-window (display-buffer b))
