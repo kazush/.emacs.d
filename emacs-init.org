@@ -2852,6 +2852,7 @@ return the same window."
 
 (defvar my/last-non-shellish-buffer nil)
 (defvar my/shellish-use-tab-p t)
+(defvar my/shellish-window-height .3)
 
 (defun my/remember-last-non-shellish-buffer ()
   "Remember last non-shellish buffer."
@@ -2867,7 +2868,7 @@ return the same window."
   (let ((tab-name (my/shellish-tab-name shell-str)))
     (if my/shellish-use-tab-p
         `(display-buffer-in-tab . ((tab-name . ,tab-name)))
-      '(display-buffer-at-bottom . ()))))
+      `(display-buffer-at-bottom . ((window-height . ,my/shellish-window-height))))))
 
 (defun my/get-shellish (arg shellfunc shell-str)
   "Switch to the shell-ish buffer last used or create new without prefix (ARG).
