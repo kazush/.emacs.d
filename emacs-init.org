@@ -4083,7 +4083,7 @@ A fork of aider.el that seems to have better integration with Emacs.
   :custom
   (copilot-chat-backend 'curl)
   (copilot-chat-frontend 'org)
-  (copilot-chat-model "claude-3.5-sonnet") ;; "gpt-4o", "o1-preview"
+  (copilot-chat-model "gpt-4.1") ;; "gpt-4o", "o1-preview"
   )
 #+end_src
 
