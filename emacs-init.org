@@ -7027,6 +7027,7 @@ and stream is t."
          ("<f12>" . elfeed)
          :map elfeed-search-mode-map
          ("<mouse-1>" . elfeed-search-show-entry)
+         ("S" . my/elfeed-search-toggle-sort)
          ("b" . my/elfeed-search-browse-url-with-eww)
          ("B" . elfeed-search-browse-url)
          ("m" . elfeed-search-untag-all-unread)
@@ -7131,7 +7132,29 @@ and stream is t."
                                   "#+title: ${title}\n")
                :unnarrowed t
                :kill-buffer t))))
-      (org-roam-capture- :keys "d" :node node :info `(:ref ,link)))))
+      (org-roam-capture- :keys "d" :node node :info `(:ref ,link))))
+
+  ;; Sort feed entries by source.
+  ;; https://www.reddit.com/r/emacs/comments/xwmnyv/is_it_possible_to_sort_elfeed_entries_by_source/
+  (defun my/elfeed-search-sort--feed-url (a b)
+    (string-lessp
+     (elfeed-feed-url (elfeed-entry-feed a))
+     (elfeed-feed-url (elfeed-entry-feed b))))
+
+  (defun my/elfeed-search-toggle-sort (&optional order)
+    "Toggle sort function or order for elfeed search"
+    (interactive "P")
+    (if order
+        (setq elfeed-sort-order
+              (if (eq elfeed-sort-order 'descending) 'ascending 'descending))
+      (setq elfeed-search-sort-function
+            (if elfeed-search-sort-function
+                nil #'my/elfeed-search-sort--feed-url)))
+    (elfeed-search-update t))
+
+  ;; Enable sort by source by default
+  (setq elfeed-sort-order 'ascending
+        elfeed-search-sort-function #'my/elfeed-search-sort--feed-url))
 
 (use-package elfeed-goodies
   :disabled
