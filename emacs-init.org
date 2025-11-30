@@ -1003,6 +1003,7 @@ I'm trying out which-key to see how useful key guidance is for me.
 #+begin_src emacs-lisp
 (use-package which-key
   :diminish
+  :bind (("C-h /" . which-key-show-major-mode))
   :config
   ;; Enable which-key through manual activation with C-h only.
   (setq which-key-show-early-on-C-h t)
