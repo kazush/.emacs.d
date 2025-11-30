@@ -6980,7 +6980,7 @@ and stream is t."
 #+begin_src emacs-lisp
 (use-package mcp-hub
   :straight (:type git :host github :repo "lizqwerscott/mcp.el")
-  :hook (gptel-mode . my/gptel-enable-mcp-tools)
+  ;; :hook (gptel-mode . my/gptel-enable-mcp-tools)
   :custom
   (mcp-hub-servers
    `(("filesystem" . (:command "npx" :args ("-y" "@modelcontextprotocol/server-filesystem" ,(file-name-concat (getenv "HOME") "prj"))))
