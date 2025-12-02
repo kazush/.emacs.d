@@ -6978,44 +6978,23 @@ and stream is t."
 ** mcp
 
 #+begin_src emacs-lisp
-(use-package mcp-hub
+(use-package mcp
   :straight (:type git :host github :repo "lizqwerscott/mcp.el")
-  ;; :hook (gptel-mode . my/gptel-enable-mcp-tools)
-  :custom
-  (mcp-hub-servers
-   `(("filesystem" . (:command "npx" :args ("-y" "@modelcontextprotocol/server-filesystem" ,(file-name-concat (getenv "HOME") "prj"))))
-     ("playwright" . (:command "npx" :args ("-y" "@playwright/mcp@latest")))
-     ;; ("firecrawl" . (:command "npx" :args ("-y" "firecrawl-mcp")
-     ;;                       :env (:FIRECRAWL_API_KEY ,(auth-source-pick-first-password :host "firecrawl-api-key"))))
-     ("tavily" . (:command "npx" :args ("-y" "tavily-mcp@0.1.4")
+  :after gptel
+  :custom (mcp-hub-servers
+           `(("filesystem" . (:command "npx"
+                              :args ("-y" "@modelcontextprotocol/server-filesystem")
+                              :roots (,(file-name-concat (getenv "HOME") "prj"))))
+             ("playwright" . (:command "npx" :args ("-y" "@playwright/mcp@latest")))
+             ("tavily" . (:command "npx" :args ("-y" "tavily-mcp@latest")
                            :env (:TAVILY_API_KEY ,(auth-source-pick-first-password :host "tavily-api-key"))))))
   :config
+  (require 'mcp-hub))
 
-  (defun gptel-mcp-register-tool ()
-    "A function for registering all MCP tools."
-    (interactive)
-    (let ((tools (mcp-hub-get-all-tool :asyncp t :categoryp t)))
-      (mapcar #'(lambda (tool)
-                  (apply #'gptel-make-tool
-                         tool))
-              tools)))
-
-  (defun gptel-mcp-use-tool ()
-    "Activate all MCP tools using gptel."
-    (interactive)
-    (let ((tools (mcp-hub-get-all-tool :asyncp t :categoryp t)))
-      (mapcar #'(lambda (tool)
-                  (let ((path (list (plist-get tool :category)
-                                    (plist-get tool :name))))
-                    (push (gptel-get-tool path)
-                          gptel-tools)))
-              tools)))
-  (defun my/gptel-enable-mcp-tools ()
-    "Setup MCP servers as tools for gptel."
-    (interactive)
-    (mcp-hub-start-all-server)
-    (run-with-timer 5 nil #'gptel-mcp-register-tool)
-    ))
+(use-package gptel-mcp
+  :straight (:type git :host github :repo "lizqwerscott/gptel-mcp.el")
+  :after (gptel, mcp)
+  :commands (gptel-mcp-dispatch))
 #+end_src
 
 * Internet Information and Media Tools
