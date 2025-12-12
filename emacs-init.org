@@ -827,9 +827,6 @@ prefix. This way which-key will be more useful.
 (global-set-key (kbd "M-T") 'tabify)
 (global-set-key (kbd "C-x T") 'untabify)
 
-;; Make find-file-other-window the default behavior for find-file.
-;; (global-set-key (kbd "C-x C-f") 'find-file-other-window)
-
 ;; Bind some commands often used under C-x keymap.
 (global-set-key (kbd "C-x 5 k") 'delete-frame)
 (global-set-key (kbd "C-x K") 'kill-buffer-and-window)
@@ -1253,7 +1250,9 @@ goggles is now used instead of volatile-highlights.
 
 #+begin_src emacs-lisp
 (use-package tab-bar
-  :bind ( :map tab-prefix-map
+  :bind (("C-x C-f" . find-file-other-tab)
+         ("C-x k" . my/tab-bar-kill-buffer-and-tab)
+         :map tab-prefix-map
           ("C-n" . tab-next)
           ("C-p" . tab-previous)
           ("k" . my/tab-bar-kill-buffer-and-tab)
@@ -1278,8 +1277,8 @@ goggles is now used instead of volatile-highlights.
   (defun my/tab-bar-kill-buffer-and-tab ()
     "Kill current buffer and its tab."
     (interactive)
-    (kill-buffer)
-    (tab-close))
+    (when (kill-buffer)
+      (tab-close)))
 
   ;; Create shortcuts for switching to a specified tab.
   (dotimes (num 9 t)
