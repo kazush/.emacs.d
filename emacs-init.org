@@ -3741,8 +3741,6 @@ Enable indentation guide bars for some modes.
 
 *** Forge
 
-Disabled for now. This entry is for future use.
-
 #+begin_src emacs-lisp
 (use-package forge
   :after magit
@@ -4313,7 +4311,14 @@ TBH this is not maintaned these days.
 
 ** Javascript
 
-TBH this is not maintaned these days.
+#+begin_src emacs-lisp
+(use-package js
+  :straight (:type built-in)
+  :custom
+  (js-indent-level 2))
+#+end_src
+
+TBH this is not maintained these days.
 
 #+begin_src emacs-lisp
 (use-package rjsx-mode
@@ -4340,7 +4345,9 @@ TBH this is not maintaned these days.
 ** JSON
 
 #+begin_src emacs-lisp
-(use-package json-mode)
+  (use-package json-ts-mode
+    :straight (:type built-in)
+    :mode ("\\.jsonc?\\'"))
 #+end_src
 
 ** MQL
@@ -4388,12 +4395,12 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
 ** Shell scripts
 
 #+begin_src emacs-lisp
-(use-package sh-script
-  :hook (sh-mode . (lambda ()
-                     (setq-local sh-basic-offset 2)
-                     (setq-local tab-width 2)
-                     (setq-local indent-tabs-mode nil)
-                     (setq-local sh-shellcheck-arguments "-x"))))
+  (use-package sh-script
+    :straight (:type built-in)
+    :custom
+    (sh-basic-offset 2)
+    (indent-tabs-mode nil)
+    (sh-shellcheck-arguments "-x"))
 #+end_src
 
 ** Pine Script
