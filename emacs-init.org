@@ -4439,8 +4439,8 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
   (org-agenda-file-regexp "\\`[^.].*\\.org\\\(\\.gpg\\\)?\\'")
   (org-agenda-sorting-strategy
    '((agenda habit-down time-up priority-down category-keep)
-     (todo priority-down todo-state-up category-keep)
-     (tags priority-down category-keep)
+     (todo urgency-down priority-down todo-state-up category-keep)
+     (tags urgency-down priority-down category-keep)
      (search category-keep)))
   (org-agenda-start-on-weekday calendar-week-start-day)
   (org-agenda-window-setup 'current-window)
@@ -4457,12 +4457,16 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
   (org-src-fontify-natively t)
   (org-confirm-babel-evaluate nil)
   (org-hide-emphasis-markers t)
-  ;; Work in Progress (WIP) status should be used exclusively for time recording
+  ;; WORKING status should be used exclusively for time recording
   ;; and should only be active while actively recording time.
   (org-todo-keywords
-   '((sequence "TODO(t)" "NEXT(n!)" "ACTIVE(a!)" "WIP(i!/!)"
+   '((sequence "TODO(t)" "NEXT(n!)" "ACTIVE(A!)" "ASSIGNED(a!)" "INPROGRESS(i!)" "WORKING(w!/!)"
                "ONHOLD(h@/!)" "BLOCKED(b@/!)" "|" "DONE(d!)" "CANCELLED(c@)")
      (sequence "SHOPPING(s)" "LATER(l)" "|" "DONE(d!)" "CANCELLED(c@)")))
+  (org-priority-faces
+   '((?A :foreground "black" :background "OrangeRed")
+     (?B :foreground "black" :background "ForestGreen")
+     (?C :foreground "black" :background "RoyalBlue3")))
   (org-log-done 'time)
   (org-capture-templates nil) ;; Migrated to org-roam-capture.
   (org-agenda-files '("~/org/agenda.org" "~/org/economic-calendar.org"))
@@ -4501,7 +4505,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
                ((org-agenda-span 'day)))
        (todo ""
              ((org-super-agenda-groups
-               `((:name "Work In Progress" :and (:todo "WIP" :not (:children todo))
+               `((:name "Working Now" :and (:todo "WORKING" :not (:children todo))
                         :face (:foreground "#333333" :background "#eecc00"))
                  (:name "Overdue" :and (:deadline past :not (:children todo))
                         :face (:foreground "#ff3300"))
@@ -4518,17 +4522,20 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
                         :and ( :scheduled (before ,(format-time-string "%Y-%m-%d" (org-read-date nil t "+1w")))
                                :not (:habit t))
                         :face (:foreground "#888888"))
-                 (:name "Active" :and (:todo "ACTIVE" :not (:children todo))
+                 (:name "In Progress" :and (:todo "INPROGRESS" :not (:children todo))
                         :face (:foreground "#ffff00"))
                  (:name "Blocked" :and (:todo "BLOCKED" :not (:children todo))
                         :face (:foreground "#8888bb"))
                  (:discard (:anything t))))
+              (org-agenda-sorting-strategy
+               '(urgency-down priority-down todo-state-up category-keep))
               (org-agenda-prefix-format
                '((todo . " %-2i %-18(my/org-get-todo-date-str)   %-10(my/org-agenda-property \"project\" 10)   ")))
               (org-agenda-overriding-header "Focused Tasks")))
        (tags-todo "+PROJECT=\"personal\"-TODO=\"SHOPPING\"-TODO=\"LATER\"-STYLE=\"habit\""
                   ((org-super-agenda-groups
-                    '((:todo "NEXT")
+                    '((:todo "ASSIGNED")
+                      (:todo "NEXT")
                       (:todo "TODO")
                       (:todo "ONHOLD")
                       (:discard (:anything t))))
@@ -4540,8 +4547,9 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
        (tags-todo "-PROJECT=\"personal\"-TODO=\"SHOPPING\"-TODO=\"LATER\"-STYLE=\"habit\""
                   ((org-use-property-inheritance '("project"))
                    (org-super-agenda-groups
-                    '((:todo "NEXT")
-                      (:todo "ONHOLD")
+                    '((:name "ASSIGNED" :and (:todo "ASSIGNED"  :not (:children todo)))
+                      (:name "NEXT" :and (:todo "NEXT"  :not (:children todo)))
+                      (:name "ONHOLD" :and (:todo "ONHOLD"  :not (:children todo)))
                       (:discard (:anything t))))
                    (org-agenda-files (my/org-roam-projects))
                    (org-agenda-overriding-header "Next Project Tasks")))
@@ -4580,7 +4588,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
                    (org-agenda-prefix-format
                     '((tags . " %-2i %-18(my/org-get-todo-date-str) ")))))))))
   (org-stuck-projects
-   '("+PROJECT/-DONE-SOMEDAY" ("TODO" "WAIT")))
+   '("+PROJECT/-DONE-SOMEDAY" ("TODO" "BLOCKED" "ONHOLD")))
 
   ;; Moved from org-modern
   (org-auto-align-tags nil)
@@ -4652,7 +4660,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
    '(org-agenda-date-weekend ((t :foreground "#aa6633" :inherit org-agenda-date)))
    '(org-agenda-date-weekend-today ((t :foreground "#cc9966" :inherit org-agenda-date-today)))
    '(org-agenda-structure ((t :family "Noto Serif" :foreground "#cccc88" :weight bold :height 1.2)))
-   '(org-headline-done ((t :foreground "#999999" :background "#333333"))))
+   '(org-headline-done ((t :barkground "gray20" :strike-through t))))
   (unless my/transparent-bg-p
     (set-face-background 'org-block "#252938"))
 
@@ -5033,7 +5041,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
   (defun my/org-update-clock ()
     "Update clock state. Called via org-after-todo-state-change-hook."
     (interactive)
-    (if (string= org-state "WIP")
+    (if (string= org-state "WORKING")
         (unless (org-clocking-p)
           (org-clock-in))
       (when (org-clocking-p)
@@ -5266,7 +5274,8 @@ add ctime and mtime properties to org-roam nodes.
   :hook ((org-mode . org-modern-mode)
          (org-agenda-finalize . org-modern-agenda)
          (org-modern-mode . my/org-modern-mode-hook))
-  ;; :custom
+  :custom
+  (org-modern-priority-faces org-priority-faces)
   ;; Uncomment if org-modern-table conflicts with valign-mode.
   ;; (org-modern-table nil)
   :config
