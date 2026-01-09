@@ -829,7 +829,7 @@ prefix. This way which-key will be more useful.
 
 ;; Bind some commands often used under C-x keymap.
 (global-set-key (kbd "C-x 5 k") 'delete-frame)
-(global-set-key (kbd "C-x K") 'kill-buffer-and-window)
+(global-set-key (kbd "C-x 4 k") 'kill-buffer-and-window)
 (global-set-key (kbd "C-x U") 'revert-buffer)
 (global-set-key (kbd "C-x %") 'query-replace-regexp)
 
@@ -1252,6 +1252,7 @@ goggles is now used instead of volatile-highlights.
 (use-package tab-bar
   :bind (("C-x C-f" . find-file-other-tab)
          ("C-x k" . my/tab-bar-kill-buffer-and-tab)
+         ("C-x K" . kill-buffer)
          :map tab-prefix-map
           ("C-n" . tab-next)
           ("C-p" . tab-previous)
