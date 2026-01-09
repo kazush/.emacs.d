@@ -4901,7 +4901,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
                 (throw :exit t))))))))
 
   (advice-add #'org-do-emphasis-faces :override
-              (if (= (string-to-number org-version) 9.7)
+              (if (>= (string-to-number org-version) 9.7)
                   #'my/org-do-emphasis-faces-9.7
                 #'my/org-do-emphasis-faces-9.6))
 
