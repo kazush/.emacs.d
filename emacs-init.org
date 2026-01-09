@@ -4518,11 +4518,11 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
                         :face (:foreground "#ffffff"))
                  (:name "Due Within a Week"
                         :deadline (before ,(format-time-string "%Y-%m-%d" (org-read-date nil t "+1w")))
-                        :face (:foreground "#888888"))
+                        :face (:inherit org-upcoming-deadline))
                  (:name "Scheduled Within a Week"
                         :and ( :scheduled (before ,(format-time-string "%Y-%m-%d" (org-read-date nil t "+1w")))
                                :not (:habit t))
-                        :face (:foreground "#888888"))
+                        :face (:inherit org-upcoming-deadline))
                  (:name "In Progress" :and (:todo "INPROGRESS" :not (:children todo))
                         :face (:foreground "#ffff00"))
                  (:name "Blocked" :and (:todo "BLOCKED" :not (:children todo))
@@ -4655,6 +4655,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
                   :family "Inconsolata Nerd Font")))
    '(org-ellipsis ((t  :inherit default :box nil)))
    '(org-scheduled ((t :foreground "#88cc88" :inherit default)))
+   '(org-scheduled-previously ((t :foreground "#ff3300" :inherit default)))
    '(org-agenda-calendar-event ((t :inherit default)))
    '(org-agenda-date ((t :foreground "#3366aa" :weight bold :height 1.1)))
    '(org-agenda-date-today ((t :foreground "#6699cc" :weight bold :slant italic :inherit org-agenda-date)))
