@@ -1250,30 +1250,55 @@ goggles is now used instead of volatile-highlights.
 
 #+begin_src emacs-lisp
 (use-package tab-bar
-  :bind (("C-x C-f" . find-file-other-tab)
+  :bind (("C-x C-f" . my/find-file-other-tab)
          ("C-x k" . my/tab-bar-kill-buffer-and-tab)
          ("C-x K" . kill-buffer)
          :map tab-prefix-map
-          ("C-n" . tab-next)
-          ("C-p" . tab-previous)
-          ("k" . my/tab-bar-kill-buffer-and-tab)
-          ("o" . tab-bar-switch-to-recent-tab)
-          ("w" . tab-bar-move-window-to-tab)
-          ("!" . tab-close-other)
-          ("1" . my/tab-bar-switch-to-1)
-          ("2" . my/tab-bar-switch-to-2)
-          ("3" . my/tab-bar-switch-to-3)
-          ("4" . my/tab-bar-switch-to-4)
-          ("5" . my/tab-bar-switch-to-5)
-          ("6" . my/tab-bar-switch-to-6)
-          ("7" . my/tab-bar-switch-to-7)
-          ("8" . my/tab-bar-switch-to-8)
-          ("9" . my/tab-bar-switch-to-9))
+         ("C-n" . tab-next)
+         ("C-p" . tab-previous)
+         ("k" . my/tab-bar-kill-buffer-and-tab)
+         ("o" . tab-bar-switch-to-recent-tab)
+         ("w" . tab-bar-move-window-to-tab)
+         ("!" . tab-close-other)
+         ("1" . my/tab-bar-switch-to-1)
+         ("2" . my/tab-bar-switch-to-2)
+         ("3" . my/tab-bar-switch-to-3)
+         ("4" . my/tab-bar-switch-to-4)
+         ("5" . my/tab-bar-switch-to-5)
+         ("6" . my/tab-bar-switch-to-6)
+         ("7" . my/tab-bar-switch-to-7)
+         ("8" . my/tab-bar-switch-to-8)
+         ("9" . my/tab-bar-switch-to-9))
   :custom
   (tab-bar-close-button-show nil)
   (tab-bar-new-button-show nil)
   (tab-bar-auto-width-max '((150) 15))
   :config
+
+  (defun my/switch-to-buffer-other-tab (buf)
+    "Switch to an existing tab if the buffer already exists or to a new tab."
+    (let ((tab (tab-bar-get-buffer-tab buf 'visible)))
+      (if tab
+          (tab-bar-select-tab-by-name (alist-get 'name tab))
+        (switch-to-buffer-other-tab buf))))
+
+  (defun my/find-file-other-tab (filename &optional wildcards)
+    "Edit file FILENAME, in another tab.
+Like \\[find-file-other-frame] (which see), but creates a new tab.
+Interactively, prompt for FILENAME.
+If WILDCARDS is non-nil, FILENAME can include widcards, and all matching
+files will be visited."
+    (interactive
+     (find-file-read-args "Find file in other tab: "
+                          (confirm-nonexistent-file-or-buffer)))
+    (let ((value (find-file-noselect filename nil nil wildcards)))
+      (if (listp value)
+          (progn
+            (setq value (nreverse value))
+            (my/switch-to-buffer-other-tab (car value))
+            (mapc #'switch-to-buffer (cdr value))
+            value)
+        (my/switch-to-buffer-other-tab value))))
 
   (defun my/tab-bar-kill-buffer-and-tab ()
     "Kill current buffer and its tab."
