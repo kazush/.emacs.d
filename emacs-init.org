@@ -4538,9 +4538,9 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
                  (:name "Scheduled Past" :and (:scheduled past :not (:children todo))
                         :face (:foreground "#ff3300"))
                  (:name "Due Today" :and (:deadline today :not (:children todo))
-                        :face (:foreground "#ffffff"))
+                        :face (:foreground "LightYellow" :weight bold))
                  (:name "Scheduled Today" :and (:scheduled today :not (:children todo))
-                        :face (:foreground "#ffffff"))
+                        :face (:foreground "LightYellow" :weight bold))
                  (:name "Due Within a Week"
                         :deadline (before ,(format-time-string "%Y-%m-%d" (org-read-date nil t "+1w")))
                         :face (:inherit org-upcoming-deadline))
