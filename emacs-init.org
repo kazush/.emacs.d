@@ -7412,7 +7412,7 @@ and stream is t."
           ("g" . consult-omni-google)
           ("G" . consult-omni-github)
           ("l" . consult-omni-locate)
-          ("n" . consult-omni-notes-search)
+          ("n" . my/consult-omni-notes-search)
           ("s" . consult-omni-multi-static)
           ("w" . consult-omni-wikipedia)
           ("y" . consult-omni-youtube))
@@ -7502,6 +7502,13 @@ and stream is t."
        :initial (if (use-region-p)
                     (buffer-substring (region-beginning) (region-end))
                   (thing-at-point 'symbol)))))
+
+  ;; Start async ripgrep process as soon as input is given.
+  (defun my/consult-omni-notes-search (&optional input prompt no-callback &rest args)
+    "Query consult-omni-notes-search with the minimum input threshold."
+    (interactive "P")
+    (let ((consult-omni-async-min-input 1))
+      (consult-omni-notes-search input prompt no-callback args)))
   )
 #+end_src
 
