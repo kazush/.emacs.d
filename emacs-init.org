@@ -5810,48 +5810,57 @@ Want monthly view.
               :host github
               :repos "kiwanami/emacs-calfw"
               :files (:defaults "*.el"))
-  :custom
-  (cfw:render-line-breaker 'cfw:render-line-breaker-none)
   :config
+  (setq calfw-render-line-breaker #'calfw-render-line-breaker-none)
+  (setq calfw-item-separator-color-face nil)
 
   (custom-set-faces
-   '(cfw:face-title ((t (:foreground "#f0dfaf" :weight bold :height 2.0 :inherit variable-pitch))))
-   '(cfw:face-header ((t (:foreground "#cccccc" :background "#666666" :weight bold))))
-   '(cfw:face-sunday ((t :foreground "#cc9393" :background "#662222" :weight bold)))
-   '(cfw:face-saturday ((t :foreground "#8cd0d3" :background "RoyalBlue" :weight bold)))
-   '(cfw:face-holiday ((t :foreground "#cccccc" :background "#662222" :weight bold)))
-   '(cfw:face-grid ((t :foreground "DarkGrey")))
-   '(cfw:face-default-content ((t :foreground "#bfebbf")))
-   '(cfw:face-periods ((t :foreground "cyan")))
-   '(cfw:face-day-title ((t :background "#333333")))
-   '(cfw:face-default-day ((t :weight bold :inherit cfw:face-day-title)))
-   '(cfw:face-annotation ((t :foreground "PalmGreen" :inherit cfw:face-day-title)))
-   '(cfw:face-disable ((t :foreground "DarkGray" :inherit cfw:face-day-title)))
-   '(cfw:face-today-title ((t :foreground "white" :weight bold)))
-   '(cfw:face-today ((t :background: "white" :weight bold)))
-   '(cfw:face-select ((t :background "#666666")))
-   '(cfw:face-toolbar ((t :foreground "Steelblue4")))
-   '(cfw:face-toolbar-button-off ((t :foreground "gray" :weight bold)))
-   '(cfw:face-toolbar-button-on ((t :foreground "gray" :weight bold))))
+   '(calfw-title-face ((t (:foreground "#f0dfaf" :weight bold :height 2.0 :inherit variable-pitch))))
+   '(calfw-header-face ((t (:foreground "#cccccc" :background "#666666" :weight bold))))
+   '(calfw-sunday-face ((t :foreground "#cc9393" :background "#662222" :weight bold)))
+   '(calfw-saturday-face ((t :foreground "#8cd0d3" :background "RoyalBlue" :weight bold)))
+   '(calfw-holiday-face ((t :foreground "#cccccc" :background "#662222" :weight bold)))
+   '(calfw-grid-face ((t :foreground "DarkGrey")))
+   '(calfw-default-content-face ((t :foreground "#bfebbf")))
+   '(calfw-periods-face ((t :foreground "cyan")))
+   '(calfw-day-title-face ((t :background "#333333")))
+   '(calfw-default-day-face ((t :weight bold :inherit calfw-day-title-face)))
+   '(calfw-annotation-face ((t :foreground "PalmGreen" :inherit calfw-day-title-face)))
+   '(calfw-disable-face ((t :foreground "DarkGray" :inherit calfw-day-title-face)))
+   '(calfw-today-title-face ((t :foreground "white" :weight bold)))
+   '(calfw-today-face ((t :background: "white" :weight bold)))
+   '(calfw-select-face ((t :background "#666666")))
+   '(calfw-toolbar-face ((t :foreground "Steelblue4")))
+   '(calfw-toolbar-button-off-face ((t :foreground "gray" :weight bold)))
+   '(calfw-toolbar-button-on-face ((t :foreground "gray" :weight bold))))
 
-  ;; (setq cfw:fchar-junction ?╋
-  ;;       cfw:fchar-vertical-line ?┃
-  ;;       cfw:fchar-horizontal-line ?━
-  ;;       cfw:fchar-left-junction ?┣
-  ;;       cfw:fchar-right-junction ?┫
-  ;;       cfw:fchar-top-junction ?┯
-  ;;       cfw:fchar-top-left-corner ?┏
-  ;;       cfw:fchar-top-right-corner ?┓)
+  (setq calfw-fchar-junction ?╋
+        calfw-fchar-vertical-line ?┃
+        calfw-fchar-horizontal-line ?━
+        calfw-fchar-left-junction ?┣
+        calfw-fchar-right-junction ?┫
+        calfw-fchar-top-junction ?┯
+        calfw-fchar-top-left-corner ?┏
+        calfw-fchar-top-right-corner ?┓)
   )
 
 (use-package calfw-org
   :after (calfw org)
   :straight nil
-  :bind (("C-c o C" . cfw:open-org-calendar))
-  :commands (cfw:open-org-calendar)
+  :bind (("C-c o C" . my/calfw-org-open-calendar))
+  :commands (my/calfw-org-open-calendar)
   :init
-  (setq cfw:org-overwrite-default-keybinding t)
-  (setq cfw:org-face-agenda-item-foreground-color "#abb2bf"))
+  (setq calfw-org-overwrite-default-keybinding t)
+  :config
+  (defun calfw-make-bg-color (src-color _fg-color)
+    "Do not override background color"
+    nil)
+
+  (defun my/calfw-org-open-calendar ()
+    (interactive)
+    (calfw-org-open-calendar (org-agenda-files nil 'ifmode)
+                             "org-agenda"
+                             my/default-face-foreground)))
 #+end_src
 
 ** org-pandoc-import
