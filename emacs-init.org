@@ -4531,33 +4531,61 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
                ((org-agenda-span 'day)))
        (todo ""
              ((org-super-agenda-groups
-               `((:name "Working Now" :and (:todo "WORKING" :not (:children todo))
-                        :face (:foreground "#333333" :background "#eecc00"))
-                 (:name "Overdue" :and (:deadline past :not (:children todo))
+               `((:name "Overdue"
+                        :and ( :todo ("TODO" "NEXT")
+                               :deadline past
+                               :not (:children todo))
                         :face (:foreground "#ff3300"))
-                 (:name "Scheduled Past" :and (:scheduled past :not (:children todo))
+                 (:name "Scheduled Past"
+                        :and ( :todo ("TODO" "NEXT")
+                               :scheduled past
+                               :not (:children todo))
                         :face (:foreground "#ff3300"))
-                 (:name "Due Today" :and (:deadline today :not (:children todo))
+                 (:name "Due Today"
+                        :and ( :todo ("TODO" "NEXT")
+                               :deadline today
+                               :not (:children todo))
                         :face (:foreground "LightYellow" :weight bold))
-                 (:name "Scheduled Today" :and (:scheduled today :not (:children todo))
+                 (:name "Scheduled Today"
+                        :and ( :todo ("TODO" "NEXT")
+                               :scheduled today
+                               :not (:children todo))
                         :face (:foreground "LightYellow" :weight bold))
                  (:name "Due Within a Week"
-                        :deadline (before ,(format-time-string "%Y-%m-%d" (org-read-date nil t "+1w")))
+                        :and ( :todo ("TODO" "NEXT")
+                               :deadline (before ,(format-time-string "%Y-%m-%d" (org-read-date nil t "+1w")))
+                               :not (:children todo))
                         :face (:inherit org-upcoming-deadline))
                  (:name "Scheduled Within a Week"
-                        :and ( :scheduled (before ,(format-time-string "%Y-%m-%d" (org-read-date nil t "+1w")))
-                               :not (:habit t))
+                        :and ( :todo ("TODO" "NEXT")
+                               :scheduled (before ,(format-time-string "%Y-%m-%d" (org-read-date nil t "+1w")))
+                               :not (:habit t)
+                               :not (:children todo))
                         :face (:inherit org-upcoming-deadline))
+                 (:discard (:anything t))))
+              (org-agenda-sorting-strategy
+               '(urgency-down priority-down todo-state-up category-keep))
+              (org-agenda-prefix-format
+               '((todo . " %-2i %-18(my/org-get-todo-date-str)   %-10(my/org-agenda-property \"project\" 10)   ")))
+              (org-agenda-overriding-header "Unassigned Tasks")))
+       (todo ""
+             ((org-super-agenda-groups
+               `((:name "Working Now" :and (:todo "WORKING" :not (:children todo))
+                        :face (:foreground "Yellow" :weight bold))
                  (:name "In Progress" :and (:todo "INPROGRESS" :not (:children todo))
                         :face (:foreground "#ffff00"))
+                 (:name "Assigned" :and (:todo "ASSIGNED" :not (:children todo))
+                        :face (:foreground "Gold"))
                  (:name "Blocked" :and (:todo "BLOCKED" :not (:children todo))
+                        :face (:foreground "#8888bb"))
+                 (:name "On Hold" :and (:todo "ONHOLD" :not (:children todo))
                         :face (:foreground "#8888bb"))
                  (:discard (:anything t))))
               (org-agenda-sorting-strategy
                '(urgency-down priority-down todo-state-up category-keep))
               (org-agenda-prefix-format
                '((todo . " %-2i %-18(my/org-get-todo-date-str)   %-10(my/org-agenda-property \"project\" 10)   ")))
-              (org-agenda-overriding-header "Focused Tasks")))
+              (org-agenda-overriding-header "Current Tasks")))
        (tags-todo "+PROJECT=\"personal\"-TODO=\"SHOPPING\"-TODO=\"LATER\"-STYLE=\"habit\""
                   ((org-super-agenda-groups
                     '((:todo "ASSIGNED")
@@ -5061,7 +5089,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
   :commands (my/org-update-clock org-clock-in org-clock-out)
   :hook (org-after-todo-state-change . my/org-update-clock)
   :custom-face
-  (org-agenda-clocking ((t :foreground "#ffcc00" :background "unspecified")))
+  (org-agenda-clocking ((t :foreground "Yellow" :weight bold :box (:line-width (1 . 1) :color "Yellow"))))
   :custom
   (org-clock-persist t)
   :config
