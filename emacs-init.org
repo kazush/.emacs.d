@@ -3652,8 +3652,7 @@ Eldoc-box displays eldoc contents in a child frame but is currently disabled.
 
 #+begin_src emacs-lisp
 (use-package apheleia
-  :config
-  (apheleia-global-mode +1))
+  :bind ("C-c i f" . apheleia-format-buffer))
 #+end_src
 
 ** Highlighting
