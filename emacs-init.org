@@ -1251,9 +1251,10 @@ goggles is now used instead of volatile-highlights.
 #+begin_src emacs-lisp
 (use-package tab-bar
   :bind (("C-x C-f" . my/find-file-other-tab)
-         ("C-x k" . my/tab-bar-kill-buffer-and-tab)
+         ("C-x k" . my/tab-bar-kill-buffer-and-window-or-tab)
          ("C-x K" . kill-buffer)
          :map tab-prefix-map
+         ("C-b" . tab-bar-switch-to-tab)
          ("C-n" . tab-next)
          ("C-p" . tab-previous)
          ("k" . my/tab-bar-kill-buffer-and-tab)
@@ -1305,6 +1306,13 @@ files will be visited."
     (interactive)
     (when (kill-buffer)
       (tab-close)))
+
+  (defun my/tab-bar-kill-buffer-and-window-or-tab ()
+    "Kill current buffer and its associated window or tab if there is a single window in the tab."
+    (interactive)
+    (if (> (count-windows) 1)
+        (kill-buffer-and-window)
+      (my/tab-bar-kill-buffer-and-tab)))
 
   ;; Create shortcuts for switching to a specified tab.
   (dotimes (num 9 t)
@@ -4141,7 +4149,7 @@ A fork of aider.el that seems to have better integration with Emacs.
   ))
 #+end_src
 
-** Structural Edciting
+** Structural Editing
 
 #+begin_src emacs-lisp
 (use-package combobulate-setup
