@@ -538,6 +538,8 @@ called in hooks.
     (if my/transparent-bg-p
         (if window-system "#000000" "unspecified-bg")
       my/default-face-background))
+  (set-face-attribute 'shadow nil
+                       :foreground "dim gray")
   (set-face-attribute 'fixed-pitch nil
                       :family 'unspecified
                       :inherit 'default)
