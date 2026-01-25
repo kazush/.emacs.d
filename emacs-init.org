@@ -2845,24 +2845,12 @@ return the same window."
 ** Custom window/buffer management for shell-ish modes
 
 #+begin_src emacs-lisp
-(defun my/shellish-buffer-p (buf &optional filter)
-  "Return if BUF is a shell-ish buffer."
-  (let ((mode (with-current-buffer buf major-mode))
-        (shell-pattern (if filter filter
-                         (rx (or "term" "shell" "eshell" "vterm" "eat")))))
-    (and (string-match-p
-          (concat "\\`\\*" shell-pattern ".*\\*\\'")
-          (buffer-name buf))
-         (seq-contains '(shell-mode eshell-mode term-mode vterm-mode eat-mode) mode))))
-
-(defun my/get-shellish-buffers ()
-  "Return a lit of shellish buffers or nil if none."
-  (mapcar
-   #'buffer-name
-   (cl-remove-if-not 'my/shellish-buffer-p (buffer-list))))
-
-(defvar my/display-shellish-buffer-list #'ignore
-  "Custom function used to display shellish buffer list.")
+(defun my/shellish-buffer-p (buf &optional filter-mode)
+  "Return if BUF is a shell-ish buffer. if FILTER-MODE is nil, buf is compared with major-mode."
+  (let ((mode (with-current-buffer buf major-mode)))
+    (if filter-mode
+        (eq filter-mode mode)
+      (eq major-mode mode))))
 
 (defvar my/consult-source-shellish-buffer
   `(:name "Shellish"
@@ -2879,99 +2867,161 @@ return the same window."
                                              #'my/shellish-buffer-p
                                              ))))
 
+(defvar my/display-shellish-buffer-list #'my/consult-shellish-buffers
+  "Custom function used to display shellish buffer list.")
+
 (defun my/consult-shellish-buffers ()
   (interactive)
   (consult-buffer (list
                    `(:hidden nil :narrow ?s ,@my/consult-source-shellish-buffer))))
 
-(setq my/display-shellish-buffer-list #'my/consult-shellish-buffers)
-
-(defun my/find-last-shellish-buffer (buflist shell-str)
+(defun my/find-last-shellish-buffer (buflist shellish-mode)
   "Return most recently used shell-ish buffer containing SHELL-STR in BUFLIST."
   (when buflist
-    (if (my/shellish-buffer-p (car buflist) shell-str)
-        (car buflist) (my/find-last-shellish-buffer (cdr buflist) shell-str))))
+    (if (my/shellish-buffer-p (car buflist) shellish-mode)
+        (car buflist) (my/find-last-shellish-buffer (cdr buflist) shellish-mode))))
 
-(defvar my/last-non-shellish-buffer nil)
 (defvar my/shellish-use-tab-p t)
 (defvar my/shellish-window-height .3)
+(defvar my/shellish-use-tab-per-buffer-alist nil)
 
-(defun my/remember-last-non-shellish-buffer ()
-  "Remember last non-shellish buffer."
-  (let ((buf (current-buffer)))
-    (unless (my/shellish-buffer-p buf)
-      (setq my/last-non-shellish-buffer buf))))
+(defun my/shellish-get-use-tab-for-buffer (buf)
+  (alist-get buf my/shellish-use-tab-per-buffer-alist my/shellish-use-tab-p nil 'string=))
 
-(defun my/shellish-tab-name (&optional shell-str)
-  (format "*%s tab*" (if shell-str shell-str "shell")))
+(defun my/shellish-set-use-tab-for-buffer (buf val)
+  (setf (alist-get buf my/shellish-use-tab-per-buffer-alist my/shellish-use-tab-p nil 'string=) val))
 
-(defun my/get-display-buffer-action-for-shellish (&optional shell-str)
+(defun my/shellish-name (shellish-mode)
+  (string-remove-suffix "-mode"
+                        (symbol-name shellish-mode)))
+
+(defun my/shellish-tab-name (shellish-mode)
+  (format "*%s tab*" (my/shellish-name shellish-mode)))
+
+(defun my/get-display-buffer-action-for-shellish (shellish-mode use-tab-p)
   "Return display-buffer's ACTION parameter applied to shellish buffers."
-  (let ((tab-name (my/shellish-tab-name shell-str)))
-    (if my/shellish-use-tab-p
-        `(display-buffer-in-tab . ((tab-name . ,tab-name)))
-      `(display-buffer-at-bottom . ((window-height . ,my/shellish-window-height))))))
+  (let ((cur-buf (current-buffer))
+        (tab-name (my/shellish-tab-name shellish-mode)))
+    (cond
+     ((and (my/shellish-buffer-p cur-buf shellish-mode)
+           (eq (my/shellish-get-use-tab-for-buffer (buffer-name cur-buf)) use-tab-p))
+      `(display-buffer-same-window))
+     ;; ((my/shellish-buffer-p (current-buffer) shellish-mode)
+     ;;  `(display-buffer-same-window))
+     (use-tab-p
+      `(display-buffer-in-tab . ((tab-name . ,tab-name))))
+     (t
+      `(display-buffer-at-bottom . ((window-height . ,my/shellish-window-height)))))))
 
-(defun my/get-shellish (arg shellfunc shell-str)
-  "Switch to the shell-ish buffer last used or create new without prefix (ARG).
-  - Close the window if the current buffer is already a shell-ish buffer of
-    the same type.
-  - With single prefix, show buffers list.
-  - With double prefixes, unconditionally create new one by calling SHELLFUNC.
-  - With triple prefixes, toggle display buffer function between tab and bottom window."
+(defvar my/shellish-max-index 9)
+(defun my/shellish-get-new-index (shellish-mode)
+  "Return the least vacant index (1-based) for given SHELLISH-MODE. Return nil if none found."
+  (let ((n 1)
+        (buf-name (my/shellish-name shellish-mode)))
+    (while (and (<= n my/shellish-max-index)
+                (get-buffer (format "*%s*<%d>" buf-name n)))
+      (setq n (1+ n)))
+    (if (<= n my/shellish-max-index) n nil)))
+
+(defun my/shellish-buffer-name (shellish-mode n)
+  (format "*%s*<%d>" (my/shellish-name shellish-mode) n))
+
+(defun my/shellish-get-keymap-symbol (shellish-mode)
+  (intern (format "my/shellish-%s-keymap"
+                  (my/shellish-name shellish-mode))))
+
+(defun my/shellish-get-switch-func-symbol (shellish-mode n)
+  (intern (format "my/shellish-%s-switch-to-%d"
+                  (my/shellish-name shellish-mode) n)))
+
+(defun my/shellish-create-switch-to-function (shellish-mode n)
+  (fset (my/shellish-get-switch-func-symbol shellish-mode n)
+        `(lambda (arg)
+           (interactive "p")
+           (my/shellish-toggle-buffer arg (quote ,shellish-mode) ,n))))
+
+(defun my/shellish-create-prefix-command (shellish-mode)
+  (let ((keymap-symbol (my/shellish-get-keymap-symbol shellish-mode)))
+    (define-prefix-command keymap-symbol)
+    (dotimes (i 9)
+      (let ((n (1+ i)))
+        (my/shellish-create-switch-to-function shellish-mode n)
+        (keymap-set keymap-symbol (format "%d" n)
+                    (my/shellish-get-switch-func-symbol shellish-mode n))))
+    (keymap-set keymap-symbol "s"
+                `(lambda (arg)
+                   (interactive "p")
+                   (my/shellish-toggle-buffer arg (quote ,shellish-mode))))
+    (keymap-set keymap-symbol "t"
+                `(lambda ()
+                   (interactive)
+                   (my/shellish-toggle-buffer 4 (quote ,shellish-mode))))
+    keymap-symbol))
+
+(defun my/shellish-create-buffer (shellish-mode n)
+  (let* ((buf-name (my/shellish-buffer-name shellish-mode n)))
+    (pcase shellish-mode
+      ('vterm-mode (vterm buf-name))
+      ('shell-mode (shell buf-name))
+      ('eshell-mode (eshell n))
+      ('term-mode (multi-term buf-name))
+      ('eat-mode (eat nil n)))))
+
+(defun my/shellish-toggle-buffer (arg shellish-mode &optional buf-index)
   (interactive "p")
-  (when (= arg 64)
-    (setq my/shellish-use-tab-p (not my/shellish-use-tab-p)))
-  (let ((b (my/find-last-shellish-buffer (buffer-list (selected-frame))
-                                         shell-str))
-        (display-buffer-overriding-action (my/get-display-buffer-action-for-shellish shell-str)))
-    (cond ((or (not b) (= arg 16))
-           (my/remember-last-non-shellish-buffer)
-           (call-interactively shellfunc))
-          ((= arg 4)
-           (when b
-             (select-window (display-buffer b)))
-           (call-interactively my/display-shellish-buffer-list))
-          ((string= (alist-get 'name (tab-bar-get-buffer-tab (current-buffer)))
-                    (my/shellish-tab-name shell-str))
-           (tab-close))
-          ((my/shellish-buffer-p (current-buffer) shell-str)
-           (condition-case err
-               (delete-window (get-buffer-window (current-buffer)))
-             (error
-              (switch-to-prev-buffer))))
-          (b
-           (my/remember-last-non-shellish-buffer)
-           (select-window (display-buffer b))
-           (when my/shellish-use-tab-p
-             (delete-other-windows))))))
-
-(defun my/newshell ()
-  "Create a new shell with specified buffer name."
-  (interactive)
-  (if (my/find-last-shellish-buffer (buffer-list (selected-frame)) "shell")
-      (shell (format "*shell<%s>*" (read-string "Shell buffer name: ")))
-    (shell)))
-
-(defun my/get-shell (arg)
-  (interactive "p")
-  (my/get-shellish arg 'my/newshell "shell"))
-
-(defun my/newterm ()
-  "Create a new shell with specified buffer name."
-  (interactive)
-  (if (my/find-last-shellish-buffer (buffer-list (selected-frame)) "term")
-      (multi-term (format "*terminal<%s>*"
-                          (read-string "Shell buffer name: ")))
-    (multi-term)))
-
-(defun my/get-term (arg)
-  (interactive "p")
-  (my/get-shellish arg 'my/newterm "term"))
-
-;; Key bindings
-(global-set-key (kbd "C-c S") #'my/get-shell)  ;; C-c s is now mapped to vterm
-(global-set-key (kbd "C-c t") #'my/get-term)
+  (let* ((select-buffer-p (= arg 4))
+         (use-tab-flipped (= arg 16))
+         (b (if buf-index (get-buffer (my/shellish-buffer-name shellish-mode buf-index))
+              (my/find-last-shellish-buffer (buffer-list) shellish-mode)))
+         (new-buf-index (or buf-index
+                            (my/shellish-get-new-index shellish-mode)))
+         (buf-name (if b (buffer-name b)
+                     (my/shellish-buffer-name shellish-mode new-buf-index)))
+         (use-tab-p (my/shellish-get-use-tab-for-buffer buf-name))
+         (new-use-tab-p (xor use-tab-p use-tab-flipped))
+         (create-new-buf-p (= arg 64))
+         (tab-name (my/shellish-tab-name shellish-mode))
+         (current-tab-name
+          (alist-get 'name (alist-get 'current-tab (tab-bar-tabs))))
+         (tab-exists-p (member tab-name
+                               (mapcar (lambda (e) (alist-get 'name e)) (tab-bar-tabs))))
+         (display-buffer-overriding-action (my/get-display-buffer-action-for-shellish
+                                            shellish-mode new-use-tab-p)))
+    (cond
+     ((or (not b) create-new-buf-p)
+      (my/shellish-create-buffer shellish-mode new-buf-index))
+     (select-buffer-p
+      (when b
+        (select-window (display-buffer b)))
+      (call-interactively my/display-shellish-buffer-list))
+     ;; ((and (string= current-tab-name tab-name)
+     ;;       (eq b (current-buffer)))
+     ;;  ;; if current-tab is dedicated tab, close it.
+     ;;  (tab-close))
+     ;; ((my/shellish-buffer-p (current-buffer) shellish-mode)
+     ;;  ;; if current buffer is shellish buffer, close it.
+     ;;  (condition-case err
+     ;;      (delete-window (get-buffer-window (current-buffer)))
+     ;;    (error
+     ;;     (switch-to-prev-buffer))))
+     ((eq b (current-buffer))
+      (if use-tab-p
+          ;; if current-tab is dedicated tab, close it.
+          (tab-close)
+        ;; if current buffer is shellish buffer, close it.
+        (condition-case err
+            (delete-window (get-buffer-window (current-buffer)))
+          (error
+           (switch-to-prev-buffer)))))
+     (b ;; switch to existing shellish buffer
+      ;; close dedicated tab if exists and not used.
+      ;; (when (and tab-exists-p
+      ;;            (not new-use-tab-p))
+      ;;   (tab-bar-close-tab-by-name tab-name))
+      ;; move focus to the shellish buffer
+      (select-window (display-buffer b))))
+    ;; update the use-tab-p flag for the next call.
+    (my/shellish-set-use-tab-for-buffer buf-name new-use-tab-p)))
 #+end_src
 
 ** Shell
@@ -2985,8 +3035,13 @@ shell window. The helper functions defined below make it possible.
 
 #+begin_src emacs-lisp
 (use-package shell
-  :bind (("C-x ~" . dirs))
+  :bind (("C-c S" . my/get-shell)
+         ("C-x ~" . dirs))
   :config
+  (defun my/get-shell (arg)
+    (interactive "p")
+    (my/shellish-toggle-buffer arg 'shell-mode))
+
   ;; dirtrack using procfs
   (defun shell-procfs-dirtrack (str)
     (prog1 str
@@ -3088,7 +3143,7 @@ config does not perfectly work.
 
   (defun my/get-eshell (arg)
     (interactive "p")
-    (my/get-shellish arg 'my/neweshell "eshell")))
+    (my/shellish-toggle-buffer arg 'eshell-mode)))
 
 (use-package eshell-git-prompt
   :config
@@ -3117,17 +3172,21 @@ fi
   :config
   (define-key vterm-mode-map (kbd "C-z") tab-prefix-map)
 
+  (my/shellish-create-prefix-command 'vterm-mode)
+  (dotimes (i 9)
+    (let ((n (1+ i)))
+      (global-set-key (kbd (format "C-c C-%d" n))
+                      (my/shellish-get-switch-func-symbol 'vterm-mode n))))
+
   (defun my/newvterm ()
     "Create a new vterm with specified buffer name."
     (interactive)
-    (if (my/find-last-shellish-buffer (buffer-list (selected-frame)) "vterm")
-        (vterm (format "*vterm<%s>*"
-                       (read-string "Shell buffer name: ")))
-      (vterm)))
+    (vterm (format "*vterm*<%d>" (my/shellish-get-new-index 'vterm-mode))))
 
   (defun my/get-vterm (arg)
     (interactive "p")
-    (my/get-shellish arg 'my/newvterm "vterm"))
+    (my/shellish-toggle-buffer arg 'vterm-mode)
+    )
 
   (defun my/vterm-send-ctrl-z ()
     (interactive)
@@ -3157,6 +3216,7 @@ fi
 
 #+begin_src emacs-lisp
 (use-package multi-term
+  :bind (("C-c t" . my/get-term))
   :custom
   (multi-term-dedicated-close-back-to-open-buffer-p nil)
   (multi-term-dedicated-select-after-open-p t)
@@ -3168,6 +3228,10 @@ fi
                                    'move-beginning-of-line)
                        (setq-local term-prompt-regexp "^[^#$%>]*[#$%>] *")))
   :config
+  (defun my/get-term (arg)
+    (interactive "p")
+    (my/shellish-toggle-buffer arg 'term-mode))
+
   (setq term-bind-key-alist
         (append
          '(("C-c C-c" . term-send-raw)
@@ -3220,14 +3284,9 @@ Yet another terminal emulator. Trying out now.
   :config
   (define-key eat-semi-char-mode-map (kbd "C-z") tab-prefix-map)
 
-  (defun my/neweat ()
-    "Create a new eat session."
-    (interactive)
-      (eat nil t))
-
   (defun my/get-eat (arg)
     (interactive "p")
-    (my/get-shellish arg 'my/neweat "eat")))
+    (my/shellish-toggle-buffer arg 'eat-mode)))
 #+end_src
 
 * Software Development
