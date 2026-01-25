@@ -2645,7 +2645,9 @@ TBH I don't use this often.
 #+begin_src emacs-lisp
 (use-package treemacs
   :bind (:map my/wm-map
-              ("T" . treemacs)))
+              ("T" . treemacs))
+  :custom
+  (treemacs-default-visit-action 'treemacs-visit-node-vertical-split))
 #+end_src
 
 ** Ace jump
