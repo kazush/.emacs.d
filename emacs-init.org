@@ -4088,7 +4088,49 @@ Manually enable ~copilot-mode~ when needed.
   (setq codeium/document/cursor_offset 'my-codeium/document/cursor_offset))
 #+end_src
 
+
 ** AI Agents
+*** agent-shell
+
+#+begin_src emacs-lisp
+(use-package agent-shell
+  :init
+  (define-prefix-command 'my/agent-shell-map)
+  :bind ( :map my/ai-map
+          ("A" . my/agent-shell-map)
+          :map my/agent-shell-map
+          ("g" . agent-shell-google-start-gemini)))
+#+end_src
+*** ai-code
+
+#+begin_src emacs-lisp
+(use-package ai-code
+  :straight (:host github :repo "tninja/ai-code-interface.el")
+  :bind ( :map my/ai-map
+          ("a" . 'ai-code-menu))
+  :config
+  ;; use codex as backend, other options are 'gemini, 'github-copilot-cli, 'opencode, 'grok, 'claude-code-ide, 'claude-code, 'cursor
+  (ai-code-set-backend 'github-copilot-cli)
+  ;; Optional: Use eat if you prefer, by default it is vterm
+  ;; (setq ai-code-backends-infra-terminal-backend 'eat) ;; for openai codex, github copilot cli, opencode, grok, cursor-cli; for claude-code-ide.el, you can check their config
+  ;; Optional: Set up Magit integration for AI commands in Magit popups
+  (with-eval-after-load 'magit
+    (ai-code-magit-setup-transients)))
+#+end_src
+
+*** Copilot Chat
+#+begin_src emacs-lisp
+(use-package copilot-chat
+  :straight (:host github :repo "chep/copilot-chat.el" :files ("*.el"))
+  :commands (copilot-chat-transient copilot-chat-display)
+  :bind ( :map my/ai-map
+          ("c" . copilot-chat-transient))
+  :custom
+  (copilot-chat-backend 'curl)
+  (copilot-chat-frontend 'org)
+  (copilot-chat-commit-model "grok-code-fast-1") ;; "gpt-4o", "o1-preview"
+  )
+#+end_src
 
 *** Helper functions for aider
 
@@ -4128,6 +4170,7 @@ Manually enable ~copilot-mode~ when needed.
 *** Aider
 #+begin_src emacs-lisp
 (use-package aider
+  :disabled
   :straight (:host github :repo "tninja/aider.el" :files ("aider.el"))
   :commands (aider-transient-menu)
   :bind ( :map my/ai-map
@@ -4161,6 +4204,7 @@ A fork of aider.el that seems to have better integration with Emacs.
 
 #+begin_src emacs-lisp
 (use-package aidermacs
+  :disabled
   :straight (:host github :repo "MatthewZMD/aidermacs" :files ("*.el"))
   :commands (aidermacs-transient-menu)
   :bind ( :map my/ai-map
@@ -4175,20 +4219,6 @@ A fork of aider.el that seems to have better integration with Emacs.
     "Set known API keys before launching aidermacs."
     (interactive)
     (my/aider-call-function 'aidermacs-transient-menu)))
-#+end_src
-
-*** Copilot Chat
-#+begin_src emacs-lisp
-(use-package copilot-chat
-  :straight (:host github :repo "chep/copilot-chat.el" :files ("*.el"))
-  :commands (copilot-chat-transient copilot-chat-display)
-  :bind ( :map my/ai-map
-          ("c" . copilot-chat-transient))
-  :custom
-  (copilot-chat-backend 'curl)
-  (copilot-chat-frontend 'org)
-  (copilot-chat-commit-model "gpt-4.1") ;; "gpt-4o", "o1-preview"
-  )
 #+end_src
 
 ** Jupyter
