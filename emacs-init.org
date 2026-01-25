@@ -142,7 +142,10 @@ Customization for miscellaneous built-in features.
 ;; C-u SPC pops the last mark, afterwords no C-u is needed for further pops.
 (setq set-mark-command-repeat-pop t)
 
+;; auto-revert buffer
 (global-auto-revert-mode)
+(setq auto-revert-interval 2)
+
 (transient-mark-mode t)
 (show-paren-mode 1)
 
