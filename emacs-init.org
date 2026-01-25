@@ -3978,10 +3978,17 @@ Manually enable ~copilot-mode~ when needed.
 (use-package copilot
   :straight (:host github :repo "copilot-emacs/copilot.el" :files ("*.el"))
   :bind ( :map copilot-completion-map
+          ("<tab>" . my/copilot-accept-completion)
           ("C-<return>" . copilot-accept-completion)
+          ("C-c ." . copilot-accept-by-sentence)
           ("C-c C-f" . copilot-accept-completion-by-word)
           ("C-c C-n" . copilot-accept-completion-by-line)
-          ("C-c C-p" . copilot-accept-completion-by-paragraph)))
+          ("C-c C-p" . copilot-accept-completion-by-paragraph))
+  :config
+  (defun my/copilot-accept-completion ()
+    (interactive)
+    (or (copilot-accept-completion)
+        (call-interactively (key-binding (kbd "<tab>"))))))
 #+end_src
 
 *** Tabnine
