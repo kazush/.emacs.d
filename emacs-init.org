@@ -2898,21 +2898,6 @@ return the same window."
 (defun my/shellish-tab-name (shellish-mode)
   (format "*%s tab*" (my/shellish-name shellish-mode)))
 
-(defun my/get-display-buffer-action-for-shellish (shellish-mode use-tab-p)
-  "Return display-buffer's ACTION parameter applied to shellish buffers."
-  (let ((cur-buf (current-buffer))
-        (tab-name (my/shellish-tab-name shellish-mode)))
-    (cond
-     ((and (my/shellish-buffer-p cur-buf shellish-mode)
-           (eq (my/shellish-get-use-tab-for-buffer (buffer-name cur-buf)) use-tab-p))
-      `(display-buffer-same-window))
-     ;; ((my/shellish-buffer-p (current-buffer) shellish-mode)
-     ;;  `(display-buffer-same-window))
-     (use-tab-p
-      `(display-buffer-in-tab . ((tab-name . ,tab-name))))
-     (t
-      `(display-buffer-at-bottom . ((window-height . ,my/shellish-window-height)))))))
-
 (defvar my/shellish-max-index 9)
 (defun my/shellish-get-new-index (shellish-mode)
   "Return the least vacant index (1-based) for given SHELLISH-MODE. Return nil if none found."
@@ -2943,11 +2928,10 @@ return the same window."
 (defun my/shellish-create-prefix-command (shellish-mode)
   (let ((keymap-symbol (my/shellish-get-keymap-symbol shellish-mode)))
     (define-prefix-command keymap-symbol)
-    (dotimes (i 9)
-      (let ((n (1+ i)))
-        (my/shellish-create-switch-to-function shellish-mode n)
-        (keymap-set keymap-symbol (format "%d" n)
-                    (my/shellish-get-switch-func-symbol shellish-mode n))))
+    (dotimes (n 10)
+      (my/shellish-create-switch-to-function shellish-mode n)
+      (keymap-set keymap-symbol (format "%d" n)
+                  (my/shellish-get-switch-func-symbol shellish-mode n)))
     (keymap-set keymap-symbol "s"
                 `(lambda (arg)
                    (interactive "p")
@@ -2958,6 +2942,33 @@ return the same window."
                    (my/shellish-toggle-buffer 4 (quote ,shellish-mode))))
     keymap-symbol))
 
+(defun my/get-display-buffer-action-for-shellish (shellish-mode use-tab-p)
+  "Return display-buffer's ACTION parameter applied to shellish buffers."
+  (let ((cur-buf (current-buffer))
+        (tab-name (my/shellish-tab-name shellish-mode)))
+    (cond
+     ((and (my/shellish-buffer-p cur-buf shellish-mode)
+           (eq (my/shellish-get-use-tab-for-buffer (buffer-name cur-buf)) use-tab-p))
+      `(display-buffer-same-window))
+     ;; ((my/shellish-buffer-p (current-buffer) shellish-mode)
+     ;;  `(display-buffer-same-window))
+     (use-tab-p
+      ;; `(display-buffer-in-tab . ((tab-name . ,tab-name))))
+      `(
+        display-buffer-in-tab))
+     (t
+      `(display-buffer-at-bottom . ((window-height . ,my/shellish-window-height)))))))
+
+(defun my/shellish-display-buffer (buf &optional omni-display)
+  "Selectively switch to an existing window or tab displaying BUF-NAME."
+  (let* ((tab (tab-bar-get-buffer-tab buf)))
+    (if (or omni-display (not tab))
+         (select-window (display-buffer buf))
+       (tab-bar-switch-to-tab (alist-get 'name tab))
+       (let ((win (get-buffer-window buf)))
+         (when win
+           (select-window win))))))
+
 (defun my/shellish-create-buffer (shellish-mode n)
   (let* ((buf-name (my/shellish-buffer-name shellish-mode n)))
     (pcase shellish-mode
@@ -2967,10 +2978,26 @@ return the same window."
       ('term-mode (multi-term buf-name))
       ('eat-mode (eat nil n)))))
 
+(defvar my/shellish-omni-display-alist nil)
+
+(defun my/shellish-get-omni-display-for-buffer (buf-name)
+  (alist-get buf-name my/shellish-omni-display-alist nil nil 'string=))
+
+(defun my/shellish-toggle-omni-display-for-buffer (buf-name)
+  (setf (alist-get buf-name my/shellish-omni-display-alist nil nil 'string=)
+        (not (my/shellish-get-omni-display-for-buffer buf-name))))
+
+(defun my/shellish-toggle-omni-display ()
+  (interactive)
+  (message "shellish omni display %s"
+           (if (my/shellish-toggle-omni-display-for-buffer (buffer-name))
+               "enabled" "disabled")))
+(define-key my/wm-map "O" #'my/shellish-toggle-omni-display)
+
 (defun my/shellish-toggle-buffer (arg shellish-mode &optional buf-index)
   (interactive "p")
-  (let* ((select-buffer-p (= arg 4))
-         (use-tab-flipped (= arg 16))
+  (let* ((use-tab-flipped (= arg 4))
+         (select-buffer-p (= arg 16))
          (b (if buf-index (get-buffer (my/shellish-buffer-name shellish-mode buf-index))
               (my/find-last-shellish-buffer (buffer-list) shellish-mode)))
          (new-buf-index (or buf-index
@@ -2994,16 +3021,6 @@ return the same window."
       (when b
         (select-window (display-buffer b)))
       (call-interactively my/display-shellish-buffer-list))
-     ;; ((and (string= current-tab-name tab-name)
-     ;;       (eq b (current-buffer)))
-     ;;  ;; if current-tab is dedicated tab, close it.
-     ;;  (tab-close))
-     ;; ((my/shellish-buffer-p (current-buffer) shellish-mode)
-     ;;  ;; if current buffer is shellish buffer, close it.
-     ;;  (condition-case err
-     ;;      (delete-window (get-buffer-window (current-buffer)))
-     ;;    (error
-     ;;     (switch-to-prev-buffer))))
      ((eq b (current-buffer))
       (if use-tab-p
           ;; if current-tab is dedicated tab, close it.
@@ -3014,12 +3031,8 @@ return the same window."
           (error
            (switch-to-prev-buffer)))))
      (b ;; switch to existing shellish buffer
-      ;; close dedicated tab if exists and not used.
-      ;; (when (and tab-exists-p
-      ;;            (not new-use-tab-p))
-      ;;   (tab-bar-close-tab-by-name tab-name))
-      ;; move focus to the shellish buffer
-      (select-window (display-buffer b))))
+      (my/shellish-display-buffer b
+                                  (my/shellish-get-omni-display-for-buffer (buffer-name b)))))
     ;; update the use-tab-p flag for the next call.
     (my/shellish-set-use-tab-for-buffer buf-name new-use-tab-p)))
 #+end_src
@@ -3172,11 +3185,17 @@ fi
   :config
   (define-key vterm-mode-map (kbd "C-z") tab-prefix-map)
 
+  ;; Create shellish commands.
   (my/shellish-create-prefix-command 'vterm-mode)
-  (dotimes (i 9)
-    (let ((n (1+ i)))
-      (global-set-key (kbd (format "C-c C-%d" n))
-                      (my/shellish-get-switch-func-symbol 'vterm-mode n))))
+
+  ;; Set up *vterm*<0> as omni display buffer.
+  (let ((buf-name (my/shellish-buffer-name 'vterm-mode 0)))
+      (my/shellish-toggle-omni-display-for-buffer buf-name)
+      (my/shellish-set-use-tab-for-buffer buf-name nil))
+
+  (dotimes (n 10)
+    (global-set-key (kbd (format "C-c C-%d" n))
+                    (my/shellish-get-switch-func-symbol 'vterm-mode n)))
 
   (defun my/newvterm ()
     "Create a new vterm with specified buffer name."
