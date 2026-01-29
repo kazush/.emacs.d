@@ -4109,6 +4109,28 @@ Manually enable ~copilot-mode~ when needed.
 
 
 ** AI Agents
+*** vterm tweaks for claude code
+
+https://github.com/anthropics/claude-code/issues/247#issuecomment-3058405139
+
+#+begin_src emacs-lisp
+(defun my/vterm-font-setup ()
+  "Configure font settings specifically for vterm buffers, workaround claude-code."
+
+  ;; Apply ASCII replacements for vterm specifically
+  (let ((tbl (or buffer-display-table (setq buffer-display-table (make-display-table)))))
+    (dolist (pair
+             '((#x273B . ?*) ; ✻ TEARDROP-SPOKED ASTERISK
+               (#x273D . ?*) ; ✽ HEAVY TEARDROP-SPOKED ASTERISK
+               (#x2722 . ?+) ; ✢ FOUR TEARDROP-SPOKED ASTERISK
+               (#x2736 . ?+) ; ✶ SIX-POINTED BLACK STAR
+               (#x2733 . ?*) ; ✳ EIGHT SPOKED ASTERISK
+               ))
+      (aset tbl (car pair) (vector (cdr pair))))))
+
+(add-hook 'vterm-mode-hook #'my/vterm-font-setup)
+#+end_src
+
 *** agent-shell
 
 #+begin_src emacs-lisp
