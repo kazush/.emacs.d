@@ -1537,7 +1537,6 @@ vertico and related packages are used for completion framework.
   (consult-customize
    consult-ripgrep consult-git-grep consult-grep
    consult-recent-file
-   consult--source-recent-file consult--source-project-recent-file
    :preview-key "M-.")
 
   ;; Optionally configure the narrowing key.
@@ -2274,6 +2273,7 @@ Note that jit-spell only works well with aspell as aspell wisely ignores Japanes
 
 #+begin_src emacs-lisp
 (use-package jit-spell
+  :if (file-executable-p "/usr/bin/aspell")
   :hook ((text-mode conf-mode markdown-mode) . jit-spell-mode)
   :config
   (set-face-underline 'jit-spell-misspelling '(:style wave :color "#d2b580")))
@@ -4327,6 +4327,7 @@ A fork of aider.el that seems to have better integration with Emacs.
 (use-package jupyter
   :custom
   (jupyter-use-zmq nil)
+  :commands (my/setup-jupyter)
   :config
   ;; Override jupyter-python in org-src-lang-modes.
   (advice-add #'org-babel-jupyter-make-language-alias :after
@@ -4348,7 +4349,7 @@ A fork of aider.el that seems to have better integration with Emacs.
     (defun my/display-ansi-colors ()
       (ansi-color-apply-on-region (point-min) (point-max)))
     (add-hook 'org-babel-after-execute-hook #'my/display-ansi-colors)
-  ))
+    ))
 #+end_src
 
 ** Structural Editing
@@ -7858,6 +7859,7 @@ and stream is t."
 
 #+begin_src emacs-lisp
 (use-package eaf-org-previewer
+  :disabled
   :after eaf
   :straight nil)
 #+end_src
