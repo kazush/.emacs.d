@@ -4174,8 +4174,12 @@ https://github.com/anthropics/claude-code/issues/247#issuecomment-3058405139
   :bind
   (:repeat-map my/claude-code-map ("M" . claude-code-cycle-mode))
   :custom
+  (claude-code-toggle-auto-select t)
+  (claude-code-terminal-backend #'vterm)
   (claude-code-term-name "xterm-256color")
+  (claude-code-startup-delay 0.2)
   (claude-code-program "claude.sh")
+  (claude-code-enable-notifications nil)
   :config
   ;; optional IDE integration with Monet
   ;; (add-hook 'claude-code-process-environment-functions #'monet-start-server-function)
@@ -4187,13 +4191,13 @@ https://github.com/anthropics/claude-code/issues/247#issuecomment-3058405139
     (if (executable-find "notify-send")
         (call-process "notify-send" nil nil nil title message)
       (message "%s: %s" title message)))
-  (setq claude-code-notification-function #'my/claude-code-notify)
+  ;; (setq claude-code-notification-function #'my/claude-code-notify)
 
   ;; Display buffer configuration.
   (defun my/claude-code-display-buffer (buf)
     "Display claude code buffer."
     (interactive)
-    (display-buffer-at-bottom buf '((window-height . 0.4))))
+    (select-window (display-buffer-at-bottom buf '((window-height . 0.4)))))
   (setq claude-code-display-window-fn #'my/claude-code-display-buffer)
 
   (claude-code-mode))
@@ -4364,7 +4368,6 @@ A fork of aider.el that seems to have better integration with Emacs.
 #+end_src
 
 * Programming language modes
-
 ** C++
 
 Use c++-ts-mode by default.
