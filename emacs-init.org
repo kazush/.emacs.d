@@ -4647,8 +4647,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
 #+end_src
 
 * Org mode
-
-** Basic Config
+** Base Config
 
 #+begin_src emacs-lisp
 (use-package org
@@ -5214,11 +5213,23 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
     (when (file-directory-p my/org-roam-project-root)
       (org-agenda nil "d")))
 
-  (add-hook 'emacs-startup-hook 'my/org-agenda-custom-view))
+  (add-hook 'emacs-startup-hook 'my/org-agenda-custom-view)
 
   ;; add org-roam-directory to consult-omni-notes's source list
   (with-eval-after-load 'consult-omni-notes
     (add-to-list 'consult-omni-notes-files org-directory))
+
+  ;; Helper function to schedule the last day of the month.
+  ;; usage: (my/end-of-month '(2 28 2017))
+  ;; borrowed from https://emacs.stackexchange.com/questions/31683/schedule-org-task-for-last-day-of-every-month
+  (defun my/end-of-month (date)
+    "Return `t` if DATE is the last day of the month."
+    (let* ((day (calendar-extract-day date))
+           (month (calendar-extract-month date))
+           (year (calendar-extract-year date))
+           (last-day-of-month
+            (calendar-last-day-of-month month year)))
+      (= day last-day-of-month))))
 #+end_src
 
 #+begin_src emacs-lisp
@@ -6165,9 +6176,7 @@ installed."
   (org-remark-create "dark-pastel-yellow" '(:background "#a6954e")))
 #+end_src
 
-
 * Writing / Note Taking
-
 ** Obsidian
 
 #+begin_src emacs-lisp
@@ -6200,7 +6209,6 @@ installed."
 #+end_src
 
 * Docker / Containers
-
 ** Docker Tramp
 #+begin_src emacs-lisp
 (use-package docker-tramp
@@ -6501,7 +6509,6 @@ installed."
 #+end_src
 
 * Device Control and Management
-
 ** PulseAudio
 
 Disabled atm as new distro is adopting pipewire.
@@ -6541,7 +6548,6 @@ Disabled atm as new distro is adopting pipewire.
 #+end_src
 
 * LLM
-
 ** Common Settings
 
 Macros to retrive API keys for LLM servce providers.
@@ -7321,7 +7327,6 @@ and stream is t."
 #+end_src
 
 * Internet Information and Media Tools
-
 ** elfeed
 
 #+begin_src emacs-lisp
@@ -7823,7 +7828,6 @@ and stream is t."
     (add-to-list 'TeX-view-program-selection '(output-pdf "eaf"))))
 #+end_src
 
-
 ** eaf-pyqterminal
 
 #+begin_src emacs-lisp
@@ -7869,7 +7873,6 @@ Load postinit.org if exists.
 #+end_src
 
 * Post post-init config
-
 ** GC settings
 
 Set GC parameters here to reset the initial value set in early-init.el.
