@@ -957,7 +957,6 @@ Currently it is disabled as I don't want to build emacs-mozc on Arch.
   (diminish 'eldoc-mode))
 #+end_src
 
-
 *** doom-modeline
 
 #+begin_src emacs-lisp
@@ -2013,7 +2012,6 @@ A new mode integrated in Emacs 30.
 #+end_src
 
 * Edit modes
-
 ** AUCTeX
 
 #+begin_src emacs-lisp
@@ -2105,7 +2103,6 @@ A new mode integrated in Emacs 30.
 #+end_src
 
 * Misc editing enhancements
-
 ** Tramp
 
 *** consult-tramp
@@ -2472,7 +2469,6 @@ Align tables with variable pitch fonts.
 #+end_src
 
 * Window and workspace management
-
 ** Persp-mode
 
 Use Persp-mode to isolate buffers based on workspace or project.
@@ -2841,7 +2837,6 @@ return the same window."
 #+end_src
 
 * Shell modes
-
 ** Custom window/buffer management for shell-ish modes
 
 #+begin_src emacs-lisp
@@ -3289,7 +3284,10 @@ Yet another terminal emulator. Trying out now.
 
 #+begin_src emacs-lisp
 (use-package eat
-  ;; :bind (("C-c s" . my/get-eat))
+  :bind (("C-c E" . my/get-eat)
+         :map eat-mode-map
+         ("C-c C-k" . eat-semi-char-mode))
+  :hook ((eat-mode . corfu-mode))  ;; enable corfu completion
   :straight '(eat :type git
                   :host codeberg
                   :repo "akib/emacs-eat"
@@ -3309,7 +3307,6 @@ Yet another terminal emulator. Trying out now.
 #+end_src
 
 * Software Development
-
 ** Misc preferences
 
 #+begin_src emacs-lisp
