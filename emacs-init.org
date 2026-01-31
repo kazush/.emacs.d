@@ -3996,10 +3996,13 @@ Manually enable ~copilot-mode~ when needed.
   :bind ( :map copilot-completion-map
           ("<tab>" . my/copilot-accept-completion)
           ("C-<return>" . copilot-accept-completion)
-          ("C-c ." . copilot-accept-by-sentence)
+          ("C-c ." . copilot-accept-completion-by-sentence)
+          ("C-c ," . copilot-accept-completion-to-char)
           ("C-c C-f" . copilot-accept-completion-by-word)
           ("C-c C-n" . copilot-accept-completion-by-line)
           ("C-c C-p" . copilot-accept-completion-by-paragraph))
+  :custom
+  (copilot-indent-offset-warning-disable t)
   :config
   (defun my/copilot-accept-completion ()
     (interactive)
@@ -4103,7 +4106,6 @@ Manually enable ~copilot-mode~ when needed.
   (setq codeium/document/text 'my-codeium/document/text)
   (setq codeium/document/cursor_offset 'my-codeium/document/cursor_offset))
 #+end_src
-
 
 ** AI Agents
 *** vterm tweaks for claude code
