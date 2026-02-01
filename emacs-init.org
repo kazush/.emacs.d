@@ -6564,7 +6564,8 @@ Macros to retrive API keys for LLM servce providers.
     (cohere :auth-source "cohere-api-key" :envvar "COHERE_API_KEY")
     (sambanova :auth-source "sambanova-api-key")
     (huggingface :auth-source "huggingface-api-key")
-    (deepl :auth-source "deepl-api-key")))
+    (deepl :auth-source "deepl-api-key")
+    (zai :auth-source "zai-api-key")))
 
 ;; Generate my/get-<provider>-api-key function
 (dolist (conf my/llm-provider-alist)
