@@ -6816,7 +6816,7 @@ Macros to retrive API keys for LLM servce providers.
   (defun my/gptel-insert-new-chat-heading ()
     "Insert new chat heading."
     (interactive)
-    (org-insert-heading-respect-content)
+    (org-insert-heading nil nil 1)
     (insert (format-time-string "[%Y-%m-%d %H:%M] New Chat\n")))
 
   (defun my/gptel-insert-prompt-prefix ()
@@ -6865,31 +6865,39 @@ Macros to retrive API keys for LLM servce providers.
 
   (gptel-make-gemini "Gemini"
     :key #'my/get-gemini-api-key
-    :models '(gemini-2.0-flash
-              gemini-2.5-flash-image-preview
+    :models '(gemini-2.5-flash-image-preview
               gemini-2.5-pro
-              gemini-2.5-flash-lite
-              gemini-2.5-flash)
+              gemini-flash-lite-latest
+              gemini-flash-latest
+              gemini-3-flash-preview
+              gemini-3-pro-preview
+              gemini-3-pro-image-preview)
     :stream t)
+
+  (gptel-make-gh-copilot "Copilot"
+    :models '(gpt-5-mini
+              gpt-5.2-codex
+              claude-sonnet-4.5
+              claude-opus-4.5
+              grok-code-fast-1))
 
   (gptel-make-openai "Groq"
     :host "api.groq.com"
     :endpoint "/openai/v1/chat/completions"
     :stream t
     :key #'my/get-groq-api-key
-    :models '(
-              llama-3.3-70b-versatile
-              openai/gpt-oss-120b
+    :models '(openai/gpt-oss-120b
               moonshotai/kimi-k2-instruct-0905))
 
-  (gptel-make-ollama "Ollama"
-    :host "localhost:11434"
-    :stream t
-    :models '(qwen2.5-coder:latest
-              deepseek-coder-v2:latest
-              ezo-common-gemma2:9b
-              mistral-nemo-instruct:latest
-              llama3.1:latest))
+  ;; Disabled for now.
+  ;; (gptel-make-ollama "Ollama"
+  ;;   :host "localhost:11434"
+  ;;   :stream t
+  ;;   :models '(qwen2.5-coder:latest
+  ;;             deepseek-coder-v2:latest
+  ;;             ezo-common-gemma2:9b
+  ;;             mistral-nemo-instruct:latest
+  ;;             llama3.1:latest))
 
   (gptel-make-openai "SambaNova"
     :host "api.sambanova.ai"
@@ -6897,15 +6905,17 @@ Macros to retrive API keys for LLM servce providers.
     :stream t
     :key #'my/get-sambanova-api-key
     :models '(Qwen3-32B
+              Qwen3-235B
               gpt-oss-120b))
 
-  (gptel-make-openai "Cohere"
-    :host "localhost:6600"
-    :endpoint "/v1/chat/completions"
-    :stream t
-    :key #'my/get-cohere-api-key
-    :models '(command-r-plus
-              command-r-plus-08-2024))
+  ;; Disabled for now.
+  ;; (gptel-make-openai "Cohere"
+  ;;   :host "localhost:6600"
+  ;;   :endpoint "/v1/chat/completions"
+  ;;   :stream t
+  ;;   :key #'my/get-cohere-api-key
+  ;;   :models '(command-r-plus
+  ;;             command-r-plus-08-2024))
 
   ;; (gptel-make-openai "HuggingFace"
   ;;   :host "api-inference.huggingface.co"
@@ -6917,13 +6927,14 @@ Macros to retrive API keys for LLM servce providers.
   ;;             Qwen/QwQ-32B
   ;;             black-forest-labs/FLUX.1-dev))
 
-  (gptel-make-anthropic "Anthropic"
-    :stream t
-    :key #'my/get-anthropic-api-key
-    :models '(claude-3-7-sonnet-latest
-              claude-sonnet-4-0
-              claude-opus-4-1
-              claude-sonnet-4-5))
+  ;; Disabled for now.
+  ;; (gptel-make-anthropic "Anthropic"
+  ;;   :stream t
+  ;;   :key #'my/get-anthropic-api-key
+  ;;   :models '(claude-3-7-sonnet-latest
+  ;;             claude-sonnet-4-0
+  ;;             claude-opus-4-1
+  ;;             claude-sonnet-4-5))
 
   (gptel-make-openai "DeepSeek"
     :host "api.deepseek.com"
@@ -6938,25 +6949,27 @@ Macros to retrive API keys for LLM servce providers.
     :endpoint "/api/v1/chat/completions"
     :stream t
     :key #'my/get-openrouter-api-key
-    :models '(openai/gpt-5-nano
-              openai/gpt-5-mini
-              openai/gpt-5
-              openai/gpt-5-chat
-              openai/gpt-5-codex
-              openai/gpt-5-codex
-              openai/gpt-oss-20b:free
+    :models '(xiaomi/mimo-v2-flash
               z-ai/glm-4.5-air:free
               tngtech/deepseek-r1t2-chimera:free
-              meituan/longcat-flash-chat:free
               moonshotai/kimi-k2:free
+              moonshotai/kimi-k2.5
               qwen/qwen3-coder:free))
+
+  (gptel-make-openai "Z.ai"
+    :host "api.z.ai"
+    :endpoint "/api/coding/paas/v4/chat/completions"
+    :stream t
+    :key #'my/get-zai-api-key
+    :models '(GLM-4.7
+              GLM-4.5-air))
 
   (defun my/gptel-get-backend (key)
     (alist-get key gptel--known-backends nil nil 'string=))
 
   ;; Set default backend.
   (setq gptel-backend (my/gptel-get-backend "Gemini"))
-  (setq gptel-model 'gemini-2.5-flash-lite)
+  (setq gptel-model 'gemini-flash-lite-latest)
 
   ;;
   ;; Tools - mostly copied from https://github.com/karthink/gptel/issues/514
@@ -7156,36 +7169,37 @@ Macros to retrive API keys for LLM servce providers.
                        :description "Path to the file to read.  Supports relative paths and ~."))
    :category "filesystem")
 
-  ;;
-  ;; Local Tools
-  ;;
-  (defun my/gptel-tool-web-search (callback keyword)
-    "Launch web search process and return results in JSON format."
-    (message "calling web_search with keyword %s" keyword)
-    (let* ((outbuf (get-buffer-create (concat (make-temp-name " *gptel-tool-web-search-") "*")))
-           (process
-            (make-process :name "curl"
-                          :command `("curl" "-X" "GET" "-L" "--no-progress-meter"
-                                     "http://localhost:8081"
-                                     "--data-urlencode" ,(concat "q=" keyword)
-                                     "--data" "format=json")
-                          :buffer outbuf
-                          :sentinel `(lambda (proc status)
-                                       (funcall ,callback
-                                                (with-current-buffer ,outbuf
-                                                  (buffer-string)))
-                                       (run-at-time 0 nil #'kill-buffer ,outbuf)))))
-      (message "web_search process created with buffer %s for keyword '%s'" outbuf keyword)))
+  ;; Disabled for now
+  ;; ;;
+  ;; ;; Local Tools
+  ;; ;;
+  ;; (defun my/gptel-tool-web-search (callback keyword)
+  ;;   "Launch web search process and return results in JSON format."
+  ;;   (message "calling web_search with keyword %s" keyword)
+  ;;   (let* ((outbuf (get-buffer-create (concat (make-temp-name " *gptel-tool-web-search-") "*")))
+  ;;          (process
+  ;;           (make-process :name "curl"
+  ;;                         :command `("curl" "-X" "GET" "-L" "--no-progress-meter"
+  ;;                                    "http://localhost:8081"
+  ;;                                    "--data-urlencode" ,(concat "q=" keyword)
+  ;;                                    "--data" "format=json")
+  ;;                         :buffer outbuf
+  ;;                         :sentinel `(lambda (proc status)
+  ;;                                      (funcall ,callback
+  ;;                                               (with-current-buffer ,outbuf
+  ;;                                                 (buffer-string)))
+  ;;                                      (run-at-time 0 nil #'kill-buffer ,outbuf)))))
+  ;;     (message "web_search process created with buffer %s for keyword '%s'" outbuf keyword)))
 
-  (gptel-make-tool
-   :function #'my/gptel-tool-web-search
-   :name "web_search"
-   :description "Search the Web for a given keyword and return results in JSON format"
-   :args (list '(:name "keyword"
-                       :type "string"
-                       :description "The search keyword"))
-   :category "web"
-   :async t)
+  ;; (gptel-make-tool
+  ;;  :function #'my/gptel-tool-web-search
+  ;;  :name "web_search"
+  ;;  :description "Search the Web for a given keyword and return results in JSON format"
+  ;;  :args (list '(:name "keyword"
+  ;;                      :type "string"
+  ;;                      :description "The search keyword"))
+  ;;  :category "web"
+  ;;  :async t)
 
   ;;
   ;; Tweak request data
@@ -7336,10 +7350,10 @@ and stream is t."
   :straight (:type git :host github :repo "lizqwerscott/mcp.el")
   :after gptel
   :custom (mcp-hub-servers
-           `(("filesystem" . (:command "npx"
-                              :args ("-y" "@modelcontextprotocol/server-filesystem")
-                              :roots (,(file-name-concat (getenv "HOME") "prj"))))
-             ("playwright" . (:command "npx" :args ("-y" "@playwright/mcp@latest")))
+           `(;; ("filesystem" . (:command "npx"
+             ;;                  :args ("-y" "@modelcontextprotocol/server-filesystem")
+             ;;                  :roots (,(file-name-concat (getenv "HOME") "prj"))))
+             ;; ("playwright" . (:command "npx" :args ("-y" "@playwright/mcp@latest")))
              ("tavily" . (:command "npx" :args ("-y" "tavily-mcp@latest")
                            :env (:TAVILY_API_KEY ,(auth-source-pick-first-password :host "tavily-api-key"))))))
   :config
