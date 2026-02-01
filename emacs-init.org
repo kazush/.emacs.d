@@ -6686,6 +6686,18 @@ Macros to retrive API keys for LLM servce providers.
       :key (my/get-huggingface-api-key)
       ,@args))
 
+  (defmacro my/make-llm-openrouter (&rest args)
+    `(make-llm-openai-compatible
+      :url "https://openrouter.ai/api/v1/"
+      :key (my/get-openrouter-api-key)
+      ,@args))
+
+  (defmacro my/make-llm-zai (&rest args)
+    `(make-llm-openai-compatible
+      :url "https://api.z.ai/api/coding/paas/v4/"
+      :key (my/get-zai-api-key)
+      ,@args))
+
   (require 'llm-gemini)
   (defmacro my/make-llm-gemini (&rest args)
     `(make-llm-gemini
@@ -6696,43 +6708,54 @@ Macros to retrive API keys for LLM servce providers.
   ;;         (my/make-llm-local-server
   ;;          :chat-model "deepseek-coder-v2:latest"))
 
-  (setopt ellama-provider (my/make-llm-gemini
-                           :chat-model "gemini-2.5-flash-lite"))
+  (setopt ellama-provider (my/make-llm-groq
+                           :chat-model "moonshotai/kimi-k2-instruct-0905"))
   ;; Predefined llm providers for interactive switching.
   ;; You shouldn't add ollama providers here - it can be selected interactively
   ;; without it. It is just example.
   (setopt ellama-providers
-          '(("gemini-2.0-flash" . (my/make-llm-gemini
-                                   :chat-model "gemini-2.0-flash"))
-            ("gemini-2.5-flash-image-preview" . (my/make-llm-gemini
-                                           :chat-model "gemini-2.5-flash-image-preview"))
-            ("gemini-2.5-flash-lite" . (my/make-llm-gemini
-                                                :chat-model "gemini-2.5-flash-lite"))
-            ("gemini-2.5-flash" . (my/make-llm-gemini
-                                           :chat-model "gemini-2.5-flash"))
+          '(("gemini-2.5-flash-image-preview" . (my/make-llm-gemini
+                                                 :chat-model "gemini-2.5-flash-image-preview"))
+            ("gemini-flash-lite-latest" . (my/make-llm-gemini
+                                                :chat-model "gemini-flash-lite-latest"))
+            ("gemini-flash-latest" . (my/make-llm-gemini
+                                           :chat-model "gemini-flash-latest"))
             ("gemini-2.5-pro" . (my/make-llm-gemini
                                          :chat-model "gemini-2.5-pro"))
-            ("groq-llama-3.3-versatile" . (my/make-llm-groq
-                                           :chat-model "llama-3.3-70b-versatile"))
+            ("gemini-3-flash-preview" . (my/make-llm-gemini
+                                         :chat-model "gemini-3-flash-preview"))
+            ("gemini-3-pro-preview" . (my/make-llm-gemini
+                                         :chat-model "gemini-3-pro-preview"))
+            ("gemini-3-pro-image-preview" . (my/make-llm-gemini
+                                         :chat-model "gemini-3-pro-image-preview"))
             ("groq-gpt-oss-120b" . (my/make-llm-groq
                                     :chat-model "openai/gpt-oss-120b"))
             ("groq-kimi-k2" . (my/make-llm-groq
                                     :chat-model "moonshotai/kimi-k2-instruct-0905"))
-            ("sambanova-qwen3" . (my/make-llm-sambanova
-                                      :chat-model "Qwen3-32B"))
+            ("openrouter-mimo-v2-flash" . (my/make-llm-openrouter
+                                     :chat-model "xiaomi/mimo-v2-flash"))
+            ("openrouter-glm-4.5-air" . (my/make-llm-sambanova
+                                     :chat-model "z-ai/glm-4.5-air:free"))
+            ("openrouter-deepseek-r1t2-chimera" . (my/make-llm-sambanova
+                                     :chat-model "tngtech/deepseek-r1t2-chimera:free"))
             ("sambanova-gpt-oss-120b" . (my/make-llm-sambanova
-                                     :chat-model "gpt-oss-120b"))))
+                                     :chat-model "gpt-oss-120b"))
+            ("sambanova-gwen3-235b" . (my/make-llm-sambanova
+                                     :chat-model "Qwen3-235B"))
+            ("zai-glm-4.7" . (my/make-llm-zai
+                                     :chat-model "GLM-4.7"))))
 
-  ;; Change AI's nickname as per the selected model.
-  (defun my/ellama-update-assistant-nick ()
-    (setq ellama-assistant-nick
-          (format-message
-           "AI (%s)"
-           (capitalize (cl-struct-slot-value (type-of ellama-provider)
-                                             'chat-model ellama-provider)))))
+  ;; Disable the nickname code; switching models mid-session won't reflect the update.
+  ;; ;; Change AI's nickname as per the selected model.
+  ;; (defun my/ellama-update-assistant-nick ()
+  ;;   (setq ellama-assistant-nick
+  ;;         (format-message
+  ;;          "AI (%s)"
+  ;;          (capitalize (cl-struct-slot-value (type-of ellama-provider)
+  ;;                                            'chat-model ellama-provider)))))
 
-  (advice-add #'ellama-provider-select :after #'my/ellama-update-assistant-nick)
-  (my/ellama-update-assistant-nick)
+  ;; (advice-add #'ellama-provider-select :after #'my/ellama-update-assistant-nick)
+  ;; (my/ellama-update-assistant-nick)
 
   ;; Disabled ellama-naming-provider and ellama-translation-provider to take
   ;; into account the situation where no local LLM server is running on the
