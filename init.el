@@ -19,12 +19,14 @@
 (defvar my/font-rescale-alist
   '(("Noto Color Emoji" . ((8 . 0.88)
                            (9 . 0.92)
+                           (14 . 0.8)
                            (16 . 0.86)
                            ;; (27 . 0.82)
                            (32 . 0.84)))
     ("Noto Sans CJK JP" . ((8 . 1.1)
                            (9 . 1.2)
                            (11 . 1.1)
+                           (14 . 1.0)
                            (16 . 1.053)))))
 
 ;;
@@ -57,7 +59,7 @@
     (dolist (font (list my/default-jp-font my/default-emoji-font))
       (let ((scale (my/get-font-rescale-param font new-font-size)))
         ;; for debugging only
-        ;; (message "font=%s newsize:%d scale:%s" font new-font-size scale)
+        ;; (message "font=%s, newsize=%d, scale=%s" font new-font-size scale)
         (when scale
           (setf (alist-get font face-font-rescale-alist nil nil 'equal)
                 scale))))))
@@ -68,7 +70,8 @@
 ;; Helper functions for default font and size.
 ;;
 
-(defvar my/default-font-size 16) ;; re-initialized later.
+(defvar my/default-font-size 16
+  "Default font size. Updated through my/update-default-font-size.")
 
 (defun my/make-font-str (font &optional size)
   "Make font string which can be used for :font in set-face-attribute."
@@ -77,22 +80,33 @@
     (x-resolve-font-name
      (format "%s:weight=regular:slant=normal" font-str))))
 
+(defun my/monitor-id ()
+  "Return monitor ID used as a key for my/default-font-size-alist."
+  (format "%s:%s"
+          (alist-get 'name (frame-monitor-attributes))
+          system-name))
+
+(defun my/update-default-font-size-alist (size)
+  "Update font size in my/default-font-size-alist."
+  (let ((monitor-id (my/monitor-id)))
+    (setf (alist-get monitor-id my/default-font-size-alist nil nil 'equal) size)))
+
 (defun my/update-default-font-size ()
   "Update default font size based on my/default-font-size-alist."
-  (let ((monitor-n-system (format "%s:%s"
-                                  (alist-get 'name (frame-monitor-attributes))
-                                  system-name)))
+  (let ((monitor-id (my/monitor-id)))
     (setq my/default-font-size
           (cl-loop for pair in my/default-font-size-alist
-                   until (string-match (car pair) monitor-n-system)
+                   until (string-match (car pair) monitor-id)
                    finally return (let ((value (cdr pair)))
                                     (if (functionp value) (funcall value) value))))))
 
-(defun my/setup-default-font ()
+(defun my/setup-default-font (&optional size)
   "Set default font size for each font as per the current monitor environment."
-  (interactive)
+  (interactive "nFont Size: ")
 
   ;; Update default font size.
+  (when size
+    (my/update-default-font-size-alist size))
   (my/update-default-font-size)
 
   ;; Update face-font-rescale-alist with default font size.
