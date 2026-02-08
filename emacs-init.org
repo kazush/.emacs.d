@@ -3678,6 +3678,7 @@ Eldoc-box displays eldoc contents in a child frame but is currently disabled.
          ("C-c [" . puni-wrap-square)
          ("C-c {" . puni-wrap-curly)
          ("C-c <" . puni-wrap-angle)
+         ("C-c ~" . puni-wrap-tilde)
          ("M-SPC" . puni-mark-sexp-at-point)
          :map puni-mode-map
          ("C-<" . puni-raise)
@@ -3688,7 +3689,8 @@ Eldoc-box displays eldoc contents in a child frame but is currently disabled.
          ("(" . puni-wrap-round)
          ("[" . puni-wrap-square)
          ("{" . puni-wrap-curly)
-         ("<" . puni-wrap-angle))
+         ("<" . puni-wrap-angle)
+         ("~" . puni-wrap-tilde))
   :hook (emacs-lisp-mode . puni-mode)
   :custom
   (puni-confirm-when-delete-unbalanced-active-region nil)
@@ -3705,7 +3707,8 @@ Eldoc-box displays eldoc contents in a child frame but is currently disabled.
                 ,(cadr wdef) ,(cddr wdef))))))
 
   (my/def-pairs '((single-quote . ("'" . "'"))
-                  (double-quote . ("\"" . "\""))))
+                  (double-quote . ("\"" . "\""))
+                  (tilde . ("~" . "~"))))
   )
 #+end_src
 
