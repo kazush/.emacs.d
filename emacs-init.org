@@ -2843,9 +2843,12 @@ return the same window."
 (defun my/shellish-buffer-p (buf &optional filter-mode)
   "Return if BUF is a shell-ish buffer. if FILTER-MODE is nil, buf is compared with major-mode."
   (let ((mode (with-current-buffer buf major-mode)))
-    (if filter-mode
-        (eq filter-mode mode)
-      (eq major-mode mode))))
+    (and (string-match-p (format "\\*%s\\*<[0-9]>"
+                                 (my/shellish-name (or filter-mode major-mode)))
+                         (buffer-name buf))
+         (if filter-mode
+             (eq filter-mode mode)
+           (eq major-mode mode)))))
 
 (defvar my/consult-source-shellish-buffer
   `(:name "Shellish"
