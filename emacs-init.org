@@ -4812,7 +4812,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
               (org-agenda-prefix-format
                '((todo . " %-2i %-18(my/org-get-todo-date-str)   %-10(my/org-agenda-property \"project\" 10)   ")))
               (org-agenda-overriding-header "Current Tasks")))
-       (tags-todo "+PROJECT=\"personal\"-TODO=\"SHOPPING\"-TODO=\"LATER\"-STYLE=\"habit\""
+       (tags-todo "+PROJECT=\"personal\"-TODO=\"SHOPPING\"-TODO=\"LATER\"-STYLE=\"habit\"-recurring"
                   ((org-super-agenda-groups
                     '((:todo "ASSIGNED")
                       (:todo "NEXT")
