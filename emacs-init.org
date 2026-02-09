@@ -3678,7 +3678,7 @@ Eldoc-box displays eldoc contents in a child frame but is currently disabled.
          ("C-c [" . puni-wrap-square)
          ("C-c {" . puni-wrap-curly)
          ("C-c <" . puni-wrap-angle)
-         ("C-c ~" . puni-wrap-tilde)
+         ("C-c ~" . my/puni-wrap-tilde)
          ("M-SPC" . puni-mark-sexp-at-point)
          :map puni-mode-map
          ("C-<" . puni-raise)
@@ -3690,7 +3690,7 @@ Eldoc-box displays eldoc contents in a child frame but is currently disabled.
          ("[" . puni-wrap-square)
          ("{" . puni-wrap-curly)
          ("<" . puni-wrap-angle)
-         ("~" . puni-wrap-tilde))
+         ("~" . my/puni-wrap-tilde))
   :hook (emacs-lisp-mode . puni-mode)
   :custom
   (puni-confirm-when-delete-unbalanced-active-region nil)
