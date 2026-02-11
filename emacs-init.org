@@ -6583,7 +6583,8 @@ Macros to retrive API keys for LLM servce providers.
     (sambanova :auth-source "sambanova-api-key")
     (huggingface :auth-source "huggingface-api-key")
     (deepl :auth-source "deepl-api-key")
-    (zai :auth-source "zai-api-key")))
+    (zai :auth-source "zai-api-key")
+    (nvidia :auth-source "nvidia-api-key")))
 
 ;; Generate my/get-<provider>-api-key function
 (dolist (conf my/llm-provider-alist)
@@ -6981,6 +6982,13 @@ Macros to retrive API keys for LLM servce providers.
     :key #'my/get-zai-api-key
     :models '(GLM-4.7
               GLM-4.5-air))
+
+  (gptel-make-openai "NVIDIA"
+    :host "integrate.api.nvidia.com"
+    :endpoint "/v1/chat/completions"
+    :stream t
+    :key #'my/get-nvidia-api-key
+    :models '(moonshotai/kimi-k2.5))
 
   (defun my/gptel-get-backend (key)
     (alist-get key gptel--known-backends nil nil 'string=))
