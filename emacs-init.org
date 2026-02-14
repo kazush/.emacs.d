@@ -537,7 +537,8 @@ called in hooks.
   (set-face-background 'default
     (if my/transparent-bg-p
         (if window-system "#000000" "unspecified-bg")
-      my/default-face-background))
+      my/default-face-background)
+    (selected-frame))
   (set-face-attribute 'shadow nil
                        :foreground "dim gray")
   (set-face-attribute 'fixed-pitch nil
@@ -719,7 +720,8 @@ Different tweaks on appearance.
   (if enable
       (progn
         (if (not window-system)
-            (set-face-background 'default "unspecified-bg")
+            (set-face-background 'default "unspecified-bg"
+                                 (selected-frame))
           (set-frame-parameter frame 'alpha my/transparency)
           (set-face-background 'default "black"))
         (setq my/transparent-bg-p t))
