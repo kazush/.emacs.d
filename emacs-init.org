@@ -76,20 +76,21 @@ Start emacs server function so emacsclient processes can connect to this
 instance. ~restart-server~ is a helper function to restart the server process.
 
 #+begin_src emacs-lisp
-  (require 'server)
-  (defun my/restart-server ()
-    "Restarts server."
-    (interactive)
-    (message "restarting server...")
-    (server-force-stop)
-    (server-force-delete)
-    (server-start))
+(require 'server)
+(defun my/restart-server ()
+  "Restarts server."
+  (interactive)
+  (message "restarting server...")
+  (server-force-stop)
+  (server-force-delete)
+  (server-start))
 
-  ;; Workaround for the env where another Emacs instance is running on CRD.
-  (when (getenv "CHROME_REMOTE_DESKTOP_SESSION")
-    (setq server-name "crd"))
+;; Workaround for the env where another Emacs instance is running on CRD.
+(when (getenv "CHROME_REMOTE_DESKTOP_SESSION")
+  (setq server-name "crd"))
 
-  (my/restart-server)
+(unless (server-running-p)
+  (my/restart-server))
 #+end_src
 
 ** Dired
