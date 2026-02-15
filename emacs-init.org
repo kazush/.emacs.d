@@ -7420,6 +7420,7 @@ and stream is t."
          ("RET" . my/elfeed-show-visit-with-eww))
   ;; :custom
   ;; (elfeed-search-remain-on-entry t)  ;; for navigation from split entry pane.
+  :commands (my/elfeed-update-headless)
   :config
   ;; Faces
   (custom-set-faces
@@ -7529,7 +7530,17 @@ and stream is t."
 
   ;; Enable sort by source by default
   (setq elfeed-sort-order 'ascending
-        elfeed-search-sort-function #'my/elfeed-search-sort--feed-url))
+        elfeed-search-sort-function #'my/elfeed-search-sort--feed-url)
+
+  ;; For headless update with emacsclient --eval.
+  (defun my/elfeed-update-headless ()
+    "Update elfeed feeds in a headless way."
+    (interactive)
+    (require 'elfeed)
+    (require 'elfeed-org)
+    (rmh-elfeed-org-process-advice)
+    (elfeed-db-load)
+    (elfeed-update)))
 
 (use-package elfeed-goodies
   :disabled
