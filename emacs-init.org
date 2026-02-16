@@ -7423,6 +7423,10 @@ and stream is t."
   ;; (elfeed-search-remain-on-entry t)  ;; for navigation from split entry pane.
   :commands (my/elfeed-update-headless)
   :config
+  ;; Add time to the search result.
+  (defun elfeed-search-format-date (date)
+    (format-time-string "%Y-%m-%d %H:%M" (seconds-to-time date)))
+
   ;; Faces
   (custom-set-faces
    '(elfeed-search-title-face ((t :foreground "#aaaaaa")))
@@ -7542,7 +7546,9 @@ and stream is t."
     (elfeed-db-unload)
     (elfeed-db-load)
     (rmh-elfeed-org-process-advice)
-    (elfeed-update)))
+    (message "[%s] elfeed feeds updated %s" (format-time-string "%Y-%m-%d %H:%M:%S")
+             (if (eq (elfeed-update) :success)
+                 "successfully" "with an error"))))
 
 (use-package elfeed-goodies
   :disabled
