@@ -7539,8 +7539,9 @@ and stream is t."
     (interactive)
     (require 'elfeed)
     (require 'elfeed-org)
-    (rmh-elfeed-org-process-advice)
+    (elfeed-db-unload)
     (elfeed-db-load)
+    (rmh-elfeed-org-process-advice)
     (elfeed-update)))
 
 (use-package elfeed-goodies
