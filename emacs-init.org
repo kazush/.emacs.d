@@ -576,9 +576,11 @@ called in hooks.
                       :background "gray15"
                       :inherit 'unspecified)
   (set-face-attribute 'tab-bar-tab-inactive nil
+                      :weight 'normal
                       :foreground "gray"
                       :background "gray15")
   (set-face-attribute 'tab-bar-tab nil
+                      :weight 'bold
                       :foreground "white"
                       :background "gray20")
   (set-face-foreground 'font-lock-variable-name-face "khaki")
