@@ -7399,8 +7399,8 @@ and stream is t."
 
 #+begin_src emacs-lisp
 (use-package elfeed
-  :bind (("C-c F" . elfeed)
-         ("<f12>" . elfeed)
+  :bind (("C-c F" . my/elfeed)
+         ("<f12>" . my/elfeed)
          :map elfeed-search-mode-map
          ("<mouse-1>" . elfeed-search-show-entry)
          ("S" . my/elfeed-search-toggle-sort)
@@ -7548,7 +7548,15 @@ and stream is t."
     (rmh-elfeed-org-process-advice)
     (message "[%s] elfeed feeds updated %s" (format-time-string "%Y-%m-%d %H:%M:%S")
              (if (eq (elfeed-update) :success)
-                 "successfully" "with an error"))))
+                 "successfully" "with an error")))
+
+  ;; Load index from filesystem before launching elfeed to try to avoid using stale index.
+  ;; This happens when elfeed db is synced among hosts using syncthing.
+  (defun my/elfeed ()
+    "Launch elfeed after reloading index from filesystem."
+    (interactive)
+    (elfeed-db-load)
+    (elfeed)))
 
 (use-package elfeed-goodies
   :disabled
