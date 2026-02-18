@@ -7539,6 +7539,24 @@ and stream is t."
   (setq elfeed-sort-order 'ascending
         elfeed-search-sort-function #'my/elfeed-search-sort--feed-url)
 
+  ;; Update in-memory DB with the db in the filesystem assuming it is newer.
+  (defun my/elfeed-update-inmemory-db ()
+    "Load elfeed-db from memory and merge read state."
+    (interactive)
+    (let ((entries-read ()))
+      ;; Save entries' read state.
+      (with-elfeed-db-visit (entry feed)
+        (unless (elfeed-tagged-p 'unread entry)
+          (add-to-list 'entries-read entry)))
+      ;; Load DB from the filesystem.
+      (elfeed-db-load)
+      ;; Update entries with current read state.
+      (dolist (entry entries-read)
+        (when (gethash (elfeed-entry-id entry) elfeed-db-entries)
+          (elfeed-untag entry 'unread))))
+    (elfeed-db-set-update-time)
+    (elfeed-search-update--force))
+
   ;; For async update with emacsclient --eval.
   (defun my/elfeed-update-async ()
     "Update elfeed feeds in a headless way."
@@ -7563,18 +7581,8 @@ and stream is t."
                  updated))
             (lambda (updated)
               (when updated
-                ;; save entries' read state
-                (let ((entries-read ()))
-                  (with-elfeed-db-visit (entry feed)
-                    (unless (elfeed-tagged-p 'unread entry)
-                      (add-to-list 'entries-read entry)))
-                  (elfeed-db-load)
-                  ;; update entries with current read state.
-                  (dolist (entry entries-read)
-                    (when (gethash (elfeed-entry-id entry) elfeed-db-entries)
-                      (elfeed-untag entry 'unread))))
-                (elfeed-db-set-update-time)
-                (elfeed-search-update--force))
+                ;; update DB
+                (my/elfeed-update-inmemory-db))
               (message "[%s] elfeed-update done.%s"
                        (format-time-string "%Y-%m-%d %H:%M:%S")
                        (if updated
