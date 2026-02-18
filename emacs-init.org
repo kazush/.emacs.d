@@ -7552,8 +7552,9 @@ and stream is t."
       (elfeed-db-load)
       ;; Update entries with current read state.
       (dolist (entry entries-read)
-        (when (gethash (elfeed-entry-id entry) elfeed-db-entries)
-          (elfeed-untag entry 'unread))))
+        (let ((entry-in-db (gethash (elfeed-entry-id entry) elfeed-db-entries)))
+          (when entry-in-db
+            (elfeed-untag entry-in-db 'unread)))))
     (elfeed-db-set-update-time)
     (elfeed-search-update--force))
 
