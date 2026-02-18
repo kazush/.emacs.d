@@ -7540,7 +7540,6 @@ and stream is t."
         elfeed-search-sort-function #'my/elfeed-search-sort--feed-url)
 
   ;; For async update with emacsclient --eval.
-  triggered.
   (defun my/elfeed-update-async ()
     "Update elfeed feeds in a headless way."
     (interactive)
