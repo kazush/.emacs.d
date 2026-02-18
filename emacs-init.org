@@ -7401,8 +7401,8 @@ and stream is t."
 
 #+begin_src emacs-lisp
 (use-package elfeed
-  :bind (("C-c F" . my/elfeed)
-         ("<f12>" . my/elfeed)
+  :bind (("C-c F" . elfeed)
+         ("<f12>" . elfeed)
          :map elfeed-search-mode-map
          ("<mouse-1>" . elfeed-search-show-entry)
          ("S" . my/elfeed-search-toggle-sort)
@@ -7423,7 +7423,7 @@ and stream is t."
          ("RET" . my/elfeed-show-visit-with-eww))
   ;; :custom
   ;; (elfeed-search-remain-on-entry t)  ;; for navigation from split entry pane.
-  :commands (my/elfeed-update-headless)
+  :commands (my/elfeed-update-async)
   :config
   ;; Add time to the search result.
   (defun elfeed-search-format-date (date)
@@ -7540,7 +7540,7 @@ and stream is t."
         elfeed-search-sort-function #'my/elfeed-search-sort--feed-url)
 
   ;; For async update with emacsclient --eval.
-triggered.
+  triggered.
   (defun my/elfeed-update-async ()
     "Update elfeed feeds in a headless way."
     (interactive)
@@ -7582,15 +7582,7 @@ triggered.
                            (format " elfeed-db updated (%s)."
                                    (with-current-buffer (elfeed-search-buffer)
                                      (elfeed-search--count-unread)))
-                         ""))))))))
-
-  ;; Load index from filesystem before launching elfeed to try to avoid using stale index.
-  ;; This happens when elfeed db is synced among hosts using syncthing.
-  (defun my/elfeed ()
-    "Launch elfeed after reloading index from filesystem."
-    (interactive)
-    (elfeed-db-load)
-    (elfeed)))
+                         "")))))))))
 
 (use-package elfeed-goodies
   :disabled
