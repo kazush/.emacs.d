@@ -7539,19 +7539,50 @@ and stream is t."
   (setq elfeed-sort-order 'ascending
         elfeed-search-sort-function #'my/elfeed-search-sort--feed-url)
 
-  ;; For headless update with emacsclient --eval.
-  (defun my/elfeed-update-headless ()
+  ;; For async update with emacsclient --eval.
+triggered.
+  (defun my/elfeed-update-async ()
     "Update elfeed feeds in a headless way."
     (interactive)
-    (require 'elfeed)
-    (require 'elfeed-org)
-    (unless (member #'elfeed-org-run-new-entry-hook elfeed-new-entry-hook)
-      (elfeed-org))
-    (elfeed-db-load)
-    (rmh-elfeed-org-process-advice)
-    (message "[%s] elfeed feeds updated %s" (format-time-string "%Y-%m-%d %H:%M:%S")
-             (if (eq (elfeed-update) :success)
-                 "successfully" "with an error")))
+    (let ((proc
+           (async-start
+            `(lambda ()
+               ,(async-inject-variables "\\`\\(load-path\\|rmh-elfeed-org-files\\)\\'")
+               (require 'elfeed)
+               (require 'elfeed-org)
+               (elfeed-org)
+               (elfeed-db-load)
+               (rmh-elfeed-org-process-advice)
+               (let ((last-db-update (elfeed-db-last-update))
+                     (updated nil))
+                 (elfeed-update)
+                 (while (> (elfeed-queue-count-total) 0)
+                   (sleep-for 1))
+                 (setq updated (> (elfeed-db-last-update) last-db-update))
+                 (when updated
+                   (elfeed-db-save))
+                 updated))
+            (lambda (updated)
+              (when updated
+                ;; save entries' read state
+                (let ((entries-read ()))
+                  (with-elfeed-db-visit (entry feed)
+                    (unless (elfeed-tagged-p 'unread entry)
+                      (add-to-list 'entries-read entry)))
+                  (elfeed-db-load)
+                  ;; update entries with current read state.
+                  (dolist (entry entries-read)
+                    (when (gethash (elfeed-entry-id entry) elfeed-db-entries)
+                      (elfeed-untag entry 'unread))))
+                (elfeed-db-set-update-time)
+                (elfeed-search-update--force))
+              (message "[%s] elfeed-update done.%s"
+                       (format-time-string "%Y-%m-%d %H:%M:%S")
+                       (if updated
+                           (format " elfeed-db updated (%s)."
+                                   (with-current-buffer (elfeed-search-buffer)
+                                     (elfeed-search--count-unread)))
+                         ""))))))))
 
   ;; Load index from filesystem before launching elfeed to try to avoid using stale index.
   ;; This happens when elfeed db is synced among hosts using syncthing.
