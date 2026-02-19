@@ -7540,13 +7540,15 @@ and stream is t."
         elfeed-search-sort-function #'my/elfeed-search-sort--feed-url)
 
   ;; Update in-memory DB with the db in the filesystem assuming it is newer.
-  (defun my/elfeed-update-inmemory-db ()
+  (defun my/elfeed-update-inmemory-db (&optional days-back)
     "Load elfeed-db from memory and merge read state."
-    (interactive)
-    (let ((entries-read ()))
+    (interactive "nDays back: ")
+    (let ((entries-read ())
+          (cutoff-time (- (float-time) (* (or days-back 7) 86400))))
       ;; Save entries' read state.
       (with-elfeed-db-visit (entry feed)
-        (unless (elfeed-tagged-p 'unread entry)
+        (when (and (>= (elfeed-entry-date entry) cutoff-time)
+                   (not (elfeed-tagged-p 'unread entry)))
           (add-to-list 'entries-read entry)))
       ;; Load DB from the filesystem.
       (elfeed-db-load)
