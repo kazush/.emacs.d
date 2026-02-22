@@ -1289,7 +1289,9 @@ goggles is now used instead of volatile-highlights.
     "Switch to an existing tab if the buffer already exists or to a new tab."
     (let ((tab (tab-bar-get-buffer-tab buf (selected-frame))))
       (if tab
-          (tab-bar-select-tab-by-name (alist-get 'name tab))
+          (progn
+            (tab-bar-select-tab-by-name (alist-get 'name tab))
+            (pop-to-buffer buf))
         (switch-to-buffer-other-tab buf))))
 
   (defun my/find-file-other-tab (filename &optional wildcards)
