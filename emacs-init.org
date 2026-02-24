@@ -7411,8 +7411,8 @@ and stream is t."
 
 #+begin_src emacs-lisp
 (use-package elfeed
-  :bind (("C-c F" . elfeed)
-         ("<f12>" . elfeed)
+  :bind (("C-c F" . my/elfeed)
+         ("<f12>" . my/elfeed)
          :map elfeed-search-mode-map
          ("<mouse-1>" . elfeed-search-show-entry)
          ("S" . my/elfeed-search-toggle-sort)
@@ -7554,7 +7554,7 @@ and stream is t."
     "Load elfeed-db from memory and merge read state."
     (interactive "nDays back: ")
     (let ((entries-read ())
-          (cutoff-time (- (float-time) (* (or days-back 7) 86400))))
+          (cutoff-time (- (float-time) (* (or days-back 30) 86400))))
       ;; Save entries' read state.
       (with-elfeed-db-visit (entry feed)
         (when (and (>= (elfeed-entry-date entry) cutoff-time)
@@ -7602,7 +7602,13 @@ and stream is t."
                            (format " elfeed-db updated (%s)."
                                    (with-current-buffer (elfeed-search-buffer)
                                      (elfeed-search--count-unread)))
-                         "")))))))))
+                         ""))))))))
+
+  (defun my/elfeed (&optional days-back)
+    "Launch elfeed after loading on-disk db and merge unread tags."
+    (interactive "P")
+    (my/elfeed-update-inmemory-db days-back)
+    (elfeed)))
 
 (use-package elfeed-goodies
   :disabled
