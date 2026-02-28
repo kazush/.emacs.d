@@ -1262,6 +1262,7 @@ goggles is now used instead of volatile-highlights.
   :bind (("C-x C-f" . my/find-file-other-tab)
          ("C-x k" . my/tab-bar-kill-buffer-and-window-or-tab)
          ("C-x K" . kill-buffer)
+         ("C-x b" . my/switch-to-buffer-maybe-other-tab)
          :map tab-prefix-map
          ("C-b" . tab-bar-switch-to-tab)
          ("C-n" . tab-next)
@@ -1311,6 +1312,25 @@ files will be visited."
             (mapc #'switch-to-buffer (cdr value))
             value)
         (my/switch-to-buffer-other-tab value))))
+
+  (defun my/switch-to-buffer-maybe-other-tab ()
+    "Switch to another tab if a given buffer is already displayed there,
+otherwise in this tab."
+    (interactive)
+    (let* ((bufname (consult--read (mapcar #'buffer-name (consult--buffer-query))
+                                   :category 'buffer
+                                   :require-match
+                                   (confirm-nonexistent-file-or-buffer)
+                                   :prompt "Switch to: "
+                                   :history 'consult--buffer-history
+                                   :sort nil))
+           (buf (get-buffer bufname))
+           (tab (tab-bar-get-buffer-tab buf (selected-frame))))
+      (if tab
+          (progn
+            (tab-bar-select-tab-by-name (alist-get 'name tab))
+            (pop-to-buffer buf))
+        (switch-to-buffer buf))))
 
   (defun my/tab-bar-kill-buffer-and-tab ()
     "Kill current buffer and its tab."
