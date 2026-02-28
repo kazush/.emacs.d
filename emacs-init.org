@@ -4763,6 +4763,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
      ("org")
      ("project")
      ("reddit")
+     ("recurring")
      ("security")
      ("tech")
      ("trading")
@@ -4817,7 +4818,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
                         :face (:foreground "Yellow" :weight bold))
                  (:name "In Progress" :and (:todo "INPROGRESS" :not (:children todo))
                         :face (:foreground "#ffff00"))
-                 (:name "Assigned" :and (:todo "ASSIGNED" :not (:children todo))
+                 (:name "Assigned" :and (:todo ("ASSIGNED" "NEXT") :not (:children todo))
                         :face (:foreground "Gold"))
                  (:name "Blocked" :and (:todo "BLOCKED" :not (:children todo))
                         :face (:foreground "#8888bb"))
@@ -4838,7 +4839,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
                       (:discard (:anything t))))
                    (org-use-property-inheritance '("project"))
                    (org-agenda-files (list (my/org-roam-project-file "personal" "tasks")))
-                   (org-agenda-overriding-header "Personal Tasks Awaiting Processing")
+                   (org-agenda-overriding-header "Non-recurring Personal Tasks Awaiting Processing")
                    (org-agenda-prefix-format
                     '((tags . " %-2i %-18(my/org-get-todo-date-str)   ")))))
        (tags-todo "-PROJECT=\"personal\"-TODO=\"SHOPPING\"-TODO=\"LATER\"-STYLE=\"habit\""
@@ -5256,14 +5257,16 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
   ;; Helper function to schedule the last day of the month.
   ;; usage: (my/end-of-month '(2 28 2017))
   ;; borrowed from https://emacs.stackexchange.com/questions/31683/schedule-org-task-for-last-day-of-every-month
-  (defun my/end-of-month (date)
+  (defun my/end-of-month (date &optional days-back)
     "Return `t` if DATE is the last day of the month."
     (let* ((day (calendar-extract-day date))
            (month (calendar-extract-month date))
            (year (calendar-extract-year date))
            (last-day-of-month
             (calendar-last-day-of-month month year)))
-      (= day last-day-of-month))))
+      (if days-back
+          (>= (+ day days-back) last-day-of-month)
+        (= day last-day-of-month)))))
 #+end_src
 
 #+begin_src emacs-lisp
