@@ -469,15 +469,9 @@ Add small wrappers so that I can launch intended browser as needed.
 #+begin_src emacs-lisp
 (use-package recentf
   :custom
-  (recentf-max-saved-items 100)
-  (recentf-exclude '("/org/roam/"))
+  (recentf-max-saved-items 200)
   :config
-
-  (add-to-list 'recentf-exclude
-               (lambda (file)
-                 (when (boundp 'org-agenda-files)
-                   (member file org-agenda-files))))
-
+  (add-to-list 'recentf-exclude "/org/roam/")
   (recentf-mode))
 #+end_src
 
@@ -5266,9 +5260,27 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
   (defun my/org-agenda-custom-view ()
     (interactive)
     (when (file-directory-p my/org-roam-project-root)
-      (org-agenda nil "d")))
+      (add-to-list 'recentf-exclude #'my/org-agenda-recentf-exclude)
+      (org-agenda nil "d")
+      (delete 'my/org-agenda-recentf-exclude recentf-exclude)))
 
-  (add-hook 'emacs-startup-hook 'my/org-agenda-custom-view)
+  (require 'seq)
+  (defun my/org-agenda-recentf-exclude (file)
+    (when (boundp 'org-agenda-files)
+      (not (null (seq-some (lambda (pat)
+                             (string-search (expand-file-name pat)
+                                            (expand-file-name file)))
+                           org-agenda-files)))))
+
+  (defun my/org-agenda-startup ()
+    (when
+        (and (not
+              (string-match-p "--\\(eval\\|batch\\|daemon\\)"
+                            (string-join command-line-args " ")))
+            (string= (buffer-name) "*scratch*"))
+      (my/org-agenda-custom-view)))
+
+  (add-hook 'emacs-startup-hook #'my/org-agenda-startup)
 
   ;; add org-roam-directory to consult-omni-notes's source list
   (with-eval-after-load 'consult-omni-notes
