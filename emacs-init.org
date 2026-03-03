@@ -4204,7 +4204,7 @@ https://github.com/anthropics/claude-code/issues/247#issuecomment-3058405139
           ("a" . 'ai-code-menu))
   :config
   ;; use codex as backend, other options are 'gemini, 'github-copilot-cli, 'opencode, 'grok, 'claude-code-ide, 'claude-code, 'cursor
-  (ai-code-set-backend 'github-copilot-cli)
+  (ai-code-set-backend 'codex)
   ;; Optional: Use eat if you prefer, by default it is vterm
   ;; (setq ai-code-backends-infra-terminal-backend 'eat) ;; for openai codex, github copilot cli, opencode, grok, cursor-cli; for claude-code-ide.el, you can check their config
   ;; Optional: Set up Magit integration for AI commands in Magit popups
