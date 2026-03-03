@@ -2661,10 +2661,36 @@ TBH I don't use this often.
 
 #+begin_src emacs-lisp
 (use-package treemacs
-  :bind (:map my/wm-map
-              ("T" . treemacs))
+  :disabled
+  :init
+  (define-prefix-command 'my/treemacs-map)
+  :bind-keymap ("C-C t" . my/treemacs-map)
+  :bind (:map my/treemacs-map
+              ("t" . treemacs)
+              ("d" . treemacs-select-directory))
+  :hook ((treemacs-mode . (lambda () (visual-line-mode -1))))
   :custom
   (treemacs-default-visit-action 'treemacs-visit-node-vertical-split))
+
+(use-package treemacs-magit
+  :disabled
+  :after (treemacs magit))
+
+(use-package treemacs-tab-bar
+  :disabled
+  :after (treemacs)
+  :config
+  (treemacs-set-scope-type 'Tabs))
+#+end_src
+
+**** Treemacs Nerd Icons
+
+#+begin_src emacs-lisp
+(use-package treemacs-nerd-icons
+  :disabled
+  :after (treemacs)
+  :config
+  (treemacs-load-theme "nerd-icons"))
 #+end_src
 
 ** Ace jump
@@ -3254,7 +3280,7 @@ fi
 
 #+begin_src emacs-lisp
 (use-package multi-term
-  :bind (("C-c t" . my/get-term))
+  :bind (("C-c T" . my/get-term))
   :custom
   (multi-term-dedicated-close-back-to-open-buffer-p nil)
   (multi-term-dedicated-select-after-open-p t)
