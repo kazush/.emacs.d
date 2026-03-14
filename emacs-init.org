@@ -3512,15 +3512,15 @@ Enable indent-tabs-mode for makefile mode.
 *** lsp-mode
 #+begin_src emacs-lisp
 (use-package lsp-mode
-  :hook
-  ((lsp-mode . (lambda ()
+  :hook ((lsp-mode . (lambda ()
                  (lsp-enable-which-key-integration)
-                 (define-key lsp-mode-map (kbd "C-c l") lsp-command-map))))
+                 (define-key lsp-mode-map (kbd "C-c l") lsp-command-map)))
+         (python-ts-mode . lsp))
   :commands (lsp lsp-register-client)
   :preface
-  ;; Use plists for emacs-lsp-booster
-  (setenv "LSP_USE_PLISTS" "true")
-  (setq lsp-use-plists t)
+  ;; ;; Use plists for emacs-lsp-booster
+  ;; (setenv "LSP_USE_PLISTS" "true")
+  ;; (setq lsp-use-plists t)
 
   :init
   (setq lsp-keymap-prefix (kbd "C-c l"))
@@ -3544,7 +3544,7 @@ Enable indent-tabs-mode for makefile mode.
               #'org-babel-edit-prep:python)
 
   ;; Enable config for emacs-lsp-booster
-  (when (file-exists-p "/usr/bin/emacs-lsp-booster")
+  (when (file-exists-p "~/bin/emacs-lsp-booster")
     (defun lsp-booster--advice-json-parse (old-fn &rest args)
       "Try to parse bytecode instead of json."
       (or
