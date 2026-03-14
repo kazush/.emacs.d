@@ -2120,18 +2120,6 @@ A new mode integrated in Emacs 30.
 #+end_src
 
 * Misc editing enhancements
-** Tramp
-
-*** consult-tramp
-
-#+begin_src emacs-lisp
-(use-package consult-tramp
-  :straight (consult-tramp
-             :type git
-             :host github
-             :repo "Ladicle/consult-tramp")
-  :bind ("C-q t" . consult-tramp))
-#+end_src
 ** Expand Region
 
 #+begin_src emacs-lisp
@@ -6356,16 +6344,7 @@ installed."
               ("C-c C-b" . obsidian-backlink-jump)))
 #+end_src
 
-* Docker / Containers
-** Docker Tramp
-#+begin_src emacs-lisp
-(use-package docker-tramp
-  :disabled
-  :after tramp
-  :custom
-  (docker-tramp-use-names t)
-  (docker-tramp-docker-executable "podman"))
-#+end_src
+
 * EXWM
 
 #+begin_src emacs-lisp
