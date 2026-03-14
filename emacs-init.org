@@ -471,7 +471,10 @@ Add small wrappers so that I can launch intended browser as needed.
   :custom
   (recentf-max-saved-items 200)
   :config
-  (add-to-list 'recentf-exclude "/org/roam/")
+  (setq recentf-exclude
+   (append recentf-exclude '("/org/roam/"
+                             "/.emacs.d/.cache/"
+                             "/.emacs.d/bookmarks")))
   (recentf-mode))
 #+end_src
 
