@@ -2132,16 +2132,20 @@ A new mode integrated in Emacs 30.
              :repo "Ladicle/consult-tramp")
   :bind ("C-q t" . consult-tramp))
 #+end_src
+** Expand Region
+
+#+begin_src emacs-lisp
+(use-package expreg
+  :bind (("C-=" . expreg-expand)
+         ("C--" . expreg-contract)))
+#+end_src
 
 ** Multiple Cursors
 
 *** multiple-cursors
 
-Being disabled for now in favor of macursors.
-
 #+begin_src emacs-lisp
 (use-package multiple-cursors
-  :disabled
   :diminish
   :bind (:map my/edit-map
               ("a" . mc/mark-all-dwim)
@@ -2149,7 +2153,6 @@ Being disabled for now in favor of macursors.
               ("r" . mc/mark-in-region-regexp))
   :commands (mc/mark-all-dwim mc/edit-lines))
 #+end_src
-
 
 *** iedit
 
