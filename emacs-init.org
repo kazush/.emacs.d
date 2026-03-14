@@ -2975,9 +2975,13 @@ return the same window."
     (if (my/shellish-buffer-p (car buflist) shellish-mode)
         (car buflist) (my/find-last-shellish-buffer (cdr buflist) shellish-mode))))
 
-(defvar my/shellish-use-tab-p t)
+(defvar my/shellish-use-tab-p nil)
 (defvar my/shellish-window-height .3)
 (defvar my/shellish-use-tab-per-buffer-alist nil)
+
+(defun my/shellish-set-window-height (&optional height)
+  (interactive "nHeight: ")
+  (setq my/shellish-window-height height))
 
 (defun my/shellish-get-use-tab-for-buffer (buf)
   (alist-get buf my/shellish-use-tab-per-buffer-alist my/shellish-use-tab-p nil 'string=))
@@ -3044,24 +3048,22 @@ return the same window."
      ((and (my/shellish-buffer-p cur-buf shellish-mode)
            (eq (my/shellish-get-use-tab-for-buffer (buffer-name cur-buf)) use-tab-p))
       `(display-buffer-same-window))
-     ;; ((my/shellish-buffer-p (current-buffer) shellish-mode)
-     ;;  `(display-buffer-same-window))
      (use-tab-p
-      ;; `(display-buffer-in-tab . ((tab-name . ,tab-name))))
-      `(
-        display-buffer-in-tab))
+      `(display-buffer-in-tab))
      (t
       `(display-buffer-at-bottom . ((window-height . ,my/shellish-window-height)))))))
 
-(defun my/shellish-display-buffer (buf &optional omni-display)
-  "Selectively switch to an existing window or tab displaying BUF-NAME."
-  (let* ((tab (tab-bar-get-buffer-tab buf)))
+(defun my/shellish-popup-buffer (buf)
+  "Popup shellish buffer BUF at a bottom with omni-display setting considered."
+  (let ((tab (tab-bar-get-buffer-tab buf (selected-frame)))
+        (omni-display (my/shellish-get-omni-display-for-buffer
+                        (buffer-name buf))))
     (if (or omni-display (not tab))
-         (select-window (display-buffer buf))
-       (tab-bar-switch-to-tab (alist-get 'name tab))
-       (let ((win (get-buffer-window buf)))
-         (when win
-           (select-window win))))))
+        (select-window (display-buffer buf))
+      (tab-bar-switch-to-tab (alist-get 'name tab))
+      (let ((win (get-buffer-window buf)))
+        (when win
+          (select-window win))))))
 
 (defun my/shellish-create-buffer (shellish-mode n)
   (let* ((buf-name (my/shellish-buffer-name shellish-mode n)))
@@ -3101,13 +3103,8 @@ return the same window."
          (use-tab-p (my/shellish-get-use-tab-for-buffer buf-name))
          (new-use-tab-p (xor use-tab-p use-tab-flipped))
          (create-new-buf-p (= arg 64))
-         (tab-name (my/shellish-tab-name shellish-mode))
-         (current-tab-name
-          (alist-get 'name (alist-get 'current-tab (tab-bar-tabs))))
-         (tab-exists-p (member tab-name
-                               (mapcar (lambda (e) (alist-get 'name e)) (tab-bar-tabs))))
-         (display-buffer-overriding-action (my/get-display-buffer-action-for-shellish
-                                            shellish-mode new-use-tab-p)))
+         (display-buffer-overriding-action
+          (my/get-display-buffer-action-for-shellish shellish-mode new-use-tab-p)))
     (cond
      ((or (not b) create-new-buf-p)
       (my/shellish-create-buffer shellish-mode new-buf-index))
@@ -3115,18 +3112,24 @@ return the same window."
       (when b
         (select-window (display-buffer b)))
       (call-interactively my/display-shellish-buffer-list))
-     ((eq b (current-buffer))
-      (if use-tab-p
-          ;; if current-tab is dedicated tab, close it.
-          (tab-close)
-        ;; if current buffer is shellish buffer, close it.
-        (condition-case err
-            (delete-window (get-buffer-window (current-buffer)))
-          (error
-           (switch-to-prev-buffer)))))
-     (b ;; switch to existing shellish buffer
-      (my/shellish-display-buffer b
-                                  (my/shellish-get-omni-display-for-buffer (buffer-name b)))))
+     (b
+      (let ((tab (tab-bar-get-buffer-tab b (selected-frame)))
+            (win (get-buffer-window b))
+            (buf-active-p (eq b (current-buffer))))
+        ;; Close shellish-buffer if it's current buffer or tab/window conf flipped.
+        (when (or buf-active-p use-tab-flipped)
+          (if use-tab-p
+              (if tab (tab-bar-close-tab-by-name (alist-get 'name tab)))
+            (if win
+                (condition-case err
+                    (delete-window win)
+                  (error
+                   (switch-to-prev-buffer))))))
+        ;; Show shellish buffer unless it was current buffer.
+        (unless (and buf-active-p (not use-tab-flipped))
+          (if new-use-tab-p
+              (my/switch-to-buffer-other-tab b)
+            (my/shellish-popup-buffer b))))))
     ;; update the use-tab-p flag for the next call.
     (my/shellish-set-use-tab-for-buffer buf-name new-use-tab-p)))
 #+end_src
