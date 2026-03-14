@@ -8024,6 +8024,18 @@ and stream is t."
   )
 #+end_src
 
+** chat tools
+
+*** telega
+
+#+begin_src emacs-lisp
+(use-package telega
+  :commands (telega)
+  :custom
+  (telega-use-docker t)
+  (telega-docker--user-id "0:0"))
+#+end_src
+
 * Emacs Application Framework
 
 #+begin_src emacs-lisp
