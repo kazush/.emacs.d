@@ -4347,7 +4347,7 @@ https://github.com/anthropics/claude-code/issues/247#issuecomment-3058405139
   :custom
   (copilot-chat-backend 'curl)
   (copilot-chat-frontend 'org)
-  (copilot-chat-commit-model "grok-code-fast-1") ;; "gpt-4o", "o1-preview"
+  (copilot-chat-commit-model "gpt-5-mini") ;; "gpt-4o", "o1-preview"
   )
 #+end_src
 
