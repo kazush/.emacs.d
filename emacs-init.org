@@ -2718,23 +2718,16 @@ TBH I don't use this often.
 
 #+begin_src emacs-lisp
 (use-package treemacs
-  :disabled
   :init
-  (define-prefix-command 'my/treemacs-map)
-  :bind-keymap ("C-C t" . my/treemacs-map)
-  :bind (:map my/treemacs-map
-              ("t" . treemacs)
-              ("d" . treemacs-select-directory))
-  :hook ((treemacs-mode . (lambda () (visual-line-mode -1))))
+  :bind (("C-c T" . treemacs-select-directory))
+  :hook ((treemacs-mode . (lambda () (setq-local truncate-lines t))))
   :custom
   (treemacs-default-visit-action 'treemacs-visit-node-vertical-split))
 
 (use-package treemacs-magit
-  :disabled
   :after (treemacs magit))
 
 (use-package treemacs-tab-bar
-  :disabled
   :after (treemacs)
   :config
   (treemacs-set-scope-type 'Tabs))
@@ -2744,7 +2737,6 @@ TBH I don't use this often.
 
 #+begin_src emacs-lisp
 (use-package treemacs-nerd-icons
-  :disabled
   :after (treemacs)
   :config
   (treemacs-load-theme "nerd-icons"))
