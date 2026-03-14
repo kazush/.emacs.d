@@ -2379,7 +2379,6 @@ Mostly borrowed from https://taipapamotohus.com/post/dired/.
 
 #+begin_src emacs-lisp
 (use-package dired+
-  :after dired
   :straight
   (dired+ :fetcher github :repo "emacsmirror/dired-plus")
   :init
@@ -2412,6 +2411,7 @@ Mostly borrowed from https://taipapamotohus.com/post/dired/.
 
 #+begin_src emacs-lisp
 (use-package dired-subtree
+  :disabled
   :after dired
   :bind (:map dired-mode-map
               ("I" . dired-insert-subdir)
@@ -2419,6 +2419,7 @@ Mostly borrowed from https://taipapamotohus.com/post/dired/.
               (";" . dired-subtree-remove)))
 
 (use-package dired-filter
+  :disabled
   :after dired
   :hook (dired-mode . dired-filter-mode)
   :bind ( :map dired-mode-map
@@ -2427,7 +2428,8 @@ Mostly borrowed from https://taipapamotohus.com/post/dired/.
           ("M" . dired-filter-mark-map)))
 
 (use-package dired-collapse
-  :after dired
+  :disabled
+  :after diredppp
   :hook (dired-mode . dired-collapse-mode))
 
 (use-package dired-open
@@ -2456,6 +2458,17 @@ Mostly borrowed from https://taipapamotohus.com/post/dired/.
             :category 'file
             :state (consult--file-preview)
             :history 'file-name-history))))
+#+end_src
+** Dirvish
+
+#+begin_src emacs-lisp
+(use-package dirvish
+  :bind (("C-c t" . dirvish-side)
+         :map dirvish-mode-map
+         ("i" . dirvish-toggle-subtree)
+         ("N" . dirvish-narrow))
+  :config
+  (dirvish-override-dired-mode))
 #+end_src
 
 ** Async
