@@ -3207,7 +3207,7 @@ config does not perfectly work.
   ;; Extensions
   (setq eshell-modules-list
         (append eshell-modules-list
-                '(eshell-smart eshell-elecslash)))
+                '(eshell-elecslash)))
 
   (defun my/eshell-setup-alias ()
     "add local alias config for eshell."
