@@ -8009,10 +8009,12 @@ and stream is t."
 
 #+begin_src emacs-lisp
 (use-package telega
-  :commands (telega)
+  :bind ( :map my/misc-map
+          ("t" . telega))
   :custom
   (telega-use-docker t)
-  (telega-docker--user-id "0:0"))
+  :config
+  (setq telega-docker--user-id "0:0"))
 #+end_src
 
 * Emacs Application Framework
