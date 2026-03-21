@@ -4595,17 +4595,32 @@ Use pyvenv package to simply support virtualenv.
 
 #+begin_src emacs-lisp
 (use-package pyvenv
-  :hook (after-init . my/pyvenv-setup)
+  :hook ((after-init . my/pyvenv-setup)
+         (python-ts-mode . my/pyvenv-activate))
   :config
   (defun my/pyvenv-activate ()
     "Activate venv at buffer's default directory or home directory."
     (interactive)
-    (let ((venv-dir (file-name-concat default-directory ".venv")))
-      (pyvenv-activate (if (file-directory-p venv-dir) venv-dir "~/.venv"))))
+    (let ((current-dir default-directory))
+      (while (and current-dir
+                  (not (file-directory-p (expand-file-name ".venv" current-dir))))
+        (setq current-dir (file-name-parent-directory current-dir)))
+      (when current-dir
+        (let ((venv-dir (expand-file-name ".venv" current-dir)))
+          (message "Activating venv with %s" venv-dir)
+          (pyvenv-activate venv-dir)))))
 
   (defun my/pyvenv-setup ()
     (require 'esh-mode)  ;; for eshell-mode-map
     (pyvenv-tracking-mode 1)))
+#+end_src
+
+*** uv
+
+#+begin_src emacs-lisp
+(use-package uv
+  :straight (uv :type git :host github :repo "johannes-mueller/uv.el")
+  :commands (uv-activate-venv))
 #+end_src
 
 ** Go
