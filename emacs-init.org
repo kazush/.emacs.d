@@ -1286,7 +1286,8 @@ goggles is now used instead of volatile-highlights.
   (defun my/switch-to-buffer-other-tab (&optional buf)
     "Switch to an existing tab if the buffer already exists or to a new tab."
     (interactive)
-    (let* ((buf (or buf
+    (let* ((prefix (prefix-numeric-value current-prefix-arg))
+           (buf (or buf
                     (get-buffer
                      (consult--read (mapcar #'buffer-name (consult--buffer-query))
                                     :category 'buffer
@@ -1297,13 +1298,17 @@ goggles is now used instead of volatile-highlights.
                                     :sort nil))))
            (win (get-buffer-window buf))
            (tab (tab-bar-get-buffer-tab buf (selected-frame))))
-      (if tab
-          (progn
-            (tab-bar-select-tab-by-name (alist-get 'name tab))
-            (if win
-                (select-window win)
-              (switch-to-buffer buf)))
-        (switch-to-buffer-other-tab buf))))
+      (cond
+       ((= prefix 4)
+        (switch-to-buffer buf))
+       (t
+        (if tab
+            (progn
+              (tab-bar-select-tab-by-name (alist-get 'name tab))
+              (if win
+                  (select-window win)
+                (switch-to-buffer buf)))
+          (switch-to-buffer-other-tab buf))))))
 
   (defun my/find-file-other-tab (filename &optional wildcards)
     "Edit file FILENAME, in another tab.
