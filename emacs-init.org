@@ -7717,6 +7717,9 @@ and stream is t."
     (elfeed-db-set-update-time)
     (elfeed-search-update--force))
 
+  (advice-add #'elfeed-search-quit-window :before
+              (lambda () (my/elfeed-update-inmemory-db 30)))
+
   ;; For async update with emacsclient --eval.
   (defun my/elfeed-update-async ()
     "Update elfeed feeds in a headless way."
