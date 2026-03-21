@@ -7553,7 +7553,7 @@ and stream is t."
   :commands (gptel-mcp-dispatch))
 #+end_src
 
-* Internet Information and Media Tools
+* Web Search and Media Tools
 ** elfeed
 
 #+begin_src emacs-lisp
@@ -8069,6 +8069,31 @@ and stream is t."
   (telega-use-docker t)
   :config
   (setq telega-docker--user-id "0:0"))
+#+end_src
+
+** embr
+
+#+begin_src emacs-lisp
+(use-package embr
+  :disabled
+  :defer t
+  :straight (:host github
+             :repo "emacs-os/embr.el"
+             :files ("*.el" "*.py" "*.sh" "native/*.c" "native/Makefile"))
+  :commands (embr-browse)
+  :config
+  (setq embr-hover-rate 30
+        embr-default-width 1280
+        embr-default-height 720
+        embr-screen-width 1920
+        embr-screen-height 1080
+        embr-color-scheme 'dark
+        embr-search-engine 'google
+        embr-scroll-method 'instant
+        embr-scroll-step 100
+        embr-frame-source 'screencast
+        embr-render-backend 'default
+        embr-display-method 'headless))
 #+end_src
 
 * Emacs Application Framework
