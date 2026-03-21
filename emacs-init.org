@@ -2061,6 +2061,17 @@ A new mode integrated in Emacs 30.
   (setq lsp-yaml-schemas '((Kubernetes . "*k8s*/*.yaml"))))
 #+end_src
 
+** TOML
+
+#+begin_src emacs-lisp
+(use-package toml-ts-mode
+  :straight (:type built-in)
+  :mode ("\\.toml\\'" . toml-ts-mode)
+  :config
+  (unless (treesit-language-available-p 'toml)
+    (treesit-install-language-grammar 'toml)))
+#+end_src
+
 ** Markdown
 
 #+begin_src emacs-lisp
