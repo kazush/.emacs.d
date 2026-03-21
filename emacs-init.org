@@ -4253,8 +4253,28 @@ https://github.com/anthropics/claude-code/issues/247#issuecomment-3058405139
   :bind ( :map my/ai-map
           ("A" . my/agent-shell-map)
           :map my/agent-shell-map
-          ("g" . agent-shell-google-start-gemini)))
+          ("a" . agent-shell-anthropic-start-claude-code)
+          ("c" . agent-shell-openai-start-codex)
+          ("g" . agent-shell-google-start-gemini))
+  :custom
+  (agent-shell-session-strategy 'new)
+  :config
+  (setq agent-shell-openai-authentication
+        (agent-shell-openai-make-authentication :login t))
+  (setq agent-shell-anthropic-authentication
+        (agent-shell-anthropic-make-authentication
+         :api-key (my/get-zai-api-key)))
+  (setq agent-shell-anthropic-claude-environment
+        (agent-shell-make-environment-variables
+         "ANTHROPIC_BASE_URL" "https://api.z.ai/api/anthropic"
+         "API_TIMEOUT_MS" "3000000"
+         "ANTHROPIC_DEFAULT_OPUS_MODEL" "glm-4.7"
+         "ANTHROPIC_DEFAULT_SONNET_MODEL" "glm-4.7"
+         "ANTHROPIC_DEFAULT_HAIKU_MODEL" "glm-4.7"
+         "ANTHROPIC_MODEL" "glm-4.7"
+         "ANTHROPIC_SMALL_FAST_MODEL" "glm-4.5-air")))
 #+end_src
+
 *** ai-code
 
 #+begin_src emacs-lisp
