@@ -7596,6 +7596,7 @@ and stream is t."
          ("<f12>" . my/elfeed)
          :map elfeed-search-mode-map
          ("<mouse-1>" . elfeed-search-show-entry)
+         ("w" . my/elfeed-db-save)
          ("S" . my/elfeed-search-toggle-sort)
          ("b" . my/elfeed-search-browse-url-with-eww)
          ("B" . elfeed-search-browse-url)
@@ -7753,6 +7754,11 @@ and stream is t."
 
   (advice-add #'elfeed-search-quit-window :before
               (lambda () (my/elfeed-update-inmemory-db 30)))
+
+  (defun my/elfeed-db-save ()
+    (interactive)
+    (when (yes-or-no-p "reall save DB? ")
+      (elfeed-db-save)))
 
   ;; For async update with emacsclient --eval.
   (defun my/elfeed-update-async ()
