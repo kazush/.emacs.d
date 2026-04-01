@@ -1266,10 +1266,10 @@ goggles is now used instead of volatile-highlights.
 
 #+begin_src emacs-lisp
 (use-package tab-bar
-  :bind (("C-x C-f" . my/find-file-other-tab)
+  :bind (("C-x C-f" . my/find-file)
          ("C-x k" . my/tab-bar-kill-buffer-and-window-or-tab)
          ("C-x K" . kill-buffer)
-         ("C-x b" . my/switch-to-buffer-other-tab)
+         ("C-x b" . my/switch-to-buffer)
          :map tab-prefix-map
          ("C-b" . tab-bar-switch-to-tab)
          ("C-n" . tab-next)
@@ -1296,6 +1296,40 @@ goggles is now used instead of volatile-highlights.
   (defun my/switch-to-buffer-other-tab (&optional buf)
     "Switch to an existing tab if the buffer already exists or to a new tab."
     (interactive)
+    (let* ((buf (or buf
+                    (get-buffer
+                     (consult--read (mapcar #'buffer-name (consult--buffer-query))
+                                    :category 'buffer
+                                    :require-match
+                                    (confirm-nonexistent-file-or-buffer)
+                                    :prompt "Switch to: "
+                                    :history 'consult--buffer-history
+                                    :sort nil))))
+           (tab (tab-bar-get-buffer-tab buf (selected-frame))))
+      (if tab
+          (progn
+            (tab-bar-select-tab-by-name (alist-get 'name tab))
+            (let ((win (get-buffer-window buf)))
+              (if win
+                  (select-window win)
+                (switch-to-buffer buf))))
+        (switch-to-buffer-other-tab buf))))
+
+  (defun my/display-buffer (buf)
+    "Display BUF via display-buffer, with a control with prefix."
+    (let* ((prefix (prefix-numeric-value current-prefix-arg)))
+      (cond
+       ((= prefix 4)
+        (my/switch-to-buffer-other-tab buf))
+       ((= prefix 16)
+        (display-buffer-at-bottom buf '()))
+       (t
+        (display-buffer buf)))
+      (select-window (get-buffer-window buf))))
+
+  (defun my/switch-to-buffer (&optional buf)
+    "Switch to an existing tab if the buffer already exists or to a new tab."
+    (interactive)
     (let* ((prefix (prefix-numeric-value current-prefix-arg))
            (buf (or buf
                     (get-buffer
@@ -1305,25 +1339,11 @@ goggles is now used instead of volatile-highlights.
                                     (confirm-nonexistent-file-or-buffer)
                                     :prompt "Switch to: "
                                     :history 'consult--buffer-history
-                                    :sort nil))))
-           (win (get-buffer-window buf))
-           (tab (tab-bar-get-buffer-tab buf (selected-frame))))
-      (cond
-       ((= prefix 4)
-        (switch-to-buffer buf))
-       (t
-        (if tab
-            (progn
-              (tab-bar-select-tab-by-name (alist-get 'name tab))
-              (if win
-                  (select-window win)
-                (switch-to-buffer buf)))
-          (switch-to-buffer-other-tab buf))))))
+                                    :sort nil)))))
+      (my/display-buffer buf)))
 
-  (defun my/find-file-other-tab (filename &optional wildcards)
-    "Edit file FILENAME, in another tab.
-Like \\[find-file-other-frame] (which see), but creates a new tab.
-Interactively, prompt for FILENAME.
+  (defun my/find-file (filename &optional wildcards)
+    "Visit file FILENAME using display-buffer.
 If WILDCARDS is non-nil, FILENAME can include widcards, and all matching
 files will be visited."
     (interactive
@@ -1333,10 +1353,10 @@ files will be visited."
       (if (listp value)
           (progn
             (setq value (nreverse value))
-            (my/switch-to-buffer-other-tab (car value))
+            (my/display-buffer (car value))
             (mapc #'switch-to-buffer (cdr value))
             value)
-        (my/switch-to-buffer-other-tab value))))
+        (my/display-buffer value))))
 
   (defun my/tab-bar-kill-buffer-and-tab ()
     "Kill current buffer and its tab."
@@ -1631,8 +1651,8 @@ vertico and related packages are used for completion framework.
              :history 'file-name-history))
            (value (find-file-noselect filename nil nil nil)))
       (if (listp value)
-          (mapcar 'display-buffer (nreverse value))
-        (let ((win (display-buffer value)))
+          (mapcar 'my/display-buffer (nreverse value))
+        (let ((win (my/display-buffer value)))
           (when win
             (select-window win))))))
 
