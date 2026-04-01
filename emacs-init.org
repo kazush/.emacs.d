@@ -935,6 +935,16 @@ Currently it is disabled as I don't want to build emacs-mozc on Arch.
                       :foreground "#c0c0c0" :background "RoyalBlue4"))
 #+end_src
 
+*** mozc-modeless
+
+#+begin_src emacs-lisp
+(use-package mozc-modeless
+  :straight (:type git :host github :repo "kiyoka/mozc-modeless-emacs")
+  :after mozc
+  :config
+  (global-mozc-modeless-mode 1))
+#+end_src
+
 ** Misc input tweaks
 
 #+begin_src emacs-lisp
