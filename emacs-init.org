@@ -1371,6 +1371,14 @@ files will be visited."
         (kill-buffer-and-window)
       (my/tab-bar-kill-buffer-and-tab)))
 
+  (defun my/tab-bar-close-duplicate-tabs (&optional buf)
+    "Close duplicate tabs."
+    (interactive)
+    (let* ((buf (or buf (current-buffer)))
+           (tabs (tab-bar-get-buffer-tab buf nil t t)))
+      (dolist (tab tabs)
+        (tab-bar-close-tab (1+ (alist-get 'index tab))))))
+
   ;; Create shortcuts for switching to a specified tab.
   (dotimes (num 9 t)
     (fset (intern (format "my/tab-bar-switch-to-%d" (1+ num)))
