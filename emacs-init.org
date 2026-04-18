@@ -1321,8 +1321,10 @@ goggles is now used instead of volatile-highlights.
     (let* ((prefix (prefix-numeric-value current-prefix-arg)))
       (cond
        ((= prefix 4)
-        (my/switch-to-buffer-other-tab buf))
+        (switch-to-buffer buf))
        ((= prefix 16)
+        (my/switch-to-buffer-other-tab buf))
+       ((= prefix 64)
         (display-buffer-at-bottom buf '()))
        (t
         (display-buffer buf)))
@@ -1363,7 +1365,8 @@ files will be visited."
     "Kill current buffer and its tab."
     (interactive)
     (when (kill-buffer)
-      (tab-close)))
+      (if (> (length (tab-bar-tabs (selected-frame))) 1)
+          (tab-close))))
 
   (defun my/tab-bar-kill-buffer-and-window-or-tab ()
     "Kill current buffer and its associated window or tab if there is a single window in the tab."
@@ -1642,6 +1645,34 @@ vertico and related packages are used for completion framework.
        :initial (if (use-region-p)
                     (buffer-substring (region-beginning) (region-end))
                   (thing-at-point 'symbol)))))
+
+  (defun my/consult-buffer (name items)
+    (interactive)
+    (cond
+     ((null items)
+      (message "no buffers specified"))
+     ((eq (length items) 1)
+      (message "switching to %s" (car items))
+      (my/switch-to-buffer (car items)))
+     (t
+      (consult-buffer `(( :name ,name
+                          :hidden nil
+                          :narrow ?s
+                          :category buffer
+                          :face consult-buffer
+                          :state ,#'consult--buffer-state
+                          :items ,items))))))
+
+  (defun my/consult-mode-buffer (&optional mode)
+    (interactive)
+    (let ((mode (or mode major-mode)))
+      (my/consult-buffer (format "%s buffers" (symbol-name mode))
+                         (consult--buffer-query
+                          :sort 'visibility
+                          :as #'buffer-name
+                          :predicate
+                          (lambda (buf) (with-current-buffer buf
+                                          (eq major-mode mode)))))))
 
   (defun my/consult-recent-file ()
     "Find recent file using `completing-read'."
@@ -2898,7 +2929,7 @@ the two windows.
 (setq window-combination-resize t)
 (setq split-width-threshold 80)
 
-(defvar my/dba-min-windows 3)
+(defvar my/max-windows-per-frame 3)
 (defvar my/split-window-horizontally-min-width 72)
 (defun my/display-buffer-fallback-action (buf alist)
   "Return a window to display buffer BUF.  ALIST is not used.
@@ -2910,20 +2941,27 @@ return the same window."
          (min-frame-width
           (* (+ num-windows 1)
              my/split-window-horizontally-min-width))
+         (current-window (selected-window))
          (win (get-buffer-window buf))
+         ;; Override split-width/height-threshold to forcibly
+         ;; split the preferred direction.
          (split-width-threshold
-          (if (>= (frame-width) min-frame-width) 0 nil))
+          (if (>= (frame-width) min-frame-width) 1 nil))
          (split-height-threshold
-          (if (< (frame-width) min-frame-width) 0 nil)))
+          (if (< (frame-width) min-frame-width) 1 nil)))
     (cond
      (win win)
-     ((or (< num-windows my/dba-min-windows))
-      (display-buffer-pop-up-window buf alist))
      ((not (buffer-file-name buf))  ;; maybe transient buffer
-      (display-buffer-use-some-window buf alist))
+      (display-buffer-at-bottom buf alist))
+     ((< num-windows my/max-windows-per-frame)
+      (if (>= (frame-width) min-frame-width)
+          (progn
+            (split-window-right)
+            (display-buffer-same-window buf alist))
+        (display-buffer-pop-up-window buf alist)))
      (t (or
-         (display-buffer-in-previous-window buf alist)
          (display-buffer-same-window buf alist)
+         (display-buffer-in-previous-window buf alist)
          (display-buffer-reuse-mode-window buf alist))))))
 
 (setq display-buffer-fallback-action
@@ -3019,7 +3057,7 @@ return the same window."
         (car buflist) (my/find-last-shellish-buffer (cdr buflist) shellish-mode))))
 
 (defvar my/shellish-use-tab-p nil)
-(defvar my/shellish-window-height .3)
+(defvar my/shellish-window-height .5)
 (defvar my/shellish-use-tab-per-buffer-alist nil)
 
 (defun my/shellish-set-window-height (&optional height)
