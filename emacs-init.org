@@ -2315,41 +2315,48 @@ Adding some config for project.el instead.
 ** Project
 
 #+begin_src emacs-lisp
-(use-package project
-  :straight (:type built-in)
-  :bind (:map project-prefix-map
-              ("d" . #'my/project-dirvish)
-              ("f" . #'my/project-find-file)
-              ("e" . #'my/project-eshell)
-              ("v" . #'my/project-vterm))
-  :custom
-  (project-switch-commands '((my/project-dirvish "dirvish")
-                             (my/project-find-file "Find File")
-                             (my/project-eshell "eshell")
-                             (my/project-vterm "vterm")))
-  :config
-  (defun my/project-vterm (&optional arg)
-    (interactive "p")
-    (let ((default-directory (project-root (project-current t)))
-          (buf-name (project-prefixed-buffer-name "vterm")))
-      (vterm buf-name)))
+  (use-package project
+    :straight (:type built-in)
+    :bind (:map project-prefix-map
+                ("d" . #'my/project-dirvish)
+                ("f" . #'my/project-find-file)
+                ("e" . #'my/project-eshell)
+                ("v" . #'my/project-vterm)
+                ("g" . #'my/project-ghostel))
+    :custom
+    (project-switch-commands '((my/project-dirvish "dirvish")
+                               (my/project-find-file "Find File")
+                               (my/project-eshell "eshell")
+                               (my/project-vterm "vterm")
+                               (my/project-ghostel "ghostel")))
+    :config
+    (defun my/project-ghostel ()
+      (interactive)
+      (let ((default-directory (project-root (project-current t))))
+        (ghostel)))
 
-  (defun my/project-eshell ()
-    (interactive)
-    (let ((display-buffer-overriding-action
-           '(display-buffer-in-tab)))
-      (project-eshell)))
+    (defun my/project-vterm (&optional arg)
+      (interactive "p")
+      (let ((default-directory (project-root (project-current t)))
+            (buf-name (project-prefixed-buffer-name "vterm")))
+        (vterm buf-name)))
 
-  (defun my/project-dirvish ()
-    (interactive)
-    (let ((default-directory (project-root (project-current t))))
-      (dirvish-side)))
+    (defun my/project-eshell ()
+      (interactive)
+      (let ((display-buffer-overriding-action
+             '(display-buffer-in-tab)))
+        (project-eshell)))
 
-  (defun my/project-find-file ()
-    (interactive)
-    (let ((display-buffer-overriding-action
-           '(display-buffer-in-tab)))
-      (project-find-file))))
+    (defun my/project-dirvish ()
+      (interactive)
+      (let ((default-directory (project-root (project-current t))))
+        (dirvish-side)))
+
+    (defun my/project-find-file ()
+      (interactive)
+      (let ((display-buffer-overriding-action
+             '(display-buffer-in-tab)))
+        (project-find-file))))
 #+end_src
 
 ** auto-sudoedit
