@@ -821,11 +821,12 @@ prefix. This way which-key will be more useful.
   (my/switch-to-buffer-other-tab (get-scratch-buffer-create)))
 (define-key tab-prefix-map "s" #'my/switch-to-scratch-tab)
 
-;; Change key translation map
-;; - bind function of C-? (DEL) to C-h
-;; - bind function of C-h (help) to C-]
-(define-key key-translation-map [?\C-h] [?\C-?])
-(define-key key-translation-map [?\C-\]] [?\C-h])
+;; Use C-h as DEL/BS and C-] as C-h (help-command).
+;; key-trsnslate is now used to make C-h (translated to DEl/BS) work with ghostel.
+;; (define-key key-translation-map (kbd "C-h") (kbd "DEL"))
+;; (define-key key-translation-map (kbd "C-]") (kbd "C-h"))
+(key-translate "C-h" "<backspace>")
+(key-translate "C-]" "C-h")
 
 ;; ibuffer
 (global-set-key (kbd "C-x C-b") 'ibuffer)
@@ -3449,6 +3450,32 @@ Yet another terminal emulator. Trying out now.
   (defun my/get-eat (arg)
     (interactive "p")
     (my/shellish-toggle-buffer arg 'eat-mode)))
+#+end_src
+
+** Ghostel
+
+#+begin_src emacs-lisp
+(use-package ghostel
+  :straight (:type git :host github :repo "dakra/ghostel" :files ("*.el" "etc"))
+  :bind (("C-c g" . my/ghostel))
+  ;; Comment out as key-translate is now used instead of define-key key-translation-map.
+  ;; :hook ((ghostel-mode . my/ghostel-setup-keymap))
+  :custom
+  (ghostel-keymap-exceptions
+   '("C-c" "C-x" "C-u" "C-h" "C-]" "C-g" "C-z" "M-x" "M-o" "M-:" "C-\\"))
+  :config
+  (defun my/ghostel ()
+    (interactive)
+    (let ((prefix (prefix-numeric-value current-prefix-arg)))
+      (cond
+       ((= prefix 4)
+        (my/consult-mode-buffer 'ghostel-mode))
+       (t
+        (ghostel)))))
+
+  (defun my/ghostel-setup-keymap ()
+    (key-translate "C-h" "<backspace>")
+    (key-translate "C-]" "C-h")))
 #+end_src
 
 * Software Development
