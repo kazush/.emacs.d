@@ -825,8 +825,9 @@ prefix. This way which-key will be more useful.
 ;; key-trsnslate is now used to make C-h (translated to DEl/BS) work with ghostel.
 ;; (define-key key-translation-map (kbd "C-h") (kbd "DEL"))
 ;; (define-key key-translation-map (kbd "C-]") (kbd "C-h"))
-(key-translate "C-h" "<backspace>")
-(key-translate "C-]" "C-h")
+(defun my/setup-keymap ()
+  (key-translate "C-h" "<backspace>")
+  (key-translate "C-]" "C-h"))
 
 ;; ibuffer
 (global-set-key (kbd "C-x C-b") 'ibuffer)
@@ -989,6 +990,7 @@ new emacsclient is connected hence ~server-after-make-frame-hook~ is set here.
   ;; (menu-bar-mode -1)
   ;; (tool-bar-mode -1)
   (my/setup-faces)
+  (my/setup-keymap)
   (when window-system
     ;; (scroll-bar-mode -1)
     ;; (fringe-mode 10)
@@ -3504,8 +3506,6 @@ Yet another terminal emulator. Trying out now.
 (use-package ghostel
   :straight (:type git :host github :repo "dakra/ghostel" :files ("*.el" "etc"))
   :bind (("C-c g" . my/ghostel))
-  ;; Comment out as key-translate is now used instead of define-key key-translation-map.
-  ;; :hook ((ghostel-mode . my/ghostel-setup-keymap))
   :custom
   (ghostel-keymap-exceptions
    '("C-c" "C-x" "C-u" "C-h" "C-]" "C-g" "C-z" "M-x" "M-o" "M-:" "C-\\"))
@@ -3517,11 +3517,7 @@ Yet another terminal emulator. Trying out now.
        ((= prefix 4)
         (my/consult-mode-buffer 'ghostel-mode))
        (t
-        (ghostel)))))
-
-  (defun my/ghostel-setup-keymap ()
-    (key-translate "C-h" "<backspace>")
-    (key-translate "C-]" "C-h")))
+        (ghostel))))))
 #+end_src
 
 * Software Development
