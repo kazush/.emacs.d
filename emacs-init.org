@@ -4609,7 +4609,7 @@ A fork of aider.el that seems to have better integration with Emacs.
 #+begin_src emacs-lisp
 (use-package jupyter
   :custom
-  (jupyter-use-zmq nil)
+  (jupyter-use-zmq t)
   :commands (my/setup-jupyter)
   :config
   ;; Override jupyter-python in org-src-lang-modes.
