@@ -4637,8 +4637,11 @@ A fork of aider.el that seems to have better integration with Emacs.
 
 ** Structural Editing
 
+Disabled as emacs got stuck while it was readong a large json file.
+
 #+begin_src emacs-lisp
 (use-package combobulate-setup
+  :disabled
   :straight (:type git :host github :repo "mickeynp/combobulate"
                    :nonrecursive t)
   :hook (prog-mode . combobulate-mode)
