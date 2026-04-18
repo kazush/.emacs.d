@@ -2436,7 +2436,8 @@ Note that jit-spell only works well with aspell as aspell wisely ignores Japanes
     (file-template-mapping-alist
      '(;; ("\\.org$" . "template.org")
        ("\\.mqh$" . "template.mqh")
-       ("\\.mq5$" . "template.mq5")))
+       ("\\.mq5$" . "template.mq5")
+       ("\\.sh$" . "template.sh")))
     :config
     (add-hook 'find-file-not-found-functions #'file-template-find-file-not-found-hook)))
 #+end_src
