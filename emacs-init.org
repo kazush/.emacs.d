@@ -5288,7 +5288,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
       (cond
        ;; Return timestamp if exists
        (timestamp
-        (format "🗓%s" (funcall format-date timestamp)))
+        (format "📅%s" (funcall format-date timestamp)))
        ;; Return combined scheduled and deadline if both exist
        ((and scheduled deadline) 
         (format "🕛%s⏰%s"
@@ -5306,7 +5306,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
   ;; Set up category icons using Noto Color Emoji.
 
   (defvar my/org-agenda-category-emoji-icon-alist
-    '(("gcal" . "🗓")
+    '(("gcal" . "📅")
       ("task" . "✅")
       ("journal" . "📃")
       ("Holiday" . "🎌")
