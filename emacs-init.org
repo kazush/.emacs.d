@@ -4658,6 +4658,14 @@ Disabled as emacs got stuck while it was readong a large json file.
   (define-key combobulate-python-map (kbd "C-c u e") combobulate-python-envelope-map))
 #+end_src
 
+** Containers
+
+#+begin_src emacs-lisp
+(use-package dockerfile-ts-mode
+  :straight (:type built-in)
+  :mode ("Dockerfile.*\\'" "Containerfile.*\\'"))
+#+end_src
+
 * Programming language modes
 ** C++
 
