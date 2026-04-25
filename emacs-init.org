@@ -2365,6 +2365,7 @@ Adding some config for project.el instead.
 
 #+begin_src emacs-lisp
 (use-package auto-sudoedit
+  :disabled
   :diminish
   :custom
   (auto-sudoedit-ask t)
@@ -4134,6 +4135,15 @@ Currentl disabled as I'm trying out diff-hl.
                 (sit-for 0.1)
                 (git-gutter:clear))
      :color blue)))
+#+end_src
+
+** GitHub
+*** Remoto.el
+
+#+begin_src emacs-lisp
+(use-package remoto
+  :straight (:host github :repo "agzam/remoto.el")
+  :demand t)
 #+end_src
 
 ** Debugging
