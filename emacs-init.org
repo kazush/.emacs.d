@@ -2938,10 +2938,10 @@ the two windows.
 (setq fit-window-to-buffer-horizontally t)
 (setq window-resize-pixelwise t)
 (setq window-combination-resize t)
-(setq split-width-threshold 80)
+(setq split-width-threshold 100)
 
-(defvar my/max-windows-per-frame 3)
-(defvar my/split-window-horizontally-min-width 72)
+(defvar my/max-windows-per-frame 2)
+(defvar my/split-window-horizontally-min-width 100)
 (defun my/display-buffer-fallback-action (buf alist)
   "Return a window to display buffer BUF.  ALIST is not used.
 
