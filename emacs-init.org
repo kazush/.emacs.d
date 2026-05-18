@@ -4143,7 +4143,7 @@ Currentl disabled as I'm trying out diff-hl.
 #+begin_src emacs-lisp
 (use-package remoto
   :straight (:host github :repo "agzam/remoto.el")
-  :demand t)
+  :commands (remoto-browse))
 #+end_src
 
 ** Debugging
