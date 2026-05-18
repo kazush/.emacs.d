@@ -6932,8 +6932,9 @@ Macros to retrive API keys for LLM servce providers.
     (sambanova :auth-source "sambanova-api-key")
     (huggingface :auth-source "huggingface-api-key")
     (deepl :auth-source "deepl-api-key")
-    (zai :auth-source "zai-api-key")
-    (nvidia :auth-source "nvidia-api-key")))
+    (zai :auth-source "zai-api-key" :envvar "ZAI_API_KEY")
+    (nvidia :auth-source "nvidia-api-key")
+    (opencode :auth-source "opencode-api-key" :envvar "OPENCODE_API_KEY")))
 
 ;; Generate my/get-<provider>-api-key function
 (dolist (conf my/llm-provider-alist)
@@ -7054,6 +7055,12 @@ Macros to retrive API keys for LLM servce providers.
       :key (my/get-huggingface-api-key)
       ,@args))
 
+  (defmacro my/make-llm-opencode (&rest args)
+    `(make-llm-openai-compatible
+      :url "https://opencode.ai/zen/go/v1/"
+      :key (my/get-opencode-api-key)
+      ,@args))
+
   (defmacro my/make-llm-openrouter (&rest args)
     `(make-llm-openai-compatible
       :url "https://openrouter.ai/api/v1/"
@@ -7098,6 +7105,12 @@ Macros to retrive API keys for LLM servce providers.
                                          :chat-model "gemini-3-pro-image-preview"))
             ("groq-gpt-oss-120b" . (my/make-llm-groq
                                     :chat-model "openai/gpt-oss-120b"))
+            ("opencode-kimi-k2.6" . (my/make-llm-opencode
+                                     :chat-model "kimi-k2.6"))
+            ("opencode-deepseek-v4-pro" . (my/make-llm-opencode
+                                     :chat-model "deepseek-v4-pro"))
+            ("opencode-deepseek-v4-flash" . (my/make-llm-opencode
+                                     :chat-model "deepseek-v4-flash"))
             ("openrouter-mimo-v2-flash" . (my/make-llm-openrouter
                                      :chat-model "xiaomi/mimo-v2-flash"))
             ("openrouter-glm-4.5-air" . (my/make-llm-sambanova
@@ -7309,6 +7322,27 @@ Macros to retrive API keys for LLM servce providers.
     :key #'my/get-deepseek-api-key
     :models '(deepseek-chat
               deepseek-reasoner))
+
+  (gptel-make-openai "OpenCode"
+    :host "opencode.ai"
+    :endpoint "/zen/go/v1/chat/completions"
+    :stream t
+    :key #'my/get-opencode-api-key
+    :models '(glm-5.1
+              kimi-k2.5
+              kimi-k2.6
+              deepseek-v4-flash
+              deepseek-v4-pro
+              qwen-3.5-plus
+              qwen-3.6-plus))
+
+  (gptel-make-openai "OpenCode-Minimax"
+    :host "opencode.ai"
+    :endpoint "/zen/go/v1/messages"
+    :stream t
+    :key #'my/get-opencode-api-key
+    :models '(minimax-m2.5
+              minimax-m2.7))
 
   (gptel-make-openai "OpenRouter"
     :host "openrouter.ai"
