@@ -3505,7 +3505,7 @@ Yet another terminal emulator. Trying out now.
 
 #+begin_src emacs-lisp
 (use-package ghostel
-  :straight (:type git :host github :repo "dakra/ghostel" :files ("*.el" "etc"))
+  :straight (:type git :host github :repo "dakra/ghostel" :files ("lisp/*.el" "etc"))
   :bind (("C-c g" . my/ghostel))
   :custom
   (ghostel-keymap-exceptions
@@ -6560,7 +6560,6 @@ installed."
               ("C-c C-b" . obsidian-backlink-jump)))
 #+end_src
 
-
 * EXWM
 
 #+begin_src emacs-lisp
@@ -7773,7 +7772,7 @@ and stream is t."
               (lambda () (delete-window)))
   ;; Close the other windows when elfeed-entry buffer is opened.
   (advice-add #'elfeed-search-show-entry :before
-              (lambda (entry) (delete-other-windows)))
+              (lambda (entry &optional preview) (delete-other-windows)))
 
   (defun my/elfeed-eww-scroll-up-then-quit (&optional arg)
     "Scroll up then kill eww buffer and window if at the bottom."
@@ -7879,7 +7878,7 @@ and stream is t."
           (when entry-in-db
             (elfeed-untag entry-in-db 'unread)))))
     (elfeed-db-set-update-time)
-    (elfeed-search-update--force))
+    (elfeed-search-update))
 
   (advice-add #'elfeed-search-quit-window :before
               (lambda () (my/elfeed-update-inmemory-db 30)))
