@@ -3505,7 +3505,7 @@ Yet another terminal emulator. Trying out now.
 
 #+begin_src emacs-lisp
 (use-package ghostel
-  :straight (:type git :host github :repo "dakra/ghostel" :files ("*.el" "etc"))
+  :straight (:type git :host github :repo "dakra/ghostel" :files ("lisp/*.el" "etc"))
   :bind (("C-c g" . my/ghostel))
   :custom
   (ghostel-keymap-exceptions
