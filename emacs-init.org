@@ -5705,6 +5705,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
          ("C-c n l" . org-roam-buffer-toggle)
          ("C-c n t a" . org-roam-tag-add)
          ("C-c n t r" . org-roam-tag-remove)
+         ("C-c o p c" . my/org-roam-project-capture-custom)
          ("C-c o p j" . my/org-roam-project-capture-journal)
          ("C-c o p t" . my/org-roam-project-capture-task)
          ("C-c o j" . my/org-roam-personal-capture-journal)
@@ -5824,6 +5825,31 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
       (unless (file-exists-p (my/org-roam-project-file prj basename))
         (my/org-roam-project-create-new-file prj plist))
       (org-capture nil "d")))
+
+  (defun my/org-roam-project-basenames (prj)
+    (mapcar (lambda (i)
+              (string-remove-suffix ".org" i))
+            (seq-remove
+             (lambda (i) (member i '("personal.org" "tasks.org")))
+             (directory-files
+              (file-name-concat my/org-roam-project-root prj)
+              nil "\\`[^.]"))))
+
+  (defun my/org-roam-project-get-custom-params ()
+    (interactive)
+    (let* ((prj (my/org-roam-project-read))
+           (basename
+            (completing-read "basename: "
+                             (my/org-roam-project-basenames prj)
+                             nil 'confirm)))
+      (list prj basename)))
+
+  (defun my/org-roam-project-capture-custom (prj basename)
+    "Capture new journal for the selected project."
+    (interactive (my/org-roam-project-get-custom-params))
+    (my/org-roam-project-capture prj `( :basename ,basename
+                                        :target file
+                                        :headline "* %?")))
 
   (defun my/org-roam-project-capture-journal (prj)
     "Capture new journal for the selected project."
