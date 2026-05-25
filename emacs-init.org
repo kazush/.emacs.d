@@ -3583,15 +3583,15 @@ Enable indent-tabs-mode for makefile mode.
   :config
   ;; setting treesit-language-source-alist via :custom not working
   (setq treesit-language-source-alist
-        '((bash "https://github.com/tree-sitter/tree-sitter-bash")
-          (c "https://github.com/tree-sitter/tree-sitter-c")
+        '((bash "https://github.com/tree-sitter/tree-sitter-bash" "v0.23.3")
+          (c "https://github.com/tree-sitter/tree-sitter-c" "v0.23.4")
           (cmake "https://github.com/uyha/tree-sitter-cmake")
           (common-lisp "https://github.com/theHamsta/tree-sitter-commonlisp")
           (cpp "https://github.com/tree-sitter/tree-sitter-cpp" "v0.22.0")
           (css "https://github.com/tree-sitter/tree-sitter-css" "v0.20.0")
-          (csharp "https://github.com/tree-sitter/tree-sitter-c-sharp")
+          (csharp "https://github.com/tree-sitter/tree-sitter-c-sharp" "v0.23.1")
           (dockerfile "https://github.com/camdencheek/tree-sitter-dockerfile")
-          (elisp "https://github.com/Wilfred/tree-sitter-elisp")
+          (elisp "https://github.com/Wilfred/tree-sitter-elisp" "1.5.0")
           (go "https://github.com/tree-sitter/tree-sitter-go" "v0.20.0")
           (go-mod "https://github.com/camdencheek/tree-sitter-go-mod")
           (html "https://github.com/tree-sitter/tree-sitter-html" "v0.20.1")
