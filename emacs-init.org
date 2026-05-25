@@ -2478,7 +2478,7 @@ Mostly borrowed from https://taipapamotohus.com/post/dired/.
 
 #+begin_src emacs-lisp
 (use-package dired-quick-sort
-  :after dired
+  :after (dired transient)
   :config
   (dired-quick-sort-setup))
 #+end_src
