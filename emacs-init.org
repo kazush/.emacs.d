@@ -7807,7 +7807,45 @@ and stream is t."
   :config
   ;; Add time to the search result.
   (defun elfeed-search-format-date (date)
-    (format-time-string "%Y-%m-%d %H:%M" (seconds-to-time date)))
+    (format-time-string "%m-%d %H:%M" (seconds-to-time date)))
+
+  ;;
+  (defun my/elfeed-format-column-advice (orig-fn string width &optional align)
+    "pad a space when needed to support titles with multi-bytes better"
+    (let ((title (apply orig-fn (list string width align))))
+      (if (= (1+ (string-width title)) width)
+          (concat title " ")
+        title)))
+
+  (advice-add #'elfeed-format-column :around #'my/elfeed-format-column-advice)
+
+  ;; Patched version - adjusted title-width for my date format.
+  (defun elfeed-search-print-entry--default (entry)
+    "Print ENTRY to the buffer."
+    (let* ((date (elfeed-search-format-date (elfeed-entry-date entry)))
+           (title (or (elfeed-meta entry :title) (elfeed-entry-title entry) ""))
+           (title-faces (elfeed-search--faces (elfeed-entry-tags entry)))
+           (feed (elfeed-entry-feed entry))
+           (feed-title
+            (when feed
+              (or (elfeed-meta feed :title) (elfeed-feed-title feed))))
+           (tags (mapcar #'symbol-name (elfeed-entry-tags entry)))
+           (tags-str (mapconcat
+                      (lambda (s) (propertize s 'face 'elfeed-search-tag-face))
+                      tags ","))
+           (title-width (- (window-width) 11 elfeed-search-trailing-width))
+           (title-column (elfeed-format-column
+                          title (elfeed-clamp
+                                 elfeed-search-title-min-width
+                                 title-width
+                                 elfeed-search-title-max-width)
+                          :left)))
+      (insert (propertize date 'face 'elfeed-search-date-face) " ")
+      (insert (propertize title-column 'face title-faces 'kbd-help title) " ")
+      (when feed-title
+        (insert (propertize feed-title 'face 'elfeed-search-feed-face) " "))
+      (when tags
+        (insert "(" tags-str ")"))))
 
   ;; Faces
   (custom-set-faces
@@ -7941,7 +7979,7 @@ and stream is t."
     (elfeed-search-update))
 
   (advice-add #'elfeed-search-quit-window :before
-              (lambda () (my/elfeed-update-inmemory-db 30)))
+              (lambda () (my/elfeed-update-inmemory-db 60)))
 
   (defun my/elfeed-db-save ()
     (interactive)
