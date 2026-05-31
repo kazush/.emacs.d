@@ -2784,6 +2784,17 @@ Pin a window so that find-file or other operations won't steal the window.
 (global-set-key (kbd "C-c f") #'find-file-other-window)
 #+end_src
 
+** Move to last window
+
+#+begin_src elisp
+(defun my/switch-to-last-window ()
+  (interactive)
+  (let ((mru-window (get-mru-window nil t t nil)))
+    (when mru-window
+      (select-window mru-window))))
+(global-set-key (kbd "C-x o") #'my/switch-to-last-window)
+#+end_src
+
 ** Select another window in the reverse cyclic order
 
 #+begin_src emacs-lisp
