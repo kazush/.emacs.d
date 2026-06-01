@@ -2954,6 +2954,10 @@ the two windows.
 
 (defvar my/max-windows-per-frame 2)
 (defvar my/split-window-horizontally-min-width 100)
+(defun my/set-split-window-threshold (width)
+  (interactive "nWidth: ")
+  (setq my/split-window-horizontally-min-width width))
+
 (defun my/display-buffer-fallback-action (buf alist)
   "Return a window to display buffer BUF.  ALIST is not used.
 
