@@ -188,7 +188,8 @@ Customization for miscellaneous built-in features.
 
 ;; Shift key enables accelerated cursor movement on a per-word basis.
 (require 'misc)
-(global-set-key (kbd "C-S-f") 'forward-to-word)
+(global-set-key (kbd "M-f") 'forward-to-word)
+(global-set-key (kbd "C-S-f") 'forward-word)
 (global-set-key (kbd "C-S-b") 'backward-word)
 
 ;; Display function name in mode line.
