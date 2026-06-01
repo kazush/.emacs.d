@@ -6425,6 +6425,28 @@ Citar provides a rich UI frontend for org-cite. citar-org-roam provides more int
   (defvar my/org-gcal-fetch-timer (run-with-idle-timer 3600 nil #'my/org-gcal-fetch)))
 #+end_src
 
+** org-gtasks
+
+#+begin_src emacs-lisp
+(defun my/org-gtasks-setup ()
+  (interactive)
+  (let* ((el "~/lib/elisp/org-gtasks/org-gtasks.el")
+         (authinfo (car (auth-source-search :host "org-gtasks")))
+         (login (plist-get authinfo :user))
+         (client (plist-get authinfo :client))
+         (secret (auth-source-pick-first-password :host "org-gtasks")))
+    (when (file-exists-p el)
+      (load el)
+      (org-gtasks-register-account :name "default"
+                                   :directory "~/.emacs.d/gtasks/"
+                                   :login login
+                                   :client-id client
+                                   :client-secret secret))))
+
+(when (file-exists-p "~/org/gtasks.org")
+  (add-to-list 'org-agenda-files "~/org/gtasks.org" 'append))
+#+end_src
+
 ** org-super-agenda
 
 #+begin_src emacs-lisp
