@@ -1302,7 +1302,8 @@ goggles is now used instead of volatile-highlights.
     (interactive)
     (let* ((buf (or buf
                     (get-buffer
-                     (consult--read (mapcar #'buffer-name (consult--buffer-query))
+                     (consult--read (mapcar #'buffer-name (consult--buffer-query
+                                                           :sort 'visibility))
                                     :category 'buffer
                                     :require-match
                                     (confirm-nonexistent-file-or-buffer)
