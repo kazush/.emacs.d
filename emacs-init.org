@@ -2745,7 +2745,7 @@ Pin a window so that find-file or other operations won't steal the window.
 (define-key my/wm-map "d" #'my/toggle-window-dedicated)
 #+end_src
 
-** Move to last buffer
+** Move to last buffer or window
 
 #+begin_src emacs-lisp
 (defun my/switch-to-last-buffer ()
@@ -2755,6 +2755,13 @@ Pin a window so that find-file or other operations won't steal the window.
          (w (get-buffer-window b)))
     (if w (select-window w)
       (switch-to-buffer b))))
+(global-set-key (kbd "M-O") #'my/switch-to-last-buffer)
+
+(defun my/switch-to-last-window ()
+  (interactive)
+  (let ((mru-window (get-mru-window nil t t nil)))
+    (when mru-window
+      (select-window mru-window))))
 (global-set-key (kbd "M-o") #'my/switch-to-last-buffer)
 #+end_src
 
