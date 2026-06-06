@@ -4533,15 +4533,15 @@ https://github.com/anthropics/claude-code/issues/247#issuecomment-3058405139
 #+end_src
 *** Copilot Chat
 #+begin_src emacs-lisp
-(use-package copilot-chat
-  :straight (:host github :repo "chep/copilot-chat.el" :files ("*.el"))
-  :commands (copilot-chat-transient copilot-chat-display)
+(use-package gh-copilot-chat
+  :straight (:host github :repo "chep/gh-copilot-chat.el" :files ("*.el"))
+  :commands (gh-copilot-chat-transient gh-copilot-chat-display)
   :bind ( :map my/ai-map
-          ("C" . copilot-chat-transient))
+          ("C" . gh-copilot-chat-transient))
   :custom
-  (copilot-chat-backend 'curl)
-  (copilot-chat-frontend 'org)
-  (copilot-chat-commit-model "gpt-5-mini") ;; "gpt-4o", "o1-preview"
+  (gh-copilot-chat-backend 'curl)
+  (gh-copilot-chat-frontend 'org)
+  (gh-copilot-chat-commit-model "gpt-5-mini")
   )
 #+end_src
 
