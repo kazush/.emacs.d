@@ -3901,6 +3901,7 @@ Eldoc-box displays eldoc contents in a child frame but is currently disabled.
   :bind (("C-d" . delete-char)  ;; don't override C-d
          ("C-)" . puni-slurp-forward)
          ("C-(" . puni-barf-forward)
+         ("M-(" . puni-barf-forward)
          ("C-c '" . my/puni-wrap-single-quote)
          ("C-c \"" . my/puni-wrap-double-quote)
          ("C-c (" . puni-wrap-round)
@@ -8407,6 +8408,7 @@ and stream is t."
 
 #+begin_src emacs-lisp
 (use-package eaf
+  :unless (my/is-wsl)
   :straight (eaf :type git :host github
                  :repo "emacs-eaf/emacs-application-framework"
                  :depth 1 :branch "master"

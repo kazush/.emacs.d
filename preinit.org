@@ -5,3 +5,18 @@
 #+begin_src emacs-lisp
 (message "Loading preinit config...")
 #+end_src
+
+* WSL
+
+#+begin_src emacs-lisp
+(defun my/is-wsl ()
+  (file-exists-p "/dev/dxg"))
+#+end_src
+
+** maximize frame
+
+#+begin_src emacs-lisp
+(when (my/is-wsl)
+  (unless (daemonp)
+    (toggle-frame-maximized)))
+#+end_src
