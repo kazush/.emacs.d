@@ -2634,6 +2634,16 @@ Align tables with variable pitch fonts.
   (require 'vlf-setup))
 #+end_src
 
+** Interaction with Clipboard
+
+Workaround for missing non-ASCII text when pasting to GTK based application.
+
+#+begin_src emacs-lisp
+(defun my/wl-copy-region ()
+  (interactive)
+  (shell-command-on-region (mark) (point) "wl-copy > /dev/null 2>&1"))
+#+end_src
+
 * Window and workspace management
 ** Persp-mode
 
