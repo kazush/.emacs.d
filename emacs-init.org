@@ -4412,10 +4412,10 @@ https://github.com/anthropics/claude-code/issues/247#issuecomment-3058405139
         (agent-shell-make-environment-variables
          "ANTHROPIC_BASE_URL" "https://api.z.ai/api/anthropic"
          "API_TIMEOUT_MS" "3000000"
-         "ANTHROPIC_DEFAULT_OPUS_MODEL" "glm-4.7"
-         "ANTHROPIC_DEFAULT_SONNET_MODEL" "glm-4.7"
+         "ANTHROPIC_DEFAULT_OPUS_MODEL" "glm-5.2"
+         "ANTHROPIC_DEFAULT_SONNET_MODEL" "glm-5.2"
          "ANTHROPIC_DEFAULT_HAIKU_MODEL" "glm-4.7"
-         "ANTHROPIC_MODEL" "glm-4.7"
+         "ANTHROPIC_MODEL" "glm-5.2"
          "ANTHROPIC_SMALL_FAST_MODEL" "glm-4.5-air")))
 #+end_src
 
@@ -7154,6 +7154,8 @@ Macros to retrive API keys for LLM servce providers.
                                          :chat-model "gemini-3-pro-image-preview"))
             ("groq-gpt-oss-120b" . (my/make-llm-groq
                                     :chat-model "openai/gpt-oss-120b"))
+            ("opencode-mimo-v2.5" . (my/make-llm-opencode
+                                     :chat-model "mimo-v2.5"))
             ("opencode-kimi-k2.6" . (my/make-llm-opencode
                                      :chat-model "kimi-k2.6"))
             ("opencode-deepseek-v4-pro" . (my/make-llm-opencode
@@ -7173,7 +7175,9 @@ Macros to retrive API keys for LLM servce providers.
             ("zai-glm-4.7" . (my/make-llm-zai
                                      :chat-model "GLM-4.7"))
             ("zai-glm-5.1" . (my/make-llm-zai
-                                     :chat-model "GLM-5.1"))))
+                                     :chat-model "GLM-5.1"))
+            ("zai-glm-5.2" . (my/make-llm-zai
+                                     :chat-model "GLM-5.2"))))
 
   ;; Disable the nickname code; switching models mid-session won't reflect the update.
   ;; ;; Change AI's nickname as per the selected model.
@@ -7380,17 +7384,23 @@ Macros to retrive API keys for LLM servce providers.
     :models '(glm-5.1
               kimi-k2.5
               kimi-k2.6
+              kimi-k2.7-code
               deepseek-v4-flash
               deepseek-v4-pro
               qwen-3.5-plus
-              qwen-3.6-plus))
+              qwen-3.6-plus
+              qwen-3.7-plus
+              qwen-3.7-max
+              mimo-v2.5
+              mimo-v2.5-pro))
 
   (gptel-make-openai "OpenCode-Minimax"
     :host "opencode.ai"
     :endpoint "/zen/go/v1/messages"
     :stream t
     :key #'my/get-opencode-api-key
-    :models '(minimax-m2.5
+    :models '(minimax-m3
+              minimax-m2.5
               minimax-m2.7))
 
   (gptel-make-openai "OpenRouter"
@@ -7410,7 +7420,8 @@ Macros to retrive API keys for LLM servce providers.
     :endpoint "/api/coding/paas/v4/chat/completions"
     :stream t
     :key #'my/get-zai-api-key
-    :models '(GLM-5.1
+    :models '(GLM-5.2
+              GLM-5.1
               GLM-4.7
               GLM-4.5-air))
 
@@ -7428,7 +7439,7 @@ Macros to retrive API keys for LLM servce providers.
 
   ;; Set default backend.
   (setq gptel-backend (my/gptel-get-backend "Z.ai"))
-  (setq gptel-model 'GLM-5.1)
+  (setq gptel-model 'GLM-5.2)
 
   ;;
   ;; Tools - mostly copied from https://github.com/karthink/gptel/issues/514
