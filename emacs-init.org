@@ -5821,7 +5821,7 @@ lsp-mode. The formatter is available [[https://github.com/google/google-java-for
     (let* ((prj-dir (my/org-roam-project-dir prj))
            (basename (plist-get plist :basename))
            (file (my/org-roam-project-file prj basename))
-           (title (or (plist-get plist :title) (format "Project %s: %s" prj basename)))
+           (title (or (plist-get plist :title) (format "[%s] %s" prj basename)))
            (props (plist-get plist :property))
            (org-roam-capture-templates
             `(("d" "default - create a new node"
