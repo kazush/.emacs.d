@@ -2458,6 +2458,15 @@ Correct indentation on bullet lists in Markdown mode.
   :hook (visual-line-mode . adaptive-wrap-prefix-mode))
 #+end_src
 
+** Spacing between latin and non-latin words
+
+#+begin_src emacs-lisp
+(use-package pangu-spacing
+  :hook ((text-mode org-mode markdown-mode) . pangu-spacing-mode)
+  :custom
+  (pangu-spacing-real-insert-separtor t))
+#+end_src
+
 * Misc utilities and enhancements
 ** Dired
 
