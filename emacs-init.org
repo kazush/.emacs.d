@@ -2427,7 +2427,8 @@ Note that jit-spell only works well with aspell as aspell wisely ignores Japanes
 #+begin_src emacs-lisp
 (use-package jit-spell
   :if (file-executable-p "/usr/bin/aspell")
-  :hook ((text-mode markdown-mode) . jit-spell-mode)
+  :hook (((org-mode markdown-mode) . jit-spell-mode)
+         (text-mode . (lambda () (when (member major-mode '(text-mode)) (jit-spell-mode)))))
   :config
   (set-face-underline 'jit-spell-misspelling '(:style wave :color "#d2b580")))
 #+end_src
