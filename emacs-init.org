@@ -2399,6 +2399,7 @@ Do not forget to install aspell.
 (use-package jinx
   :disabled
   :diminish
+
   :bind (("M-$" . jinx-correct)
          ("C-M-$" . jinx-languages))
   :hook (((text-mode conf-mode markdown-mode) . jinx-mode))
@@ -2426,7 +2427,7 @@ Note that jit-spell only works well with aspell as aspell wisely ignores Japanes
 #+begin_src emacs-lisp
 (use-package jit-spell
   :if (file-executable-p "/usr/bin/aspell")
-  :hook ((text-mode conf-mode markdown-mode) . jit-spell-mode)
+  :hook ((text-mode markdown-mode) . jit-spell-mode)
   :config
   (set-face-underline 'jit-spell-misspelling '(:style wave :color "#d2b580")))
 #+end_src
