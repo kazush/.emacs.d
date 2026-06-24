@@ -7311,12 +7311,15 @@ Macros to retrive API keys for LLM servce providers.
 
   (gptel-make-gemini "Gemini"
     :key #'my/get-gemini-api-key
-    :models '(gemini-2.5-flash
+    :models '(gemma-4-26b-a4b-it
+              gemma-4-31b-it
+              gemini-3.5-flash
+              gemini-2.5-flash
               gemini-3-flash-preview
-              gemini-3.1-flash-lite-preview
+              gemini-3.1-flash-lite
               gemini-3.1-pro-preview
-              gemini-3.1-flash-image-preview
-              gemini-3-pro-image-preview)
+              gemini-3.1-flash-image
+              gemini-3-pro-image)
     :stream t)
 
   (gptel-make-gh-copilot "Copilot"
@@ -7421,11 +7424,12 @@ Macros to retrive API keys for LLM servce providers.
     :stream t
     :key #'my/get-openrouter-api-key
     :models '(moonshotai/kimi-k2.5
-              z-ai/glm-4.5-air:free
-              stepfun/step-3.5-flash:free
+              openai/gpt-oss-20b:free
+o              openai/gpt-oss-120b:free
+              google/gemma-4-31b-it:free
+              poolside/laguna-m.1:free
               nvidia/nemotron-3-super-120b-a12b:free
-              arcee-ai/trinity-large-preview:free
-              qwen/qwen3.6-plus:free))
+              nvidia/nemotron-3-ultra-550b-a55b:free))
 
   (gptel-make-openai "Z.ai"
     :host "api.z.ai"
