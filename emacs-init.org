@@ -2776,7 +2776,8 @@ Pin a window so that find-file or other operations won't steal the window.
          (w (get-buffer-window b)))
     (if w (select-window w)
       (switch-to-buffer b))))
-(global-set-key (kbd "M-O") #'my/switch-to-last-buffer)
+;; M-O breaks arrow keys in terminal.
+;; (global-set-key (kbd "M-O") #'my/switch-to-last-buffer)
 
 (defun my/switch-to-last-window ()
   (interactive)
