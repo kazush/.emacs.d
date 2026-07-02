@@ -992,10 +992,11 @@ new emacsclient is connected hence ~server-after-make-frame-hook~ is set here.
   ;; (tool-bar-mode -1)
   (my/setup-faces)
   (my/setup-keymap)
-  (when window-system
-    ;; (scroll-bar-mode -1)
-    ;; (fringe-mode 10)
-    (my/setup-fonts)))
+  (if window-system
+      ;; (scroll-bar-mode -1)
+      ;; (fringe-mode 10)
+      (my/setup-fonts)
+    (set-terminal-parameter nil 'background-mode 'dark)))
 
 (defun my/setup-default-frame-bgcolor ()
   "To resolve the issue where the server cannot create a new X frame when the unspecified-bg (tty-specific value) is set to background."
