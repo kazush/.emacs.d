@@ -3409,6 +3409,7 @@ fi
 #+begin_src emacs-lisp
 (use-package vterm
   :bind (("C-c s" . my/get-vterm)
+         ("C-c ESC" . my/vterm-send-esc)
          ("C-c C-z" . my/vterm-send-ctrl-z))
   :commands (vterm)
   :config
@@ -3436,6 +3437,9 @@ fi
     (my/shellish-toggle-buffer arg 'vterm-mode)
     )
 
+  (defun my/vterm-send-esc ()
+    (interactive)
+    (vterm-send-key (kbd "ESC")))
   (defun my/vterm-send-ctrl-z ()
     (interactive)
     (vterm-send-key (kbd "C-z")))
