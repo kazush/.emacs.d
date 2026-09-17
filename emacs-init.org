@@ -2151,12 +2151,14 @@ A new mode integrated in Emacs 30.
 
 ** Markdown
 
+*** markdown-mode
+
 #+begin_src emacs-lisp
 (use-package markdown-mode
   :commands (markdown-mode gfm-mode)
-  :mode (("README\\.md\\'" . gfm-mode)
-         ("\\.md\\'" . markdown-mode)
-         ("\\.markdown\\'" . markdown-mode))
+  ;; :mode (("README\\.md\\'" . gfm-mode)
+  ;;        ("\\.md\\'" . markdown-mode)
+  ;;        ("\\.markdown\\'" . markdown-mode))
   ;; :init
   ;; ;; gfm-preview is a 1-line script containing "grip --export $1 -"
   ;; (let ((cmd (expand-file-name "~/bin/gfm-preview")))
@@ -2185,6 +2187,16 @@ A new mode integrated in Emacs 30.
   )
 #+end_src
 
+*** md-mode
+
+#+begin_src emacs-lisp
+(use-package textui
+  :straight (:type git :host github :repo "yibie/textui"))
+
+(use-package md-mode
+  :straight (:type git :host github :repo "yibie/md-mode")
+  :mode ("\\.md\\'" . md-mode))
+#+end_src
 ** UML
 
 #+begin_src emacs-lisp
