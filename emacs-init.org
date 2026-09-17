@@ -623,12 +623,7 @@ called in hooks.
    '(diff-refine-removed ((t :foreground "unspecified" :background "#504040")))
    '(diff-refine-added ((t :foreground "unspecified" :background "#405040")))
    '(diff-refine-changed ((t :foreground "unspecified" :background "#404030"))))
-
-  (unless (daemonp)
-    (set-face-attribute 'mode-line-inactive nil
-                        :foreground "darkgray"
-                        :background "gray10"
-                        :inherit 'mode-line)))
+)
 
 (defun my/set-fontset-emoji-font (&optional font size fset)
   "Set up color emoji font to a given FONTSET or fontset for default face."

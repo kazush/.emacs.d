@@ -75,7 +75,11 @@
 
 (set-face-attribute 'mode-line nil
                     :foreground "#d3d3d3"
-                    :background "#000000")
+                    :background "#333333")
+(set-face-attribute 'mode-line-inactive nil
+                    :foreground "darkgray"
+                    :background "gray10"
+                    :inherit 'mode-line)
 
 ;; Initialize GUI frame parameters.
 (setq default-frame-alist
