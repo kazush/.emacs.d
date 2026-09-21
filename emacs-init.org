@@ -7904,9 +7904,7 @@ and stream is t."
               (message "[%s] elfeed-update done.%s"
                        (format-time-string "%Y-%m-%d %H:%M:%S")
                        (if updated
-                           (format " elfeed-db updated (%s)."
-                                   (with-current-buffer (elfeed-search-buffer)
-                                     (elfeed-search--count-unread)))
+                           " elfeed-db updated."
                          ""))))))))
 
   (defun my/elfeed (&optional days-back)
