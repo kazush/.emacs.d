@@ -2190,7 +2190,13 @@ A new mode integrated in Emacs 30.
 
 (use-package md-mode
   :straight (:type git :host github :repo "yibie/md-mode")
-  :mode ("\\.md\\'" . md-mode))
+  :mode ("\\.md\\'" . md-mode)
+  :hook ((md-mode . my/md-mode-hook-func))
+  :config
+
+  (defun my/md-mode-hook-func ()
+    (visual-line-mode +1)
+    (md-mode-render)))
 #+end_src
 ** UML
 
