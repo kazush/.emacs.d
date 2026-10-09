@@ -2195,8 +2195,7 @@ A new mode integrated in Emacs 30.
   :config
 
   (defun my/md-mode-hook-func ()
-    (visual-line-mode +1)
-    (md-mode-render)))
+    (visual-line-mode +1)))
 #+end_src
 ** UML
 
