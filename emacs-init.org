@@ -2854,7 +2854,8 @@ TBH I don't use this often.
   :bind (("C-c T" . treemacs-select-directory))
   :hook ((treemacs-mode . (lambda () (setq-local truncate-lines t))))
   :custom
-  (treemacs-default-visit-action 'treemacs-visit-node-vertical-split))
+  (treemacs-default-visit-action 'treemacs-visit-node-vertical-split)
+  (treemacs-missing-project-action 'remove))
 
 (use-package treemacs-magit
   :after (treemacs magit))
