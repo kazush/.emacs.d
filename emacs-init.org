@@ -946,6 +946,19 @@ Currently it is disabled as I don't want to build emacs-mozc on Arch.
   (global-mozc-modeless-mode 1))
 #+end_src
 
+*** ddskk
+
+#+begin_src emacs-lisp
+(use-package ddskk
+  :if (file-directory-p "/data/data/com.termux/")
+  :bind ("C-x C-j" . skk-mode)
+  :custom
+  (skk-large-jisyo "~/.emacs.d/dict/SKK-JISYO.L")
+  (skk-sticky-key ";")
+  (skk-show-inline t)
+  (skk-dcomp-activate t))
+#+end_src
+
 ** Misc input tweaks
 
 #+begin_src emacs-lisp
