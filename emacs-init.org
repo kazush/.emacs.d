@@ -953,7 +953,6 @@ Currently it is disabled as I don't want to build emacs-mozc on Arch.
   :if (file-directory-p "/data/data/com.termux/")
   :bind ("C-x C-j" . skk-mode)
   :custom
-  (skk-large-jisyo "~/.emacs.d/dict/SKK-JISYO.L")
   (skk-sticky-key ";")
   (skk-show-inline t)
   (skk-dcomp-activate t))
