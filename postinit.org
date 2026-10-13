@@ -3,6 +3,7 @@
 #+property: header-args :tangle yes
 
 #+begin_src emacs-lisp
+;; -*- lexical-binding: t; -*-
 (message "Loading postinit config...")
 #+end_src
 

@@ -1,3 +1,4 @@
+;; -*- lexical-binding: t; -*-
 ;; (require 'profiler)
 ;; (profiler-start 'cpu)
 
