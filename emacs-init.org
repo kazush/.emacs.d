@@ -4393,6 +4393,7 @@ https://github.com/anthropics/claude-code/issues/247#issuecomment-3058405139
 
 #+begin_src emacs-lisp
 (use-package ai-code
+  :disabled
   :straight (:host github :repo "tninja/ai-code-interface.el")
   :bind ( :map my/ai-map
           ("a" . 'ai-code-menu))
@@ -4410,10 +4411,12 @@ https://github.com/anthropics/claude-code/issues/247#issuecomment-3058405139
 #+begin_src emacs-lisp
 ;; install required inheritenv dependency:
 (use-package inheritenv
+  :disabled
   :straight (:type git :host github :repo "purcell/inheritenv"))
 
 ;; install claude-code.el, using :depth 1 to reduce download size:
 (use-package claude-code
+  :disabled
   :straight (:type git :host github :repo "stevemolitor/claude-code.el" :branch "main" :depth 1
                    :files ("*.el" (:exclude "images/*")))
   :bind-keymap
@@ -4455,6 +4458,7 @@ https://github.com/anthropics/claude-code/issues/247#issuecomment-3058405139
 
 #+begin_src emacs-lisp
 (use-package claude-code-ide
+  :disabled
   :straight (:type git :host github :repo "manzaltu/claude-code-ide.el")
   :bind ( :map my/ai-map
           ("c" . claude-code-ide-menu)) ; Set your favorite keybinding
